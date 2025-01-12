@@ -1,0 +1,244 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+# change all " 0 " in eval_card to " TalismanCompat(0) "
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "if chips > 0 then"
+position = "at"
+payload = "if TalismanCompat(chips) > TalismanCompat(0) then"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "if mult > 0 then"
+position = "at"
+payload = "if TalismanCompat(mult) > TalismanCompat(0) or TalismanCompat(mult) < TalismanCompat(0) then"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "if x_mult > 0 then"
+position = "at"
+payload = "if TalismanCompat(x_mult) > TalismanCompat(0) then"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "if p_dollars > 0 then"
+position = "at"
+payload = "if TalismanCompat(p_dollars) > TalismanCompat(0) then"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "if h_mult > 0 then"
+position = "at"
+payload = "if TalismanCompat(h_mult) > TalismanCompat(0) then"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "if h_x_mult > 0 then"
+position = "at"
+payload = "if TalismanCompat(h_x_mult) > TalismanCompat(0) then"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "if amt > 0 or amt < 0 then"
+position = "at"
+payload = "if TalismanCompat(amt) > TalismanCompat(0) or TalismanCompat(amt) < TalismanCompat(0) then"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/misc_functions.lua"
+pattern = "assembled_string = assembled_string..(type(subpart) == 'string' and subpart or args.vars[tonumber(subpart[1])])"
+position = "at"
+payload = "assembled_string = assembled_string..(type(subpart) == 'string' and subpart or tostring(args.vars[tonumber(subpart[1])]))"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = "if self.ability.x_mult <= 1 then return 0 end"
+position = "before"
+payload = "if self.ability.x_mult == nil then return 0 end"
+match_indent = true
+
+# Half-life changing displayed joker limit in CardArea:draw()
+[[patches]]
+[patches.pattern]
+target = "cardarea.lua"
+pattern = "{n=G.UIT.T, config={ref_table = self.config, ref_value = 'card_limit', scale = 0.3, colour = G.C.WHITE}},"
+position = "at"
+payload = "{n=G.UIT.T, config={ref_table = self.config, ref_value = self==G.jokers and used_voucher and used_voucher('half_life') and 'card_limit_ref' or 'card_limit', scale = 0.3, colour = G.C.WHITE}},"
+match_indent = true
+
+# Reincarnate changing get_current_pool to be able to return specific rarity of jokers and supporting mod rarities as long as these jokers are in G.P_JOKER_RARITY_POOLS. Set _append to BetmmaAssigningRarity and set _legendary to rarity you want
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "_starting_pool, _pool_key = G.P_JOKER_RARITY_POOLS[rarity], 'Joker'..rarity..((not _legendary and _append) or '')"
+position = "before"
+payload = '''
+    if _append=='BetmmaAssigningRarity' and (_legendary) then
+        rarity=_legendary
+    end
+'''
+match_indent = true
+
+# Forbidden Area adds consumables to joker slots
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = "G.consumeables:emplace(c1)"
+position = "at"
+payload = '''
+    if not (#G.consumeables.cards < G.consumeables.config.card_limit + ((c1.edition and c1.edition.negative) and 1 or 0)) and c1.betmma_forbidden_area_bought then
+        G.jokers:emplace(c1)
+    else
+        G.consumeables:emplace(c1)
+    end
+'''
+match_indent = true
+
+# Bargain/Clearance Aisle setting first item/pack to $0
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "G.GAME.tags[i]:apply_to_run({type = 'shop_final_pass'})"
+position = "after"
+payload = '''
+    end
+    if used_voucher('bargain_aisle') then
+        bargain_aisle_effect()
+    end
+    if used_voucher('clearance_aisle') then
+        clearance_aisle_effect()
+'''
+match_indent = true
+
+# Rich/Richer Boss effect
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = "G.GAME.orbital_choices = G.GAME.orbital_choices or {}"
+position = "before"
+payload = '''
+    local betmma_extra_blind_money=0
+    if type=='Boss' and betmma_rich_boss_bonus then
+        betmma_extra_blind_money=betmma_extra_blind_money+betmma_rich_boss_bonus()
+    end
+    local function string_rep(string,times)
+        local ans=""
+        if times<=8 then
+            for i=1,times do
+                ans=ans..string
+            end
+        else
+            ans=string..times
+        end
+        return ans
+    end
+'''
+match_indent = true
+
+# Rich/Richer Boss effect
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''{n=G.UIT.T, config={text = string.rep(localize("$"), blind_choice.config.dollars)..'+', scale = 0.35, colour = disabled and G.C.UI.TEXT_INACTIVE or G.C.MONEY, shadow = not disabled}}'''
+position = "at"
+payload = '''
+    {n=G.UIT.T, config={text = string_rep(localize("$"), blind_choice.config.dollars+betmma_extra_blind_money)..'+', scale = 0.35, colour = disabled and G.C.UI.TEXT_INACTIVE or G.C.MONEY, shadow = not disabled}}
+'''
+match_indent = true
+
+# Rich/Richer Boss effect
+[[patches]]
+[patches.pattern]
+target = "blind.lua"
+pattern = '''G.GAME.current_round.dollars_to_be_earned = self.dollars > 0 and (string.rep(localize('$'), self.dollars)..'') or ('')'''
+position = "at"
+payload = '''
+    if self.boss and betmma_rich_boss_bonus then
+        self.dollars=self.dollars+betmma_rich_boss_bonus()
+    end
+    local function string_rep(string,times)
+        local ans=""
+        if times<=8 then
+            for i=1,times do
+                ans=ans..string
+            end
+        else
+            ans=string..times
+        end
+        return ans
+    end
+    G.GAME.current_round.dollars_to_be_earned = self.dollars > 0 and (string_rep(localize('$'), self.dollars)..'') or ('')
+    if self.boss and betmma_rich_boss_bonus then
+        self.dollars=self.dollars-betmma_rich_boss_bonus()
+    end
+'''
+match_indent = true
+
+# Garbage Bag and Handbag effect
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''G.GAME.current_round.discards_left = math.max(0, G.GAME.round_resets.discards + G.GAME.round_bonus.discards)'''
+position = "before"
+payload = '''
+if used_voucher and used_voucher('garbage_bag') then
+    G.GAME.betmma_discards_left_ref=G.GAME.current_round.discards_left or 0
+end
+if used_voucher and used_voucher('handbag') then
+    G.GAME.betmma_hands_left_ref=G.GAME.current_round.hands_left or 0
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''G.GAME.current_round.hands_left = (math.max(1, G.GAME.round_resets.hands + G.GAME.round_bonus.next_hands))'''
+position = "after"
+payload = '''
+if used_voucher and used_voucher('garbage_bag') then
+    G.GAME.current_round.discards_left = G.GAME.current_round.discards_left + G.GAME.betmma_discards_left_ref
+end
+if used_voucher and used_voucher('handbag') then
+    G.GAME.current_round.hands_left = G.GAME.current_round.hands_left + G.GAME.betmma_hands_left_ref
+end
+'''
+match_indent = true
+
+
+
+# Garbage Bag and Handbag effect (Why setting hands and discards twice in both cash out and new round?)
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''G.GAME.current_round.hands_left = (math.max(1, G.GAME.round_resets.hands + G.GAME.round_bonus.next_hands))'''
+position = "after"
+payload = '''
+if used_voucher and used_voucher('garbage_bag') then
+    G.GAME.current_round.discards_left = G.GAME.current_round.discards_left + (G.GAME.betmma_discards_left_ref or 0)
+end
+if used_voucher and used_voucher('handbag') then
+    G.GAME.current_round.hands_left = G.GAME.current_round.hands_left + (G.GAME.betmma_hands_left_ref or 0)
+end
+'''
+match_indent = true
