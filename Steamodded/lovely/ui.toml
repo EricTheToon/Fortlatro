@@ -1,0 +1,359 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+### Addition Tab
+
+## Jokers tab
+# create_UIBox_your_collection_jokers()
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''local joker_options = {}'''
+position = "before"
+payload = '''
+local joker_pool = SMODS.collection_pool(G.P_CENTER_POOLS.Joker)'''
+match_indent = true
+
+# create_UIBox_your_collection_jokers()
+[[patches]]
+[patches.regex]
+target = 'functions/UI_definitions.lua'
+pattern = '''(?<indent>[\t ]*)for i = 1, math\.ceil\(#G\.P_CENTER_POOLS\.Joker\/\(5\*#G\.your_collection\)\) do\n[\s\S]{4}table\.insert\(joker_options, localize\('k_page'\)..' '..tostring\(i\)..'\/'..tostring\(math\.ceil\(#G\.P_CENTER_POOLS\.Joker\/\(5\*#G\.your_collection\)\)\)\)'''
+position = 'at'
+payload = '''
+for i = 1, math.ceil(#joker_pool/(5*#G.your_collection)) do
+    table.insert(joker_options, localize('k_page')..' '..tostring(i)..'/'..tostring(math.ceil(#joker_pool/(5*#G.your_collection))))'''
+line_prepend = '$indent'
+
+# create_UIBox_your_collection_jokers()
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''local center = G.P_CENTER_POOLS["Joker"][i+(j-1)*5]'''
+position = "at"
+payload = '''
+local center = joker_pool[i+(j-1)*5]
+if not center then break end'''
+match_indent = true
+
+# create_UIBox_your_collection_jokers()
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''local t =  create_UIBox_generic_options({ back_func = 'your_collection', contents = {'''
+position = "at"
+payload = '''local t =  create_UIBox_generic_options({ back_func = G.ACTIVE_MOD_UI and "openModUI_"..G.ACTIVE_MOD_UI.id or 'your_collection', contents = {'''
+match_indent = true
+
+# G.FUNCS.your_collections_joker_page
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''for i = 1, 5 do'''
+position = "before"
+payload = '''
+local joker_pool = SMODS.collection_pool(G.P_CENTER_POOLS.Joker)
+'''
+match_indent = true
+
+# G.FUNCS.your_collection_joker_page
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''local center = G.P_CENTER_POOLS["Joker"][i+(j-1)*5 + (5*#G.your_collection*(args.cycle_config.current_option - 1))]'''
+position = "at"
+payload = '''local center = joker_pool[i+(j-1)*5 + (5*#G.your_collection*(args.cycle_config.current_option - 1))]'''
+match_indent = true
+
+## Decks tab
+# create_UIBox_your_collection_decks()
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''G.GAME.viewed_back = Back(G.P_CENTERS.b_red)'''
+position = "at"
+payload = '''
+local deck_pool = SMODS.collection_pool(G.P_CENTER_POOLS.Back)
+G.GAME.viewed_back = Back(G.ACTIVE_MOD_UI and deck_pool[1] or G.P_CENTERS.b_red)'''
+match_indent = true
+
+# create_UIBox_your_collection_decks()
+[[patches]]
+[patches.regex]
+target = 'functions/UI_definitions.lua'
+pattern = '''(?<indent>[\t ]*)for k, v in ipairs\(G\.P_CENTER_POOLS\.Back\) do\n[\s\S]{4}ordered_names\[#ordered_names\+1\] = v\.name\n[\s\S]{2}end'''
+position = 'at'
+payload = '''
+for k, v in ipairs(deck_pool) do
+    ordered_names[#ordered_names+1] = v.key
+end'''
+line_prepend = '$indent'
+
+## Note: This covers Decks, Boosters, and Tags
+# create_UIBox_your_collection_decks() and create_UIBox_your_collection_boosters() and create_UIBox_your_collection_tags()
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''local t = create_UIBox_generic_options({ back_func = 'your_collection', contents = {'''
+position = "at"
+payload = '''local t = create_UIBox_generic_options({ back_func = G.ACTIVE_MOD_UI and "openModUI_"..G.ACTIVE_MOD_UI.id or 'your_collection', contents = {'''
+match_indent = true
+
+# G.FUNCS.your_collection_deck_page
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''G.GAME.viewed_back:change_to(G.P_CENTER_POOLS.Back[args.to_key])'''
+position = "at"
+payload = '''
+local deck_pool = SMODS.collection_pool(G.P_CENTER_POOLS.Back)
+G.GAME.viewed_back:change_to(deck_pool[args.to_key])'''
+match_indent = true
+
+## Boosters Page
+# create_UIBox_your_collection_boosters()
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''local booster_options = {}'''
+position = "before"
+payload = '''
+local booster_pool = SMODS.collection_pool(G.P_CENTER_POOLS.Booster)'''
+match_indent = true
+
+# create_UIBox_your_collection_boosters()
+[[patches]]
+[patches.regex]
+target = 'functions/UI_definitions.lua'
+pattern = '''(?<indent>[\t ]*)for i = 1, math\.ceil\(#G\.P_CENTER_POOLS\.Booster\/8\) do\n[\s\S]{4}table\.insert\(booster_options, localize\('k_page'\)..' '..tostring\(i\)..'\/'..tostring\(math\.ceil\(#G\.P_CENTER_POOLS\.Booster\/8\)\)\)'''
+position = 'at'
+payload = '''
+for i = 1, math.ceil(#booster_pool/8) do
+    table.insert(booster_options, localize('k_page')..' '..tostring(i)..'/'..tostring(math.ceil(#booster_pool/8)))'''
+line_prepend = '$indent'
+
+# create_UIBox_your_collection_boosters()
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
+pattern = '''local center = G.P_CENTER_POOLS["Booster"][i+(j-1)*4]'''
+position = 'at'
+payload = '''
+local center = booster_pool[i+(j-1)*4]
+if not center then break end'''
+match_indent = true
+
+# G.FUNCS.your_collection_booster_page
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''G.FUNCS.your_collection_booster_page = function(args)'''
+position = "after"
+payload = '''
+local booster_pool = SMODS.collection_pool(G.P_CENTER_POOLS.Booster)'''
+match_indent = true
+
+# G.FUNCS.your_collection_booster_page
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''local center = G.P_CENTER_POOLS["Booster"][i+(j-1)*4 + (8*(args.cycle_config.current_option - 1))]'''
+position = "at"
+payload = '''local center = booster_pool[i+(j-1)*4 + (8*(args.cycle_config.current_option - 1))]'''
+match_indent = true
+
+## Voucher Tabs
+# create_UIBox_your_collection_vouchers()
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''local voucher_options = {}'''
+position = "before"
+payload = '''
+local voucher_pool = SMODS.collection_pool(G.P_CENTER_POOLS.Voucher)'''
+match_indent = true
+
+# create_UIBox_your_collection_vouchers()
+[[patches]]
+[patches.regex]
+target = 'functions/UI_definitions.lua'
+pattern = '''(?<indent>[\t ]*)for i = 1, math\.ceil\(#G\.P_CENTER_POOLS\.Voucher\/\(4\*#G\.your_collection\)\) do\n[\s\S]{4}table\.insert\(voucher_options, localize\('k_page'\)..' '..tostring\(i\)..'\/'..tostring\(math\.ceil\(#G\.P_CENTER_POOLS\.Voucher\/\(4\*#G\.your_collection\)\)\)\)'''
+position = 'at'
+payload = '''
+  for i = 1, math.ceil(#voucher_pool/(4*#G.your_collection)) do
+    table.insert(voucher_options, localize('k_page')..' '..tostring(i)..'/'..tostring(math.ceil(#voucher_pool/(4*#G.your_collection))))'''
+line_prepend = '$indent'
+
+# create_UIBox_your_collection_boosters()
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
+pattern = '''local center = G.P_CENTER_POOLS["Voucher"][i+(j-1)*4]'''
+position = 'at'
+payload = '''
+local center = voucher_pool[i+(j-1)*4]
+if not center then break end'''
+match_indent = true
+
+## Note: This covers Blinds and Vouchers
+# create_UIBox_your_collection_vouchers() and create_UIBox_your_collection_blinds()
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''local t = create_UIBox_generic_options({ back_func = exit or 'your_collection', contents = {'''
+position = "at"
+payload = '''local t = create_UIBox_generic_options({ back_func = G.ACTIVE_MOD_UI and "openModUI_"..G.ACTIVE_MOD_UI.id or exit or 'your_collection', contents = {'''
+match_indent = true
+
+# G.FUNCS.your_collection_voucher_page
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''G.FUNCS.your_collection_voucher_page = function(args)'''
+position = "after"
+payload = '''
+local voucher_pool = SMODS.collection_pool(G.P_CENTER_POOLS.Voucher)'''
+match_indent = true
+
+# G.FUNCS.your_collection_voucher_page
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''local center = G.P_CENTER_POOLS["Voucher"][i+(j-1)*4 + (8*(args.cycle_config.current_option - 1))]'''
+position = "at"
+payload = '''local center = voucher_pool[i+(j-1)*4 + (8*(args.cycle_config.current_option - 1))]'''
+match_indent = true
+
+# create_UIBox_your_collection()
+[[patches]]
+[patches.regex]
+target = 'functions/UI_definitions.lua'
+pattern = '''(?<indent>[\t ]*)UIBox_button\(\{button = 'your_collection_blinds', label = \{localize\('b_blinds'\)\}, count = G\.DISCOVER_TALLIES\.blinds, minw = 5, minh = 2.0, id = 'your_collection_blinds', focus_args = \{snap_to = true\}\}\),'''
+position = 'after'
+payload = '''UIBox_button({button = 'your_collection_other_gameobjects', label = {localize('k_other')}, minw = 5, id = 'your_collection_other_gameobjects', focus_args = {snap_to = true}}),'''
+
+# Fix UIElement.config.chosen being overriden if choice=true is set
+# UIElement:click()
+[[patches]]
+[patches.pattern]
+target = "engine/ui.lua"
+match_indent = true
+position = "after"
+pattern = "if self.config.choice then"
+payload = "    local chosen_temp = self.config.chosen"
+
+[[patches]]
+[patches.pattern]
+target = "engine/ui.lua"
+match_indent = true
+position = "at"
+pattern = "self.config.chosen = true"
+payload = "self.config.chosen = chosen_temp or true"
+
+# Escape from mod menu saves config
+# Needs to be before all checks
+[[patches]]
+[patches.pattern]
+target = 'engine/controller.lua'
+pattern = "function Controller:key_press_update(key, dt)"
+position = "after"
+payload = '''
+    if key == "escape" and G.ACTIVE_MOD_UI then
+        G.FUNCS.exit_mods()
+    end
+'''
+match_indent = true
+
+[[patches]]
+[patches.regex]
+target = 'functions/UI_definitions.lua'
+position = 'before'
+line_prepend = '$indent'
+pattern = '''
+(?<indent>[\t ]*)return \{n=G\.UIT\.ROOT, config = \{align = 'cm', colour = G\.C\.CLEAR\}, nodes=\{
+[\t ]*\{n=G\.UIT\.C,'''
+payload = '''
+local cols
+if #info_boxes <= 3 then
+    cols = 1
+elseif #info_boxes <= 10 then
+    cols = 2
+elseif #info_boxes <= 24 then
+    cols = 3
+else
+    cols = 4
+end
+local nodes_per_col = math.ceil(#info_boxes/cols)
+local info_cols = {}
+for i = 0, cols-1 do
+    local col = {}
+    for j = 1, nodes_per_col do
+        local info_box = info_boxes[i*nodes_per_col+j]
+        if info_box then
+            table.insert(col, info_box)
+        else break end
+    end
+    table.insert(info_cols, {n=G.UIT.C, config = {align="cm"}, nodes = col})
+end
+info_boxes = {{n=G.UIT.R, config = {align="cm", padding = 0.05, card_pos = card.T.x }, nodes = info_cols}}
+'''
+
+[[patches]]
+[patches.pattern]
+target = 'functions/button_callbacks.lua'
+match_indent = true
+position = 'at'
+pattern = "config = {offset = {x=-0.03,y=0}, align = 'cl', parent = e}"
+payload = """config = (not e.config.ref_table or not e.config.ref_table[1].config.card_pos or e.config.ref_table[1].config.card_pos > G.ROOM.T.w*0.4) and
+    {offset = {x=-0.03,y=0}, align = 'cl', parent = e} or
+    {offset = {x=0.03,y=0}, align = 'cr', parent = e}"""
+
+[[patches]]
+[patches.pattern]
+target = 'tag.lua'
+match_indent = true
+position = 'at'
+pattern = "_self.config.h_popup_config ={align = 'cl', offset = {x=-0.1,y=0},parent = _self}"
+payload = """_self.config.h_popup_config = (_self.T.x > G.ROOM.T.w*0.4) and
+    {align =  'cl', offset = {x=-0.1,y=0},parent = _self} or
+    {align =  'cr', offset = {x=0.1,y=0},parent = _self}"""
+    
+# desc_from_rows
+[[patches]]
+[patches.regex]
+target = 'functions/UI_definitions.lua'
+position = 'at'
+pattern = 'colour = empty and G\.C\.CLEAR or G\.C\.UI\.BACKGROUND_WHITE'
+payload = 'colour = desc_nodes.background_colour or empty and G.C.CLEAR or G.C.UI.BACKGROUND_WHITE'
+
+# info_tip_from_rows
+[[patches]]
+[patches.regex]
+target = 'functions/UI_definitions.lua'
+position = 'at'
+pattern = 'padding = 0\.05, colour = G\.C\.WHITE\}'
+payload = 'padding = 0.05, colour = desc_nodes.background_colour or G.C.WHITE}'
+
+# localize
+[[patches]]
+[patches.regex]
+target = 'functions/misc_functions.lua'
+position = 'after'
+pattern = '\(part\.control\.C and loc_colour\(part\.control\.C\)\)'
+payload = ' or args.text_colour'
+
+[[patches]]
+[patches.regex]
+target = 'functions/misc_functions.lua'
+position = 'at'
+pattern = 'loc_colour\(part\.control\.C or nil, args\.default_col\)'
+payload = 'not part.control.C and args.text_colour or loc_colour(part.control.C or nil, args.default_col)'
+
+[[patches]]
+[patches.regex]
+target = 'functions/misc_functions.lua'
+position = 'after'
+pattern = 'part\.control\.s and tonumber\(part\.control\.s\)'
+payload = ' or args.scale '
