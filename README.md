@@ -7,3 +7,5 @@ featuring as of right now
 # 1 Spectral
 # 10 Consumables
 # 1 Blind
+
+# im pretty sure you need ALL the included mod files for other mods here so please use them idk im really bad at coding
