@@ -1,0 +1,164 @@
+[manifest]
+version = '1.0.0'
+dump_lua = true
+priority = 0
+
+# temp changes to run
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = 'if (not G.hand.cards[1]) and G.deck.cards[1] then'
+position = 'at'
+payload = '''if (not G.hand.cards[1]) and G.deck.cards[1] and not G.GAME.cere then'''
+match_indent = true
+
+
+# general perk functionality
+
+# temp changes to run
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = 'self.GAME = saveTable and saveTable.GAME or self:init_game_object()'
+position = 'after'
+payload = '''self.GAME.cere = self.GAME.cere or {jokers = {}, hand_size = 0, shredded ={}, can_hit = true, can_stand = true}'''
+match_indent = true
+
+# TODO seperate hand for perk cards
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''self.deck = CardArea('''
+position = "before"
+payload = '''self.cere_perks = not Ceres.COMPAT.loyaltycard and CardArea(
+        0, 0,
+        CAI.hand_W,CAI.hand_H, 
+        {card_limit = self.GAME.starting_params.hand_size, type = 'hand'})'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = '''G.discard.T.x = G.jokers.T.x + G.jokers.T.w/2 + 0.3 + 15'''
+position = "before"
+payload = '''if G.cere_perks then 
+        G.cere_perks.T.x = G.TILE_W - G.cere_perks.T.w - 2.85
+        G.cere_perks.T.y = G.TILE_H - (0.5 * G.cere_perks.T.h)
+        G.cere_perks:hard_set_VT()
+end'''
+match_indent = true
+
+# exploit area?
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''self.deck = CardArea('''
+position = "before"
+payload = '''self.cere_exploit = not Ceres.COMPAT.loyaltycard and CardArea(
+        0, 0,
+        CAI.play_W,CAI.play_H, 
+        {card_limit = 1, type = 'play'})'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = '''G.discard.T.x = G.jokers.T.x + G.jokers.T.w/2 + 0.3 + 15'''
+position = "before"
+payload = '''
+if G.cere_exploit then
+        G.cere_exploit.T.x = G.play.T.x
+        G.cere_exploit.T.y = G.play.T.y
+        G.cere_exploit:hard_set_VT()
+end'''
+match_indent = true
+
+# card burning functionality
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''if (not v.shattered) and (not v.destroyed) then'''
+position = "at"
+payload = '''if (not v.shattered) and (not v.destroyed) and (not v.burnt) and (not v.shredded) then'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''self.deck = CardArea('''
+position = "before"
+payload = '''self.cere_burnt = not Ceres.COMPAT.loyaltycard and CardArea(
+        0, 0,
+        CAI.discard_W,CAI.discard_H,
+        {card_limit = 500, type = 'discard'})'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = '''G.discard.T.x = G.jokers.T.x + G.jokers.T.w/2 + 0.3 + 15'''
+position = "before"
+payload = '''
+if G.cere_burnt then
+        G.cere_burnt.T.x = G.jokers.T.x + G.jokers.T.w/2 + 0.3 + 15
+        G.cere_burnt.T.y = 4.2
+        G.cere_burnt:hard_set_VT()
+end'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''G.GAME.voucher_restock = nil'''
+position = "before"
+payload = '''G.FUNCS.cere_draw_from_burnt_to_discard()'''
+match_indent = true
+
+# TODO card shredding
+
+# fixes bug that disallowed selecting perk cards from booster packs
+[[patches]]
+[patches.pattern]
+target = 'functions/button_callbacks.lua'
+pattern = '''elseif card.ability.set == 'Enhanced' or card.ability.set == 'Default' then'''
+position = "at"
+payload = '''elseif card.ability.set == 'Enhanced' or card.ability.set == 'Default' or card.ability.set == 'Perk' then'''
+match_indent = true
+
+# disallow changing edition/enhancement/seal on perk cards
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = '''function Card:set_ability(center, initial, delay_sprites)'''
+position = "after"
+payload = '''   if self.ability and self.ability.set == 'Perk' then return end'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = '''function Card:set_edition(edition, immediate, silent)'''
+position = "after"
+payload = '''   if self.ability and self.ability.set == 'Perk' then return end'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = '''function Card:set_seal(_seal, silent, immediate)'''
+position = "after"
+payload = '''   if self.ability and self.ability.set == 'Perk' then return end'''
+match_indent = true
+
+# starting with 0 advantage
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''self.GAME.round_resets.hands = self.GAME.starting_params.hands'''
+position = "after"
+payload = '''if not Ceres.COMPAT.loyaltycard then
+        self.GAME.round_resets.advantage = self.GAME.starting_params.advantage
+end'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''G.GAME.current_round.hands_left = G.GAME.round_resets.hands'''
+position = "after"
+payload = '''if not Ceres.COMPAT.loyaltycard then
+        G.GAME.current_round.advantage_left = G.GAME.round_resets.advantage
+end'''
+match_indent = true

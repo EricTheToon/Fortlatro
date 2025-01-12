@@ -1,0 +1,13 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 1
+
+# more than 2 boosters
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "for i = 1, 2 do"
+position = "at"
+payload = "for i = 1, ((not Ceres.COMPAT.cryptid and (G.GAME.modifiers.cere_boosters or 0) + 2) or (G.GAME.modifiers.cry_booster_packs or 2)) do"
+match_indent = true

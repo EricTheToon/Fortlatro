@@ -1,0 +1,219 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "if effects.jokers.Xmult_mod then mult = mod_mult(mult*effects.jokers.Xmult_mod);extras.mult = true  end"
+position = "after"
+payload = '''
+if effects.jokers.cere_Emult_mod then mult = mod_mult(mult^effects.jokers.cere_Emult_mod);extras.mult = true end
+if effects.jokers.cere_Xchip_mod then hand_chips = mod_chips(hand_chips*effects.jokers.cere_Xchip_mod);extras.hand_chips = true end
+if effects.jokers.cere_Echip_mod then hand_chips = mod_chips(hand_chips^effects.jokers.cere_Echip_mod);extras.hand_chips = true end'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "if effect.Xmult_mod then mult = mod_mult(mult*effect.Xmult_mod);extras.mult = true  end"
+position = "after"
+payload = '''
+if effect.cere_Emult_mod then mult = mod_mult(mult^effect.cere_Emult_mod);extras.mult = true end
+if effect.cere_Xchip_mod then hand_chips = mod_chips(hand_chips*effect.cere_Xchip_mod);extras.hand_chips = true end
+if effect.cere_x_chips then hand_chips = mod_chips(hand_chips*effect.cere_x_chips);extras.hand_chips = true end
+if effect.cere_Echip_mod then hand_chips = mod_chips(hand_chips^effect.cere_Echip_mod);extras.hand_chips = true end'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "elseif eval_type == 'dollars' then"
+position = "before"
+payload = '''
+elseif eval_type == 'cere_h_chips' then 
+	sound = 'chips1'
+	amt = amt
+	colour = G.C.CHIPS
+	text = localize{type='variable',key='a_chips',vars={amt}}
+    config.type = 'fade'
+	delay = 0.7
+elseif eval_type == 'cere_x_chips' then 
+	sound = 'chips1'
+	amt = amt
+	text = 'X' .. amt
+	colour = G.C.CHIPS
+	config.type = 'fade'
+	config.scale = 0.7
+elseif eval_type == 'cere_e_chips' then 
+	sound = 'chips1'
+	amt = amt
+	text = '^' .. amt
+	colour = G.C.CHIPS
+	config.type = 'fade'
+	config.scale = 0.7
+elseif eval_type == 'cere_e_mult' then 
+	sound = 'multhit2'
+	amt = amt
+	text = '^' .. amt .. ' Mult'
+	colour = G.C.MULT
+	config.type = 'fade'
+	config.scale = 0.7
+elseif eval_type == 'cere_damage' then 
+	sound = 'multhit1'
+	amt = amt
+	text = amt .. ' Damage'
+	colour = G.C.MULT
+	config.type = 'fade'
+	config.scale = 0.7'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "if effects[ii].message then"
+position = "before"
+payload = '''
+if effects[ii].cere_h_chips then
+	mod_percent = true
+	hand_chips = mod_chips(hand_chips+effects[ii].cere_h_chips)
+	update_hand_text({delay = 0}, {chips = hand_chips})
+	card_eval_status_text(G.hand.cards[i], 'cere_h_chips', effects[ii].cere_h_chips, percent)
+end
+if effects[ii].cere_x_chips then
+	mod_percent = true
+	hand_chips = mod_chips(hand_chips*effects[ii].cere_x_chips)
+	update_hand_text({delay = 0}, {chips = hand_chips})
+	card_eval_status_text(G.hand.cards[i], 'cere_x_chips', effects[ii].cere_x_chips, percent)
+end
+if effects[ii].cere_e_chips then
+	mod_percent = true
+	hand_chips = mod_chips(hand_chips^effects[ii].cere_e_chips)
+	update_hand_text({delay = 0}, {chips = hand_chips})
+	card_eval_status_text(G.hand.cards[i], 'cere_e_chips', effects[ii].cere_e_chips, percent)
+end
+if effects[ii].cere_e_mult then
+	mod_percent = true
+	mult = mod_mult(mult^effects[ii].cere_e_mult)
+	update_hand_text({delay = 0}, {mult = mult})
+	card_eval_status_text(G.hand.cards[i], 'cere_e_mult', effects[ii].cere_e_mult, percent)
+end'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "--calculate the card edition effects"
+position = "before"
+payload = '''
+if effects[ii].cere_x_chips then
+	mod_percent = true
+	if effects[ii].card then juice_card(effects[ii].card) end
+	hand_chips = mod_chips(mult*effects[ii].cere_x_chips)
+	update_hand_text({delay = 0}, {chips = hand_chips})
+	card_eval_status_text(scoring_hand[i], 'cere_x_chips', effects[ii].cere_x_chips, percent)
+end
+if effects[ii].cere_e_chips then
+	mod_percent = true
+	if effects[ii].card then juice_card(effects[ii].card) end
+	hand_chips = mod_chips(hand_chips^effects[ii].cere_e_chips)
+	update_hand_text({delay = 0}, {chips = hand_chips})
+	card_eval_status_text(scoring_hand[i], 'cere_e_chips', effects[ii].cere_e_chips, percent)
+end
+if effects[ii].cere_e_mult then
+	mod_percent = true
+	if effects[ii].card then juice_card(effects[ii].card) end
+	mult = mod_mult(mult^effects[ii].cere_e_mult)
+	update_hand_text({delay = 0}, {mult = mult})
+	card_eval_status_text(scoring_hand[i], 'cere_e_mult', effects[ii].cere_e_mult, percent)
+end'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = 'if effects[ii].edition then'
+position = 'after'
+match_indent = true
+payload = '''
+if scoring_hand and scoring_hand[i] and scoring_hand[i].edition then
+	local trg = scoring_hand[i]
+	local edi = trg.edition
+	if edi.cere_x_chips then
+		hand_chips = mod_chips(hand_chips * edi.cere_x_chips)
+		update_hand_text({delay = 0}, {chips = hand_chips})
+		card_eval_status_text(trg, 'extra', nil, percent, nil,
+		{message = 'X'.. edi.cere_x_chips ..' Chips',
+		edition = true,
+		cere_x_chips = true})
+	end
+	if edi.cere_e_chips then
+		hand_chips = mod_chips(hand_chips ^ edi.cere_e_chips)
+		update_hand_text({delay = 0}, {chips = hand_chips})
+		card_eval_status_text(trg, 'extra', nil, percent, nil,
+		{message = '^'.. edi.cere_e_chips ..' Chips',
+		edition = true,
+		cere_e_chips = true})
+	end
+	if edi.cere_e_mult then
+		mult = mod_mult(mult ^ edi.cere_e_mult)
+		update_hand_text({delay = 0}, {mult = mult})
+		card_eval_status_text(trg, 'extra', nil, percent, nil,
+		{message = '^'.. edi.cere_e_mult ..' Mult',
+		edition = true,
+		cere_e_mult = true})
+	end
+    if edi.cere_x_dollars then
+		local mod = math.floor((G.GAME.dollars + (G.GAME.dollar_buffer or 0)) * (edi.cere_x_dollars-1))
+        ease_dollars(mod)
+		card_eval_status_text(trg, 'extra', nil, percent, nil,
+		{message = 'X'.. edi.cere_x_dollars ..' Dollars',
+		edition = true,
+		cere_x_dollars = true})
+	end
+end'''
+
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = 'if edition_effects.jokers.x_mult_mod then'
+position = 'before'
+match_indent = true
+payload = '''
+if G.jokers.cards and G.jokers.cards[i] and G.jokers.cards[i].edition then
+	local trg = G.jokers.cards[i]
+	local edi = trg.edition
+	if edi.cere_x_chips then
+		hand_chips = mod_chips(hand_chips * edi.cere_x_chips)
+		update_hand_text({delay = 0}, {chips = hand_chips})
+		card_eval_status_text(trg, 'extra', nil, percent, nil,
+		{message = 'X'.. edi.cere_x_chips ..' Chips',
+		edition = true,
+		cere_x_chips = true})
+	end
+	if edi.cere_e_chips then
+		hand_chips = mod_chips(hand_chips ^ edi.cere_e_chips)
+		update_hand_text({delay = 0}, {chips = hand_chips})
+		card_eval_status_text(trg, 'extra', nil, percent, nil,
+		{message = '^'.. edi.cere_e_chips ..' Chips',
+		edition = true,
+		cere_e_chips = true})
+	end
+	if edi.cere_e_mult then
+		mult = mod_mult(mult ^ edi.cere_e_mult)
+		update_hand_text({delay = 0}, {mult = mult})
+		card_eval_status_text(trg, 'extra', nil, percent, nil,
+		{message = '^'.. edi.cere_e_mult ..' Mult',
+		edition = true,
+		cere_e_mult = true})
+	end
+    if edi.cere_x_dollars then
+		local mod = math.floor((G.GAME.dollars + (G.GAME.dollar_buffer or 0)) * (edi.cere_x_dollars-1))
+        ease_dollars(mod)
+		card_eval_status_text(trg, 'extra', nil, percent, nil,
+		{message = 'X'.. edi.cere_x_dollars ..' Dollars',
+		edition = true,
+		cere_x_dollars = true})
+	end
+end'''

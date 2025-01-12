@@ -1,0 +1,22 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = '''if _de then'''
+position = "before"
+payload = '''if self.GAME.starting_params.one_suit and not v.suit == self.GAME.starting_params.one_suit then keep = false end'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "back.lua"
+pattern = '''G.GAME.starting_params.discards = G.GAME.starting_params.discards + self.effect.config.discards'''
+position = "after"
+payload = '''G.GAME.starting_params.discards = math.max(G.GAME.starting_params.discards, 0)'''
+match_indent = true
+
+

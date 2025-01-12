@@ -1,0 +1,66 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = "if AUT.card_type == 'Joker' or (AUT.badges and AUT.badges.force_rarity) then card_type = ({localize('k_common'), localize('k_uncommon'), localize('k_rare'), localize('k_legendary')})[card.config.center.rarity] end"
+position = "at"
+payload = '''if Ceres.COMPAT.cryptid then
+    if AUT.card_type == 'Joker' or (AUT.badges and AUT.badges.force_rarity) then card_type = ({localize('k_common'), localize('k_uncommon'), localize('k_rare'), localize('k_legendary'), ['cry_epic'] = 'Epic', ['cry_exotic'] = 'Exotic', ['cere_divine'] = 'Divine'})[card.config.center.rarity] end
+else
+    if AUT.card_type == 'Joker' or (AUT.badges and AUT.badges.force_rarity) then card_type = ({localize('k_common'), localize('k_uncommon'), localize('k_rare'), localize('k_legendary'), ['cere_divine'] = 'Divine'})[card.config.center.rarity] end
+end'''
+match_indent = true
+
+# being saved just says saved
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "{n=G.UIT.O, config={object = DynaText({string = {' '..localize('ph_mr_bones')..' '}, colours = {G.C.FILTER}, shadow = true, pop_in = 0, scale = 0.5*scale, silent = true})}}"
+position = "at"
+payload = '''{n=G.UIT.O, config={object = DynaText({string = {' Saved '}, colours = {G.C.FILTER}, shadow = true, pop_in = 0, scale = 0.5*scale, silent = true})}}'''
+match_indent = true
+overwrite = true
+
+# for the hologram effect on jokers
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''self.hover_tilt = self.hover_tilt/1.5'''
+position = "after"
+payload = '''elseif self.ability.name == 'j_cere_miku' then
+    self.hover_tilt = self.hover_tilt*1.5
+    self.children.floating_sprite:draw_shader('hologram', nil, self.ARGS.send_to_shader, nil, self.children.center, 2*scale_mod, 2*rotate_mod)
+    self.hover_tilt = self.hover_tilt/1.5'''
+match_indent = true
+
+# large joker large joker large
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''elseif self.config.center.name == "Wee Joker" then'''
+position = "before"
+payload = '''elseif self.config.center.name == "Large Joker" then
+    self.T.h = H*scale*1.4*scale
+    self.T.w = W*scale*1.4*scale'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''if center.name == "Wee Joker" and (center.discovered or self.bypass_discovery_center) then'''
+position = "before"
+payload = '''if center.name == "Large Joker" and (center.discovered or self.bypass_discovery_center) then 
+    H = H*1.4
+    W = W*1.4
+    self.T.h = H
+    self.T.w = W
+end'''
+match_indent = true
+
+
