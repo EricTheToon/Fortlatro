@@ -10,7 +10,7 @@ Emily - Legendary - Retrigger EVERYTHING
 
 Toilet Gang - Uncommon - Gains x0.2 mult every time played hand contains a Flush
 
-Ground Game - Common - Applies Glitched to EVERYTHING if you score a 6, 7, 2, 2, and 3 in the same
+Ground Game - Common - Applies Glitched to EVERYTHING if you score a 6, 7, 2, 2, and 3 in the same hand
 
 The Dub - Common - 1/4 chance to create an LTM card when blind starts (must have room)
 
