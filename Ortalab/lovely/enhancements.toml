@@ -1,0 +1,134 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 1
+
+## Shop Card Area Width
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
+pattern = '''G.GAME.shop.joker_max*1.02*G.CARD_W,'''
+position = 'at'
+match_indent = true
+payload = '''math.min(G.GAME.shop.joker_max*1.02*G.CARD_W,4.08*G.CARD_W),'''
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = '''G.shop_jokers.T.w = G.GAME.shop.joker_max*1.01*G.CARD_W'''
+position = 'at'
+match_indent = true
+payload = '''G.shop_jokers.T.w = math.min(G.GAME.shop.joker_max*1.02*G.CARD_W,4.08*G.CARD_W)'''
+
+# IOU Card logic
+# evaluate_play()
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''mult, hand_chips, modded = G.GAME.blind:modify_hand(G.play.cards, poker_hands, text, mult, hand_chips)'''
+position = 'before'
+match_indent = true
+payload = '''
+local iou_count = 0
+for i=1, #scoring_hand do
+    if scoring_hand[i].config.center.key == 'm_'..Ortalab.prefix..'_iou' and not scoring_hand[i].debuff then
+        local reps = {1}
+                    
+        --From Red seal
+        local eval = eval_card(scoring_hand[i], {repetition_only = true,cardarea = G.play, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, repetition = true})
+        if next(eval) then 
+            for h = 1, eval.seals.repetitions do
+                reps[#reps+1] = eval
+            end
+        end
+        --From jokers
+        for j=1, #G.jokers.cards do
+            --calculate the joker effects
+            local eval = eval_card(G.jokers.cards[j], {cardarea = G.play, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, other_card = scoring_hand[i], repetition = true})
+            if eval and eval.jokers and eval.jokers.repetitions and eval.jokers.joker_repetitions then
+                rep_list = eval.jokers.joker_repetitions
+                for z=1, #rep_list do
+                    if type(rep_list[z]) == 'table' and rep_list[z].repetitions then
+                        for r=1, rep_list[z].repetitions do
+                            for s=1, eval.jokers.repetitions do
+                                reps[#reps+1] = {from_retrigger = rep_list[z]}
+                                for k, v in pairs(eval) do
+                                    reps[#reps][k] = v
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            if eval and eval.jokers and not eval.jokers.repetitions then eval.jokers = nil end
+                                if next(eval) and eval.jokers then 
+                for h = 1, eval.jokers.repetitions do
+                    reps[#reps+1] = eval
+                end
+            end
+        end
+        for j=1, #reps do
+            if reps[j] ~= 1 then
+                card_eval_status_text((reps[j].jokers or reps[j].seals).card, 'jokers', nil, nil, nil, (reps[j].jokers or reps[j].seals))
+                if reps[j].from_retrigger then
+                    card_eval_status_text(reps[j].from_retrigger.card, 'jokers', nil, nil, nil, reps[j].from_retrigger)
+                end
+            end
+            iou_count = iou_count + 1
+            update_hand_text({sound = 'button', volume = 0.7, pitch = 0.9, delay = 0}, {level=G.GAME.hands[text].level..'+'..iou_count})
+            mult = mod_mult(mult+G.GAME.hands[text].l_mult)
+            update_hand_text({delay = 0}, {mult = mult})
+            hand_chips = mod_chips(hand_chips+G.GAME.hands[text].l_chips)
+            update_hand_text({delay = 0}, {chips = hand_chips})
+            card_eval_status_text(scoring_hand[i], 'extra', nil, nil, nil, {message = 'Level up!', colour = G.C.PURPLE})
+        end
+    end
+end'''
+
+# Sand card
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''if destroyed then'''
+position = 'before'
+match_indent = true
+payload = '''
+if scoring_hand[i].config.center == G.P_CENTERS['m_'..Ortalab.prefix..'_sand'] and not scoring_hand[i].debuff and not next(SMODS.find_card('j_ortalab_sandstone')) then
+    local card = scoring_hand[i]
+    card.ability.extra.x_mult = card.ability.extra.x_mult - card.ability.extra.change
+    G.E_MANAGER:add_event(Event({
+        trigger = 'immediate',
+        func = function()
+            card_eval_status_text(card, 'extra', nil, nil, nil, {message = 'Crumble', colour = G.C.GOLD, instant = true})
+            if card.ability.extra.x_mult < 1 then
+                card:start_dissolve()
+            end
+            card.particles = Particles(1, 1, 0,0, {
+                timer = 0.015,
+                scale = 0.3,
+                initialize = true,
+                lifespan = 1,
+                speed = 3,
+                padding = -1,
+                attach = card,
+                colours = {G.C.GOLD, lighten(G.C.GOLD, 0.4), lighten(G.C.GOLD, 0.2), darken(G.C.GOLD, 0.2)},
+                fill = true
+            })
+            card.particles.fade_alpha = 1
+            card.particles:fade(1, 0)
+            
+            return true
+        end
+    }))  
+    G.E_MANAGER:add_event(Event({
+        trigger = 'after',
+        delay = 1,
+        func = function()
+            card.particles:remove()
+            return true
+        end
+    })) 
+    
+    if card.ability.extra.x_mult < 1 then
+        destroyed = true
+    end
+end'''

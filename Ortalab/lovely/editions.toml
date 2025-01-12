@@ -1,0 +1,40 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 1
+
+## Greyscale edition on playing cards
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''if effects[ii].edition then'''
+position = 'after'
+match_indent = true
+payload = '''
+local card = effects[ii].edition.card
+if card.edition.swap then
+    local old_mult = mult
+    mult = mod_mult(hand_chips)
+    hand_chips = mod_chips(old_mult)
+    update_hand_text({delay = 0}, {chips = hand_chips, mult = mult})
+    card_eval_status_text(card, 'extra', nil, percent, nil, {message = localize('ortalab_swap'), colour = G.C.PURPLE})
+end
+'''
+
+## Greyscale edition on jokers
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''if edition_effects.jokers.x_mult_mod then'''
+position = 'before'
+match_indent = true
+payload = '''
+local card = edition_effects.jokers.card
+if card.edition.swap then
+    local old_mult = mult
+    mult = mod_mult(hand_chips)
+    hand_chips = mod_chips(old_mult)
+    update_hand_text({delay = 0}, {chips = hand_chips, mult = mult})
+    card_eval_status_text(card, 'extra', nil, percent, nil, {message = localize('ortalab_swap'), colour = G.C.PURPLE})
+end
+'''

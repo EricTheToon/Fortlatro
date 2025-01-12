@@ -1,0 +1,17 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 1
+
+## Shop Card Area Width
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''add_round_eval_row({dollars = G.GAME.blind.dollars, name='blind1', pitch = pitch})'''
+position = 'after'
+match_indent = true
+payload = '''if G.GAME.modifiers.frozen_deck then
+add_round_eval_row({dollars = G.GAME.blind.dollars, bonus='true', name='joker_frozen_deck', card={config={center={set='Back', key='b_ortalab_frozen'}}, juice_up=function(self) end}, pitch = pitch})
+G.GAME.blind.dollars = G.GAME.blind.dollars * 2
+G.GAME.modifiers.frozen_deck = false end
+'''

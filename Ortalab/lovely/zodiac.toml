@@ -1,0 +1,170 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2
+
+
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''G.GAME.current_round.hands_left = G.GAME.round_resets.hands'''
+position = 'after'
+match_indent = true
+payload = '''
+G.zodiacs = {}
+'''
+
+# Zodiac Loading/Saving
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''if self.HUD_tags then'''
+position = 'before'
+match_indent = true
+payload = '''
+if self.HUD_zodiacs then
+    for k, v in pairs(self.HUD_zodiacs) do
+        v:remove()
+    end
+    self.HUD_zodiacs = nil
+end
+'''
+[[patches]]
+[patches.pattern]
+target = 'functions/misc_functions.lua'
+pattern = '''G.culled_table =  recursive_table_cull{'''
+position = 'before'
+match_indent = true
+payload = '''
+local zodiacs = {}
+if G.zodiacs then
+    for k, v in pairs(G.zodiacs) do
+        if (type(v) == "table") and v.is and v:is(Zodiac) then 
+            local zodiacSer = v:save()
+            if zodiacSer then zodiacs[k] = zodiacSer end
+        end
+    end
+end
+'''
+[[patches]]
+[patches.pattern]
+target = 'functions/misc_functions.lua'
+pattern = '''tags = tags,'''
+position = 'before'
+match_indent = true
+payload = '''
+zodiacs = zodiacs,
+'''
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''check_and_set_high_score('most_money', G.GAME.dollars)'''
+position = 'before'
+match_indent = true
+payload = '''
+if saveTable then 
+    self.zodiacs = {}
+    self.HUD_zodiac = {}
+    local zodiacs = saveTable.zodiacs or {}
+    for k, v in pairs(zodiacs) do
+        local _zodiac = Zodiac('zodiac_ortalab_scorpio')
+        _zodiac:load(v)
+        add_zodiac(_zodiac, true, true)
+    end
+end
+'''
+
+
+# Zodiac effects
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''mult, hand_chips, modded = G.GAME.blind:modify_hand(G.play.cards, poker_hands, text, mult, hand_chips)'''
+position = 'before'
+match_indent = true
+payload = '''
+if G.zodiacs then
+    zodiac_effect = nil
+    zodiac_current = nil
+    for _, zodiac in pairs(G.zodiacs) do
+        if zodiac.config.extra.hand_type == text then
+            zodiac_effect = G.ZODIACS[zodiac.key]
+            zodiac_current = zodiac
+            G.GAME.zodiacs_activated[zodiac.key] = true
+
+            -- Update Stargazing Jokers
+            local stargazings = SMODS.find_card('j_ortalab_stargazing')
+            for _, stargazing_card in pairs(stargazings) do
+                stargazing_card.ability.extra.xmult = stargazing_card.ability.extra.xmult + stargazing_card.ability.extra.gain
+                card_eval_status_text(stargazing_card, 'extra', nil, nil, nil, {message = localize{type='variable',key='a_xmult',vars={stargazing_card.ability.extra.gain}}, colour = G.C.RED})
+            end
+
+            for i=1, zodiac_current.config.extra.temp_level do
+                iou_count = iou_count + 1
+                    update_hand_text({sound = 'button', volume = 0.7, pitch = 0.9, delay = 0}, {level=G.GAME.hands[text].level..'+'..iou_count})
+                    mult = mod_mult(mult+G.GAME.hands[text].l_mult)
+                    update_hand_text({delay = 0}, {mult = mult})
+                    hand_chips = mod_chips(hand_chips+G.GAME.hands[text].l_chips)
+                    update_hand_text({delay = 0}, {chips = hand_chips})
+                if not Ortalab.config.zodiac_skip then
+                    delay(0.3)
+                end
+            end
+        end
+    end
+
+    if zodiac_effect then
+        zodiac_text(localize({set='Tag',key=zodiac_current.key,type='name_text'})..localize('ortalab_zodiac_active'), zodiac_current.key)
+        if zodiac_effect.pre_trigger and type(zodiac_effect.pre_trigger) == 'function' then
+            local triggered = false
+            mult, hand_chips, modded, triggered = zodiac_effect:pre_trigger(zodiac_current, {full_hand = G.play.cards, scoring_hand = scoring_hand, poker_hands = poker_hands, handname = text, mult = mult, chips = hand_chips})
+            if modded then update_hand_text({sound = 'chips2', modded = modded}, {chips = hand_chips, mult = mult}) end
+            
+            for i=1, #G.play.cards do
+                if G.play.cards[i].add_to_scoring then
+                    G.play.cards[i].add_to_scoring = nil
+                    table.insert(scoring_hand, G.play.cards[i])
+                end
+            end
+
+            for i=1, #scoring_hand do
+                highlight_card(scoring_hand[i],(i-0.999)/5,'up')
+            end            
+        end
+    end
+end
+'''
+
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''local cards_destroyed = {}'''
+position = 'after'
+match_indent = true
+payload = '''
+if zodiac_effect and zodiac_effect.destroy and type(zodiac_effect.destroy) == 'function' then
+    for i=1, #G.hand.cards do
+        local destroyed = zodiac_effect:destroy(zodiac_current, {full_hand = G.play.cards, scoring_hand = scoring_hand, poker_hands = poker_hands, handname = text, other_card = G.hand.cards[i]})
+        if destroyed then
+            if G.hand.cards[i].ability.name == 'Glass Card' then 
+                G.hand.cards[i].shattered = true
+            else 
+                G.hand.cards[i].destroyed = true
+            end 
+            cards_destroyed[#cards_destroyed+1] = G.hand.cards[i]
+        end
+    end
+    zodiac_reduce_level(zodiac_current)
+end
+'''
+
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''local cards_destroyed = {}'''
+position = 'after'
+match_indent = true
+payload = '''
+
+'''
+
