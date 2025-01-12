@@ -1,5 +1,5 @@
 # Fortlatro
-a terrible fortnite themed balatro mod
+a terrible Fortnite themed Balatro mod
 featuring as of right now 
 # 13 Jokers
 # 2 Decks
