@@ -7,7 +7,7 @@
 --- PREFIX: fn
 --- PRIORITY: -69420
 --- DEPENDENCIES: [Steamodded>=0.9.8, Cryptid>=0.5.3, ortalab, SnowMods>=0.2.0, ceres>=1.2.0b, BetmmaAbilities>=1.0.3.3(20241018), DiceSeal, CursedDiceSeal, Talisman>=2.0.0-beta8,]
---- VERSION: 1.0.0 Release
+--- VERSION: 1.0.1 Release
 ----------------------------------------------
 ------------MOD CODE -------------------------
 SMODS.Atlas({
@@ -2104,6 +2104,7 @@ SMODS.Consumable{
 
 ----------------------------------------------
 ------------POLYCHROME SPLASH CODE BEGIN----------------------
+
 SMODS.Consumable{
     key = 'LTMPolychromeSplash',
     set = 'LTMConsumableType',
@@ -2190,6 +2191,10 @@ SMODS.Consumable{
 
 ----------------------------------------------
 ------------POLYCHROME SPLASH CODE END----------------------
+
+----------------------------------------------
+------------FRACTURE CODE BEGIN----------------------
+
 SMODS.Atlas({ key = "Blinds", atlas_table = "ANIMATION_ATLAS", path = "Blinds.png", px = 34, py = 34, frames = 21 })
 
 SMODS.Blind {
@@ -2226,9 +2231,124 @@ SMODS.Blind {
 end
 }
 
+----------------------------------------------
+------------FRACTURE CODE END----------------------
 
+----------------------------------------------
+------------CRYSTAL CODE BEGIN----------------------
 
+SMODS.Enhancement({
+    loc_txt = {
+        name = 'Crystal',
+        text = {
+            '{X:mult,C:white}X#1#{} Mult {C:chips}#2#{} Chips',
+            'no rank or suit',
+			'{C:green}#4# in #3#{} chance this',
+            'card is {C:red}destroyed',
+            'when triggered',
+        },
+    },
+    key = "Crystal",
+    atlas = "Jokers",
+    pos = {x = 0, y = 6},
+    discovered = false,
+    no_rank = true,
+    no_suit = true,
+    replace_base_card = true,
+    always_scores = true,
+    config = {extra = {base_x = 1.5, chips = 50, odds = 6}},
+    loc_vars = function(self, info_queue, card)
+        if card and Ortalab.config.artist_credits then
+            info_queue[#info_queue+1] = {generate_ui = ortalab_artist_tooltip, key = 'gappie'}
+        end
+        local card_ability = card and card.ability or self.config
+        return {
+            vars = {
+                card_ability.extra.base_x,
+                card_ability.extra.chips,
+                card.ability.extra.odds,
+				G.GAME.probabilities.normal
+            }
+        }
+    end,
+    calculate = function(self, card, context, effect)
+        if context.cardarea == G.play and not context.repetition then
+            -- Apply the enhancement effects
+            effect.x_mult = self.config.extra.base_x
+            effect.chips = self.config.extra.chips
+            
+            -- Chance to shatter the card
+            if pseudorandom('CrystalShatter') < G.GAME.probabilities.normal / card.ability.extra.odds then
+                -- Shatter the card
+                card:shatter()
+            end
+        end
+    end
+})
 
+----------------------------------------------
+------------CRYSTAL CODE END----------------------
+
+----------------------------------------------
+------------RAINBOW CODE BEGIN----------------------
+SMODS.Consumable{
+    key = 'LTMRainbow', -- key
+    set = 'LTMConsumableType', -- the set of the card: corresponds to a consumable type
+    atlas = 'Jokers', -- atlas
+    pos = {x = 1, y = 6}, -- position in atlas
+    loc_txt = {
+        name = 'Rainbow Crystal', -- name of card
+        text = { -- text of card
+            'An ore never meant to exist',
+			'yet somehow it does',
+			'after {C:cry_epic}SOMEONE{} duped them endlessly',
+            'Apply {C:inactive}Crystal{} and {C:dark_edition}Polychrome{} to up to {C:attention}#1#{} selected cards',
+        }
+    },
+    config = {
+        extra = {
+            cards = 1, -- configurable value
+        }
+    },
+    loc_vars = function(self, info_queue, center)
+        info_queue[#info_queue + 1] = G.P_CENTERS.m_fn_crystal
+        info_queue[#info_queue + 1] = G.P_CENTERS.e_polychrome
+        if center and center.ability and center.ability.extra then
+            return {vars = {center.ability.extra.cards}} 
+        end
+        return {vars = {}}
+    end,
+    can_use = function(self, card)
+        if G and G.hand and G.hand.highlighted and card.ability and card.ability.extra and card.ability.extra.cards then
+            if #G.hand.highlighted > 0 and #G.hand.highlighted <= card.ability.extra.cards then
+                return true
+            end
+        end
+        return false
+    end,
+    use = function(self, card, area, copier)
+        if G and G.hand and G.hand.highlighted then
+            for i = 1, #G.hand.highlighted do
+                -- Set the edition to Crystal first
+                G.hand.highlighted[i]:set_ability(G.P_CENTERS.m_fn_Crystal, nil, true)
+                
+                -- Then apply the enhancement to Polychrome
+                local v = G.hand.highlighted[i]
+                v:set_edition({polychrome = true}, true)
+                
+                -- Add an event to juice up the card
+                G.E_MANAGER:add_event(Event({
+                    func = function()
+                        v:juice_up()
+                        return true
+                    end
+                }))
+            end
+        end
+    end,
+}
+----------------------------------------------
+------------RAINBOW CODE END----------------------
 
 ----------------------------------------------
 ------------CRAC DECK CODE BEGIN----------------------
