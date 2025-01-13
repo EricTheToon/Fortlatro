@@ -57,6 +57,8 @@ Launch Pad - Draw up to 2 additional Cards
 Decoy Grenade - Create 3 temporary copies of up to 1 selected card
 
 Polychrome Splash - Convert 1 random Card, Joker, or Consumable into Polychrome 50% chance to destroy it instead
+# 1 Enhancement
+Crystal - 1.5X mult +50 chips no rank or suit 1/6 chance to break
 
 # 1 Blind
 Fracture - all played cards are destroyed
