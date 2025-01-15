@@ -7,7 +7,7 @@
 --- PREFIX: fn
 --- PRIORITY: -69420
 --- DEPENDENCIES: [Steamodded>=0.9.8, Cryptid>=0.5.3, ortalab, SnowMods>=0.2.0, ceres>=1.2.0b, BetmmaAbilities>=1.0.3.3(20241018), DiceSeal, CursedDiceSeal, Talisman>=2.0.0-beta8,]
---- VERSION: 1.0.1 Release
+--- VERSION: 1.0.2 Release
 ----------------------------------------------
 ------------MOD CODE -------------------------
 SMODS.Atlas({
@@ -1399,7 +1399,66 @@ SMODS.Joker
 }
 
 ----------------------------------------------
-------------STW CODE BEGIN----------------------
+------------STW CODE END----------------------
+SMODS.Joker{
+    key = 'TheLoop',
+    loc_txt = {
+        ['en-us'] = {
+            name = "The Loop",
+            text = {
+                "{C:green}#3# in #2#{} chance to",
+                "give each scored card {C:cry_epic}Echo{}",
+            }
+        }
+    },
+    atlas = 'Jokers',
+    pos = { x = 2, y = 6 },
+    config = {
+        extra = { 
+            odds = 4,      -- 1 in 4 chance
+            mult = 1,      -- Default multiplier
+            multmod = 1,   -- Default multiplier modifier
+        }
+    },
+    rarity = 1,          -- Common joker
+    cost = 10,            -- Cost to purchase
+    blueprint_compat = true,
+
+    loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue + 1] = G.P_CENTERS.m_cry_echo
+        return {
+            vars = {
+                card.ability.extra.mult,
+                card.ability.extra.odds,
+                '' .. (G.GAME and G.GAME.probabilities.normal or 1),
+                card.ability.extra.multmod
+            }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        if context.joker_main then
+            local odds = card.ability.extra.odds or 4
+            local chance = 1 / odds
+            local probability = G.GAME and G.GAME.probabilities.normal or 1
+            chance = chance * probability -- Scale by global probability
+
+            -- Apply the effect to each card in the scoring hand
+            for _, scored_card in ipairs(context.scoring_hand) do
+                if pseudorandom('solidgold_' .. tostring(scored_card)) < chance then
+                    -- Turn the card to gold
+                    scored_card:set_ability(G.P_CENTERS.m_cry_echo, nil, true)
+                    G.E_MANAGER:add_event(Event({
+                        func = function()
+                            scored_card:juice_up()
+                            return true
+                        end,
+                    }))
+                end
+            end
+        end
+    end,
+}
 
 ----------------------------------------------
 ------------GLASSES CODE BEGIN----------------------
@@ -1580,13 +1639,14 @@ SMODS.Consumable{
             G.P_CENTERS.m_glass, G.P_CENTERS.m_steel, G.P_CENTERS.m_stone, G.P_CENTERS.m_gold,
 			G.P_CENTERS.m_ortalab_post, G.P_CENTERS.m_ortalab_bent, G.P_CENTERS.m_ortalab_sand,
 			G.P_CENTERS.m_ortalab_rusty, G.P_CENTERS.m_ortalab_ore, G.P_CENTERS.m_ortalab_iou, G.P_CENTERS.m_ortalab_recycled,
-			G.P_CENTERS.m_snow_platinum_card, G.P_CENTERS.m_cry_echo,
+			G.P_CENTERS.m_snow_platinum_card, G.P_CENTERS.m_cry_echo, G.P_CENTERS.m_fn_Crystal, G.P_CENTERS.m_fn_Wood,
+			G.P_CENTERS.m_fn_Brick, G.P_CENTERS.m_fn_Metal,
         }
 
         if G and G.hand and G.hand.highlighted then
             for k, v in ipairs(G.hand.highlighted) do
                 -- Randomly select an enhancement for each card
-                local random_enhancement = enhancements[math.random(1, #enhancements)]
+                local random_enhancement = enhancements[math.random(1, #enhancements)] or G.P_CENTERS.m_fn_Wood
                 
                 -- Apply the randomly selected enhancement to the current card
                 v:set_ability(random_enhancement, nil, true)
@@ -2349,6 +2409,283 @@ SMODS.Consumable{
 }
 ----------------------------------------------
 ------------RAINBOW CODE END----------------------
+
+----------------------------------------------
+------------WOOD CODE BEGIN----------------------
+SMODS.Enhancement({
+    loc_txt = {
+        name = 'Wood',
+        text = {
+            '{X:mult,C:white}X#1#{} Mult {C:chips}#2#{} Chips',
+        },
+    },
+    key = "Wood",
+    atlas = "Jokers",
+    pos = {x = 3, y = 6},
+    discovered = false,
+    no_rank = false,
+    no_suit = false,
+    replace_base_card = false,
+    always_scores = false,
+    config = {extra = {base_x = 1.2, chips = 15,}},
+    loc_vars = function(self, info_queue, card)
+        if card and Ortalab.config.artist_credits then
+            info_queue[#info_queue+1] = {generate_ui = ortalab_artist_tooltip, key = 'gappie'}
+        end
+        local card_ability = card and card.ability or self.config
+        return {
+            vars = {
+                card_ability.extra.base_x,
+                card_ability.extra.chips,
+            }
+        }
+    end,
+    calculate = function(self, card, context, effect)
+        if context.cardarea == G.play and not context.repetition then
+            -- Apply the enhancement effects
+            effect.x_mult = self.config.extra.base_x
+            effect.chips = self.config.extra.chips
+        end
+    end
+})
+----------------------------------------------
+------------WOOD CODE END----------------------
+
+----------------------------------------------
+------------BRICK CODE BEGIN----------------------
+
+SMODS.Sound({
+	key = "gnome",
+	path = "gnome.ogg",
+})
+
+SMODS.Enhancement({
+    loc_txt = {
+        name = 'Brick',
+        text = {
+            '{X:mult,C:white}X#1#{} Mult {C:chips}#2#{} Chips',
+            '{C:green}#4# in #3#{} chance to',
+            'summon a {C:red}Gnome',
+        },
+    },
+    key = "Brick",
+    atlas = "Jokers",
+    pos = {x = 4, y = 6},
+    discovered = false,
+    no_rank = false,
+    no_suit = false,
+    replace_base_card = false,
+    always_scores = false,
+    config = {
+        extra = {
+            base_x = 1.3, -- Multiplier effect
+            chips = 40,   -- Chip bonus
+            odds = 100    -- Odds for gnome 
+        },
+    },
+    loc_vars = function(self, info_queue, card)
+        if card and Ortalab.config.artist_credits then
+            info_queue[#info_queue + 1] = {generate_ui = ortalab_artist_tooltip, key = 'gappie'}
+        end
+        local card_ability = card and card.ability or self.config
+        return {
+            vars = {
+                card_ability.extra.base_x,           -- Multiplier
+                card_ability.extra.chips,           -- Chip bonus
+                card_ability.extra.odds,            -- Odds for gnome 
+                G.GAME.probabilities.normal         -- Base probability
+            }
+        }
+    end,
+    calculate = function(self, card, context, effect)
+        if context.cardarea == G.play and not context.repetition then
+            -- Apply the enhancement effects
+            effect.x_mult = self.config.extra.base_x
+            effect.chips = self.config.extra.chips
+            
+            -- Chance to summon a gnome
+            if pseudorandom('Gnome') < G.GAME.probabilities.normal / card.ability.extra.odds then
+                -- Summon the gnome
+                play_sound("fn_gnome")
+                G.E_MANAGER:add_event(Event({
+                    func = function() 
+                        local c = create_card(
+                            nil, G.consumeables, nil, nil, nil, nil, 'c_fn_Gnome', 'sup'
+                        )
+                        c:add_to_deck()
+                        G.consumeables:emplace(c)
+                        return true
+                    end
+                }))
+            end
+        end
+    end,
+})
+
+----------------------------------------------
+------------BRICK CODE END----------------------
+
+----------------------------------------------
+------------GNOME CODE BEGIN----------------------
+
+SMODS.Consumable{
+    key = 'Gnome', -- key
+    set = 'LTMConsumableType', -- the set of the card: corresponds to a consumable type
+    atlas = 'Jokers', -- atlas
+    pos = {x = 0, y = 7}, -- position in atlas
+    loc_txt = {
+        name = 'Gnome', -- name of card
+        text = { -- text of card
+            'Has a {C:green,E:1,S:1.1}#1# in #2#{} chance to',
+			'give an eternal copy of {C:cry_epic}Eric{}, {C:mult}Crac{}, {C:cry_epic}Emily{}, or {C:green,E:1,S:1.1}Zorlodo{}',
+			'else give {C:red}nothing{}.',
+        },
+    },
+    config = {
+        extra = { odds = 10 }, -- Configuration: odds of success (set to 2 for 50% chance)
+        no_pool_flag = 'gamble',
+    },
+    loc_vars = function(self, info_queue, card)
+        return {vars = {G.GAME.probabilities.normal, card.ability.extra.odds}}
+    end,
+    use = function(self, card, area, copier)
+        G.GAME.pool_flags.gamble = true -- Ensure 'gamble' flag is set
+		play_sound("fn_gnome")
+
+        -- Use the game's internal roll value (assuming it's already handled)
+        if pseudorandom('FriendsGamble') < G.GAME.probabilities.normal / card.ability.extra.odds then
+            -- List of possible jokers
+            local jokers = {'j_fn_Crac', 'j_fn_Eric', 'j_fn_Emily', 'j_fn_Zorlodo'}
+
+            -- Randomly select one joker to add
+            local selected_joker = jokers[math.random(#jokers)]
+            joker_add(selected_joker)
+
+            -- Display success message on the consumable
+            SMODS.eval_this('card_eval_status_text', {
+                card = card, -- Reference the consumable card
+                message = "Friends!", -- Display "Friends!" message
+                colour = G.C.PURPLE,
+            })
+        else
+            -- Failure: No joker granted
+            -- Display failure message on the consumable
+            SMODS.eval_this('card_eval_status_text', {
+                card = card, -- Reference the consumable card
+                message = "NOTHING!", -- Display "NOTHING!" message
+                colour = G.C.RED,
+            })
+        end
+    end,
+    can_use = function(self, card)
+        return true
+    end,
+}
+----------------------------------------------
+------------GNOME CODE END----------------------
+
+----------------------------------------------
+------------METAL CODE BEGIN----------------------
+SMODS.Enhancement({
+    loc_txt = {
+        name = 'Metal',
+        text = {
+            '{X:mult,C:white}X#1#{} Mult {C:chips}#2#{} Chips',
+        },
+    },
+    key = "Metal",
+    atlas = "Jokers",
+    pos = {x = 1, y = 7},
+    discovered = false,
+    no_rank = false,
+    no_suit = false,
+    replace_base_card = false,
+    always_scores = false,
+    config = {extra = {base_x = 1.5, chips = 60,}},
+    loc_vars = function(self, info_queue, card)
+        if card and Ortalab.config.artist_credits then
+            info_queue[#info_queue+1] = {generate_ui = ortalab_artist_tooltip, key = 'gappie'}
+        end
+        local card_ability = card and card.ability or self.config
+        return {
+            vars = {
+                card_ability.extra.base_x,
+                card_ability.extra.chips,
+            }
+        }
+    end,
+    calculate = function(self, card, context, effect)
+        if context.cardarea == G.play and not context.repetition then
+            -- Apply the enhancement effects
+            effect.x_mult = self.config.extra.base_x
+            effect.chips = self.config.extra.chips
+        end
+    end
+})
+
+----------------------------------------------
+------------METAL CODE END----------------------
+
+SMODS.Consumable{
+    key = 'LTMBlueprint', -- key
+    set = 'LTMConsumableType', -- the set of the card: corresponds to a consumable type
+    atlas = 'Jokers', -- atlas
+    pos = {x = 2, y = 7}, -- position in atlas
+    loc_txt = {
+        name = 'Blueprint', -- name of card
+        text = { -- text of card
+            'Enhances {C:attention}#1#{} selected cards',
+            'into {C:money}Wood{}, {C:mult}Brick{}, or {C:inactive}Metal{}.',
+        }
+    },
+    config = {
+        extra = {
+            cards = 1, -- configurable value
+        }
+    },
+    loc_vars = function(self, info_queue, center)
+        info_queue[#info_queue + 1] = G.P_CENTERS.m_fn_Wood
+        info_queue[#info_queue + 1] = G.P_CENTERS.m_fn_Brick
+        info_queue[#info_queue + 1] = G.P_CENTERS.m_fn_Metal
+        if center and center.ability and center.ability.extra then
+            return {vars = {center.ability.extra.cards}} 
+        end
+        return {vars = {}}
+    end,
+    can_use = function(self, card)
+        if G and G.hand and G.hand.highlighted and card.ability and card.ability.extra and card.ability.extra.cards then
+            if #G.hand.highlighted > 0 and #G.hand.highlighted <= card.ability.extra.cards then
+                return true
+            end
+        end
+        return false
+    end,
+    use = function(self, card, area, copier)
+        if G and G.hand and G.hand.highlighted then
+            for i = 1, #G.hand.highlighted do
+                -- Randomly select an enhancement type
+                local enhancement_type = math.random(3) -- 1 for Wood, 2 for Brick, 3 for Metal
+                
+                -- Assign the enhancement based on the random type
+                if enhancement_type == 1 then
+                    G.hand.highlighted[i]:set_ability(G.P_CENTERS.m_fn_Wood, nil, true)
+                elseif enhancement_type == 2 then
+                    G.hand.highlighted[i]:set_ability(G.P_CENTERS.m_fn_Brick, nil, true)
+                elseif enhancement_type == 3 then
+                    G.hand.highlighted[i]:set_ability(G.P_CENTERS.m_fn_Metal, nil, true)
+                end
+                
+                -- Add an event to juice up the card
+                G.E_MANAGER:add_event(Event({
+                    func = function()
+                        G.hand.highlighted[i]:juice_up()
+                        return true
+                    end
+                }))
+            end
+        end
+    end,
+}
 
 ----------------------------------------------
 ------------CRAC DECK CODE BEGIN----------------------
