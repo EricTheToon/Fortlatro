@@ -652,7 +652,6 @@ return {
 			-- C so Gemini doesn't say they are compatible when they are not
 			-- D Invisible Joker
 			
-			if center.name == "Fortune Teller" 
 			or center.name == "Shoot the Moon" 
 			or center.name == "Riff-raff" 
 			or center.name == "Business Card"
