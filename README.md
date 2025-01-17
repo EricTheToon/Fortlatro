@@ -30,6 +30,13 @@ Save The World - Rare - Gains 0.5x mult if you do not purchase anything at the s
 
 The Loop - Common - 1/4 chance to give each scored card Echo
 
+Chug Jug - Uncommon - Copies total hands at the start of the round if you run out of hands reset hands back to however many you had at the start of round
+
+Big Pot - Common - Copies total half of hands at the start of the round if you run out of hands reset hands back to half of however many you had at the start of round
+
+Mini Shield - Common - Copies total a fourth of hands at the start of the round if you run out of hands reset hands back to a forth of however many you had at the start of round
+
+Vbucks - Uncommon - 1/3 Chance to gain $10 when blind starts
 # 2 Decks
 Eric Deck - Start with Eric
 
