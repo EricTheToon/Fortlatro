@@ -174,6 +174,10 @@ SMODS.Sound({
 	key = "arcana",
 	path = "arcana.ogg",
 })
+SMODS.Sound({
+	key = "persona",
+	path = "persona.ogg",
+})
 
 SMODS.Atlas{
     key = 'Jokers', --atlas key
@@ -250,6 +254,7 @@ SMODS.Joker{
                     new_card:add_to_deck()
                     G.jokers:emplace(new_card)
                     G.GAME.pool_flags.crac_flag = true  -- Set Crac's unique flag
+					play_sound("fn_persona")
                     return {
                         message = "PERSONA!"
                     }
@@ -371,6 +376,7 @@ SMODS.Joker{
                         elseif rerolled_outcome < 0.2856 then
                             table.insert(outcomes, "Summon a random joker")
                             -- Summon a random joker
+							play_sound("fn_persona")
                             local new_card = create_card('Joker', G.jokers, is_soul, nil, nil, nil, nil, "mno")
                             new_card:add_to_deck()
                             G.jokers:emplace(new_card)

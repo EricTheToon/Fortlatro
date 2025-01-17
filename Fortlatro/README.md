@@ -1,7 +1,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 18 Jokers
+# 14 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see)
@@ -30,13 +30,6 @@ Save The World - Rare - Gains 0.5x mult if you do not purchase anything at the s
 
 The Loop - Common - 1/4 chance to give each scored card Echo
 
-Chug Jug - Uncommon - Copies total hands at the start of the round if you run out of hands reset hands back to however many you had at the start of round and self destructs
-
-Big Pot - Common - Copies half of hands at the start of the round if you run out of hands reset hands back to half of however many you had at the start of round and self destructs
-
-Mini Shield - Common - Copies a fourth of hands at the start of the round if you run out of hands reset hands back to a forth of however many you had at the start of round and self destructs
-
-Vbucks - Uncommon - 1/3 Chance to gain $10 when blind starts
 # 2 Decks
 Eric Deck - Start with Eric
 
