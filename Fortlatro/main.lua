@@ -7,7 +7,7 @@
 --- PREFIX: fn
 --- PRIORITY: -69420
 --- DEPENDENCIES: [Steamodded>=0.9.8, Cryptid>=0.5.3, ortalab, SnowMods>=0.2.0, ceres>=1.2.0b, BetmmaAbilities>=1.0.3.3(20241018), DiceSeal, CursedDiceSeal, Talisman>=2.0.0-beta8,]
---- VERSION: 1.0.2 Release
+--- VERSION: 1.0.3 Release
 ----------------------------------------------
 ------------MOD CODE -------------------------
 SMODS.Atlas({
@@ -91,6 +91,11 @@ SMODS.Joker{
 
 ----------------------------------------------
 ------------SWORD CODE BEGIN----------------------
+SMODS.Sound({
+	key = "error",
+	path = "error.ogg",
+})
+
 
 SMODS.ConsumableType{
     key = 'LTMConsumableType', --consumable type key
@@ -149,6 +154,8 @@ SMODS.Consumable{
         return false
     end,
     use = function(self, card, area, copier)
+		play_sound("slice1")
+		play_sound("fn_error")
         if G and G.hand and G.hand.highlighted then
             for i = 1, #G.hand.highlighted do
                 G.hand.highlighted[i]:set_edition(poll_edition('random key', nil, false, true))
@@ -163,7 +170,10 @@ SMODS.Consumable{
 
 ----------------------------------------------
 ------------CRAC CODE BEGIN----------------------
-
+SMODS.Sound({
+	key = "arcana",
+	path = "arcana.ogg",
+})
 
 SMODS.Atlas{
     key = 'Jokers', --atlas key
@@ -272,6 +282,7 @@ SMODS.Joker{
                     _card:add_to_deck()
                     G.consumeables:emplace(_card)
                     G.GAME.pool_flags.crac_flag = true  -- Set Crac's unique flag
+					play_sound("fn_arcana")
                     return {
                         message = "The Arcana is the means by which all is revealed."
                     }
@@ -379,6 +390,7 @@ SMODS.Joker{
                         elseif rerolled_outcome < 0.4998 then
                             table.insert(outcomes, "Summon a random Tarot card")
                             -- Summon a random Tarot card
+							play_sound("fn_arcana")
                             local tarot_cards = {
                                 'c_fool', 'c_magician', 'c_hanged_man',
                                 'c_lovers', 'c_chariot', 'c_hermit',
@@ -579,11 +591,16 @@ SMODS.Joker{
   end,
 }
 
-
 ----------------------------------------------
 ------------EMILY CODE END----------------------
+
 ----------------------------------------------
 ------------TOILET GANG CODE BEGIN----------------------
+
+SMODS.Sound({
+	key = "flush",
+	path = "flush.ogg",
+})
 
 SMODS.Atlas{
     key = 'Jokers', --atlas key
@@ -620,6 +637,7 @@ SMODS.Joker{
         if context.scoring_name == "Flush" or context.scoring_name == "Straight Flush" or context.scoring_name == "Royal Flush" or context.scoring_name == "Flush Five" or context.scoring_name == "Flush House" then
                         card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_add
                         return {
+							play_sound("fn_flush"),
                             message = localize('k_upgrade_ex'),
                             colour = G.C.Mult,
                             card = card
@@ -640,7 +658,13 @@ SMODS.Joker{
 ------------TOILET GANG CODE END----------------------
 
 ----------------------------------------------
-------------GROUND GAME CODE END----------------------
+------------GROUND GAME CODE BEGIN----------------------
+
+SMODS.Sound({
+	key = "bus",
+	path = "bus.ogg",
+})
+
 SMODS.Atlas{
     key = 'Jokers', --atlas key
     path = 'Jokers.png', --atlas' path in (yourMod)/assets/1x or (yourMod)/assets/2x
@@ -692,6 +716,7 @@ SMODS.Joker{
             -- Check for the specific condition: 6, 7, 2 (x2), and 3
             if counts[6] >= 1 and counts[7] >= 1 and counts[2] >= 2 and counts[3] >= 1 then
                 -- Draw the entire deck
+				play_sound("fn_bus")
                 G.FUNCS.draw_from_deck_to_hand(#G.deck.cards)
                 
                 -- Apply the GLITCHED effect to scoring hand
@@ -822,6 +847,12 @@ SMODS.Joker{
 
 ----------------------------------------------
 ------------DUB CODE BEGIN----------------------
+
+SMODS.Sound({
+	key = "dub",
+	path = "dub.ogg",
+})
+
 SMODS.Atlas{
     key = 'Jokers', --atlas key
     path = 'Jokers.png', --atlas' path in (yourMod)/assets/1x or (yourMod)/assets/2x
@@ -870,6 +901,7 @@ SMODS.Joker{
                 local new_card = create_card('LTMConsumableType', G.consumeables)
                 new_card:add_to_deck()
                 G.consumeables:emplace(new_card)
+				play_sound("fn_dub")
             end
         end
     end -- End of calculate function
@@ -880,6 +912,7 @@ SMODS.Joker{
 
 ----------------------------------------------
 ------------FLUSH FACTORY CODE BEGIN----------------------
+
 SMODS.Atlas{
     key = 'Jokers', --atlas key
     path = 'Jokers.png', --atlas' path in (yourMod)/assets/1x or (yourMod)/assets/2x
@@ -953,7 +986,8 @@ SMODS.Joker{
             
             -- Return the dynamic message based on the scoring hand type
             return {
-                message = context.scoring_name .. "!"
+                play_sound("fn_flush"),
+				message = context.scoring_name .. "!"
             }
         end
     end
@@ -1054,7 +1088,7 @@ SMODS.Joker{
     blueprint_compat = true,
     
     -- Calculate function for applying the Joker's effect
-    calculate = function(self, card, context) -- Ground Game Logic
+    calculate = function(self, card, context)
         if context.joker_main then
             -- Check if the current round has not played any hands yet
             if G.GAME.current_round.hands_played == 0 then
@@ -1304,6 +1338,7 @@ SMODS.Joker {
             card.ability.extra.chips = chips + jokers_bonus  -- Total chips calculation
 
             -- Debug log
+			play_sound("fn_bus")
             print("" .. joker_name .. " has thanked the bus driver")
             SMODS.eval_this(card, {message = ("Beep Beep"), colour = G.C.BLUE})
 
@@ -1400,6 +1435,10 @@ SMODS.Joker
 
 ----------------------------------------------
 ------------STW CODE END----------------------
+
+----------------------------------------------
+------------THE LOOP CODE BEGIN----------------------
+
 SMODS.Joker{
     key = 'TheLoop',
     loc_txt = {
@@ -1459,6 +1498,261 @@ SMODS.Joker{
         end
     end,
 }
+----------------------------------------------
+------------THE LOOP CODE END----------------------
+
+----------------------------------------------
+------------CHUG JUG CODE BEGIN----------------------
+
+SMODS.Sound({
+	key = "chug",
+	path = "chug.ogg",
+})
+
+SMODS.Atlas{
+    key = 'Jokers', -- Atlas key
+    path = 'Jokers.png', -- Path to the atlas file
+    px = 71.1, -- Width of one card
+    py = 95 -- Height of one card
+}
+
+SMODS.Joker{
+    key = 'ChugJug',
+    loc_txt = {
+        ['en-us'] = {
+            name = "Chug Jug",
+            text = {
+                "When {C:attention}Blind{} starts, stores your {C:chips}Hands{}",
+                "If you run out of {C:chips}Hands{}, restore {C:chips}Hands{} to the stored value",
+                "{C:mult}Self-destruct{} when triggered",
+                "{C:chips}#1# {C:inactive}Stored{} {C:chips}hands{}"
+            }
+        }
+    },
+    atlas = 'Jokers',
+    pos = { x = 3, y = 7 },
+    config = {
+        extra = { 
+            hands = 0 -- Default hands
+        }
+    },
+    rarity = 2,          -- Uncommon joker
+    cost = 5,            -- Cost to purchase
+    blueprint_compat = false,
+
+    loc_vars = function(self, info_queue, card)
+        -- Dynamically display the stored hands
+        local stored_hands = self.config.extra.initial_hands or self.config.extra.hands
+        return {
+            vars = { stored_hands }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        if context.joker_main then
+            local round = G.GAME.current_round
+
+            -- Store the initial hands at the start of the round
+            if round.hands_played == 0 and not self.config.extra.initial_hands then
+                self.config.extra.initial_hands = round.hands_left + 1
+            end
+            
+            -- Check if hands are depleted and the player can't meet the blind
+            if round.hands_left <= 0 and G.GAME.chips < G.GAME.blind.chips then
+				play_sound("fn_chug")
+                -- Restore hands to the stored value
+                local restore_value = self.config.extra.initial_hands or self.config.extra.hands
+                round.hands_left = restore_value
+
+                --trigger self-destruction
+                card:start_dissolve()
+            end
+        end
+    end
+}
+----------------------------------------------
+------------CHUG JUG CODE END----------------------
+
+----------------------------------------------
+------------BIG POT CODE BEGIN----------------------
+SMODS.Joker{
+    key = 'BigPot',
+    loc_txt = {
+        ['en-us'] = {
+            name = "Big Pot",
+            text = {
+                "When {C:attention}Blind{} starts, stores {C:attention}Half{} your {C:chips}Hands{}",
+                "If you run out of {C:chips}Hands{}, restore {C:chips}Hands{} to the stored value",
+                "{C:mult}Self-destruct{} when triggered",
+                "{C:chips}#1# {C:inactive}Stored{} {C:chips}hands{}"
+            }
+        }
+    },
+    atlas = 'Jokers',
+    pos = { x = 4, y = 7 },
+    config = {
+        extra = { 
+            hands = 0 -- Default hands
+        }
+    },
+    rarity = 1,          -- Uncommon joker
+    cost = 2,            -- Cost to purchase
+    blueprint_compat = false,
+
+    loc_vars = function(self, info_queue, card)
+        -- Dynamically display the stored hands
+        local stored_hands = self.config.extra.initial_hands or self.config.extra.hands
+        return {
+            vars = { stored_hands }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        if context.joker_main then
+            local round = G.GAME.current_round
+
+            -- Store the initial hands at the start of the round
+            if round.hands_played == 0 and not self.config.extra.initial_hands then
+                self.config.extra.initial_hands = round.hands_left / 2 +0.5
+            end
+            
+            -- Check if hands are depleted and the player can't meet the blind
+            if round.hands_left <= 0 and G.GAME.chips < G.GAME.blind.chips then
+				play_sound("fn_chug")
+                -- Restore hands to the stored value
+                local restore_value = self.config.extra.initial_hands or self.config.extra.hands
+                round.hands_left = restore_value
+
+                --trigger self-destruction
+                card:start_dissolve()
+            end
+        end
+    end
+}
+
+----------------------------------------------
+------------BIG POT CODE END----------------------
+
+----------------------------------------------
+------------MINI CODE BEGIN----------------------
+
+SMODS.Joker{
+    key = 'Mini',
+    loc_txt = {
+        ['en-us'] = {
+            name = "Mini Shield",
+            text = {
+                "When {C:attention}Blind{} starts, stores a {C:attention}Fourth{} of your {C:chips}Hands{}",
+                "If you run out of {C:chips}Hands{}, restore {C:chips}Hands{} to the stored value",
+                "{C:mult}Self-destruct{} when triggered",
+                "{C:chips}#1# {C:inactive}Stored{} {C:chips}hands{}"
+            }
+        }
+    },
+    atlas = 'Jokers',
+    pos = { x = 0, y = 8 },
+    config = {
+        extra = { 
+            hands = 0 -- Default hands
+        }
+    },
+    rarity = 1,          -- Uncommon joker
+    cost = 1,            -- Cost to purchase
+    blueprint_compat = false,
+
+    loc_vars = function(self, info_queue, card)
+        -- Dynamically display the stored hands
+        local stored_hands = self.config.extra.initial_hands or self.config.extra.hands
+        return {
+            vars = { stored_hands }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        if context.joker_main then
+            local round = G.GAME.current_round
+
+            -- Store the initial hands at the start of the round
+            if round.hands_played == 0 and not self.config.extra.initial_hands then
+                self.config.extra.initial_hands = round.hands_left / 4 +0.25
+            end
+            
+            -- Check if hands are depleted and the player can't meet the blind
+            if round.hands_left <= 0 and G.GAME.chips < G.GAME.blind.chips then
+				play_sound("fn_chug")
+                -- Restore hands to the stored value
+                local restore_value = self.config.extra.initial_hands or self.config.extra.hands
+                round.hands_left = restore_value
+
+                --trigger self-destruction
+                card:start_dissolve()
+            end
+        end
+    end
+}
+----------------------------------------------
+------------MINI CODE END----------------------
+SMODS.Joker {
+    key = 'Vbucks',
+    loc_txt = {
+        ['en-us'] = {
+            name = "Vbucks",
+            text = {
+                "{C:green}#3#{} in {C:green}#2#{} chance to",
+                "gain {C:money}$#1#{}",
+                "when {C:attention}Blind{} starts",
+            }
+        }
+    },
+    atlas = 'Jokers',
+    pos = { x = 1, y = 8 },
+    config = {
+        extra = { 
+            dollars = 10,   -- Fixed Money Granted
+            odds = 3,       -- Odds of getting the money
+        }
+    },
+    rarity = 1,            -- Common joker
+    cost = 10,             -- Cost to purchase
+    blueprint_compat = true,
+
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.extra.dollars,
+                card.ability.extra.odds,
+                '' .. (G.GAME and G.GAME.probabilities.normal or 1),
+            }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        -- Check if the Blind effect is starting and that conditions are met (no blueprint card or slicing)
+        if context.setting_blind and not (context.blueprint_card or self).getting_sliced then
+            local money = card.ability.extra.dollars
+            local odds = card.ability.extra.odds
+
+            -- Check if you win the money
+            if pseudorandom('Vbucks') < G.GAME.probabilities.normal / odds then
+                if money > 0 then
+                    ease_dollars(money)
+                    G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + money
+                    G.E_MANAGER:add_event(Event({func = (function() G.GAME.dollar_buffer = 0; return true end)}))
+                    return {
+                        message = localize('$') .. money,
+                        dollars = money,
+                        colour = G.C.MONEY
+                    }
+                end
+            end
+        end
+    end
+}
+
+
+
+
+
 
 ----------------------------------------------
 ------------GLASSES CODE BEGIN----------------------
@@ -1577,6 +1871,11 @@ SMODS.Consumable{
 ----------------------------------------------
 ------------PERK UP CODE BEGIN----------------------
 
+SMODS.Sound({
+	key = "perk",
+	path = "perk.ogg",
+})
+
 SMODS.ConsumableType{
     key = 'LTMConsumableType', -- consumable type key
 
@@ -1633,6 +1932,7 @@ SMODS.Consumable{
         return false
     end,
     use = function(self, card, area, copier)
+		play_sound("fn_perk")
         -- List of possible enhancements
         local enhancements = {
             G.P_CENTERS.m_bonus, G.P_CENTERS.m_mult, G.P_CENTERS.m_wild, G.P_CENTERS.m_lucky,
@@ -2024,6 +2324,11 @@ SMODS.Consumable{
 ----------------------------------------------
 ------------DECOY GRENADE CODE BEGIN---------------------
 
+SMODS.Sound({
+	key = "decoy",
+	path = "decoy.ogg",
+})
+
 SMODS.Consumable{
     key = 'LTMDecoy',
     set = 'LTMConsumableType',
@@ -2056,6 +2361,7 @@ SMODS.Consumable{
         return false
     end,
     use = function(self, card, area, copier)
+		play_sound("fn_decoy")
         -- Ensure the creation configuration is initialized
         G.deck.config.wonderMagnum_betmma = G.deck.config.wonderMagnum_betmma or {}
 
@@ -2506,7 +2812,6 @@ SMODS.Enhancement({
             -- Chance to summon a gnome
             if pseudorandom('Gnome') < G.GAME.probabilities.normal / card.ability.extra.odds then
                 -- Summon the gnome
-                play_sound("fn_gnome")
                 G.E_MANAGER:add_event(Event({
                     func = function() 
                         local c = create_card(
@@ -2514,6 +2819,7 @@ SMODS.Enhancement({
                         )
                         c:add_to_deck()
                         G.consumeables:emplace(c)
+						play_sound("fn_gnome")
                         return true
                     end
                 }))
@@ -2625,6 +2931,18 @@ SMODS.Enhancement({
 
 ----------------------------------------------
 ------------METAL CODE END----------------------
+SMODS.Sound({
+	key = "wood",
+	path = "wood.ogg",
+})
+SMODS.Sound({
+	key = "brick",
+	path = "brick.ogg",
+})
+SMODS.Sound({
+	key = "metal",
+	path = "metal.ogg",
+})
 
 SMODS.Consumable{
     key = 'LTMBlueprint', -- key
@@ -2668,10 +2986,13 @@ SMODS.Consumable{
                 
                 -- Assign the enhancement based on the random type
                 if enhancement_type == 1 then
+					play_sound("fn_wood")
                     G.hand.highlighted[i]:set_ability(G.P_CENTERS.m_fn_Wood, nil, true)
                 elseif enhancement_type == 2 then
+					play_sound("fn_brick")
                     G.hand.highlighted[i]:set_ability(G.P_CENTERS.m_fn_Brick, nil, true)
                 elseif enhancement_type == 3 then
+					play_sound("fn_metal")
                     G.hand.highlighted[i]:set_ability(G.P_CENTERS.m_fn_Metal, nil, true)
                 end
                 
