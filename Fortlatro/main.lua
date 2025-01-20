@@ -7,7 +7,7 @@
 --- PREFIX: fn
 --- PRIORITY: -69420
 --- DEPENDENCIES: [Steamodded>=0.9.8, Cryptid>=0.5.3, ortalab, ceres>=1.2.0b, BetmmaAbilities>=1.0.3.3(20241018), DiceSeal, CursedDiceSeal, Talisman>=2.0.0-beta8,]
---- VERSION: 1.0.4 Pre-Release Build
+--- VERSION: 1.0.4 Release
 ----------------------------------------------
 ------------MOD CODE -------------------------
 SMODS.Atlas({
