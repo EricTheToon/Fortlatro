@@ -1,7 +1,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 18 Jokers
+# 19 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see)
@@ -37,6 +37,8 @@ Big Pot - Common - Copies half of hands at the start of the round if you run out
 Mini Shield - Common - Copies a fourth of hands at the start of the round if you run out of hands reset hands back to a forth of however many you had at the start of round and self destructs
 
 Vbucks - Uncommon - 1/3 Chance to gain $10 when blind starts
+
+Reality Augment - Rare - All chances are guarenteed
 # 2 Decks
 Eric Deck - Start with Eric
 
@@ -82,7 +84,9 @@ Brick - 1.3X Mult +40 Chips 1/100 chance to summon a Gnome
 
 Metal - 1.5X Mult +60 Chips
 
-# 1 Blind
-Fracture - all played cards are destroyed
+# 2 Blinds
+Fracture - All played cards are destroyed
+
+Zero Build - Wood, Brick and Metal are debuffed
 
 # im pretty sure you need ALL the included mod files for other mods here so please use them idk im really bad at coding
