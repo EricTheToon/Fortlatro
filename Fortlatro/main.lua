@@ -2144,7 +2144,7 @@ SMODS.Joker {
         text = {
             "Retriggers every {C:diamond}Diamond{} card played {C:attention}#1#{} times",
             "Gains {X:mult,C:white}X#2#{} Mult for each scoring {C:diamond}Diamond{} in played hand",
-            "{C:mult}Self-destruct{} if played contains 2 Aces",
+            "{C:mult}Self-destruct{} if played hand contains 2 Aces",
         }
     },
     rarity = 2,
