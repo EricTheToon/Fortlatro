@@ -1,7 +1,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 23 Jokers
+# 26 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see)
@@ -48,16 +48,24 @@ Oscar's Medallion - Common - +20 Mult destroy this if playing a flush
 
 Montague's Medallion - Uncommon - Diamond cards retrigger give 0.5x mult for each scoring diamond in hand destroyed if hand contains 2 aces
 
+MagmaReef - Rare - Destroy every LTM card when blind is selected +50 chips for each destroyed LTM card
+
+Durr Burger - Common - having cards of the same rank in the first and last slot gives +10 mult
+
+Aces Wild - Rare - Played Aces and Wild cards retrigger and give X1.5 Mult
+
 # 2 Decks
 Eric Deck - Start with Eric
 
 Crac Deck - Start with 4 Cracs that ALWAYS trigger from Infinity
 
-# 1 Tarot
+# 2 Tarots
 Left Handed Death - its just death but backwards i made it specifically to fuck with Crac since he keeps messing it up and then he installed a persona tarot card mod so now its a persona death tarot
+
+Glitched - Create 2 random LTM cards (must have room)
 # 1 Spectral
 Double or Nothing - 1/2 chance to get 2 Spectral packs else give nothing
-# 16 Consumables
+# 21 Consumables
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -90,6 +98,16 @@ Boombox - Select 3 cards and destroy them 3 other cards in your deck recieve ran
 
 Junk Rift - Create 3 new cards cards created in this way have a chance for editions enhancements and seals
 
+Pizza Slice - Gives 25% of current blind requirement as Chips
+
+Pizza Party - Gives 2 Pizza Slices
+
+Rift to Go - Select up to 3 cards and discard them without using a discard
+
+Chest - Create 1 random low tier Joker (must have room)
+
+Rare Chest - Create 1 random high tier Joker (must have room)
+
 # 4 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
 
@@ -98,6 +116,11 @@ Wood - 1.2X Mult +15 Chips
 Brick - 1.3X Mult +40 Chips 1/100 chance to summon a Gnome
 
 Metal - 1.5X Mult +60 Chips
+
+# 2 Tags
+Ship It! - Gives a free LTM Pack
+
+Ship It Express! - Gives a free MEGA LTM Pack
 
 # 2 Blinds
 Fracture - All played cards are destroyed
