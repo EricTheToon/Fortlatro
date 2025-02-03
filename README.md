@@ -137,6 +137,7 @@ Fracture - All played cards are destroyed
 
 Zero Build - Wood, Brick and Metal are debuffed
 
-# Be sure to check config.lua you can enable and disable sounds, cracsounds, cryptid compat, ortalab compat, and enhancements.
+# Be sure to check config.lua you can enable and disable sounds, cracsounds, cryptid compat, ortalab compat, ceres compat and enhancements.
 [ortalab](https://github.com/Eremel/Ortalab/tree/12ad0459565911aa5de428288c5d431466f06c73)
 [cryptid](https://github.com/MathIsFun0/Cryptid)
+[ceres](https://github.com/nekojoe/Ceres)
