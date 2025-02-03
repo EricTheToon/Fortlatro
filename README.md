@@ -54,6 +54,16 @@ Durr Burger - Common - having cards of the same rank in the first and last slot 
 
 Aces Wild - Rare - Played Aces and Wild cards retrigger and give X1.5 Mult
 
+Hatsune Miku - Rare - X1.39 Mult for every 3 and 9 played
+
+Upgrade Bench - Common - Upgrade 1 random card into a random enhanced card when blind is selected
+
+The Nothing - Common - Destroy 1 random card when blind is selected and gain +2 mult
+
+The Flip - Uncommon - Gain X0.2 Mult for each flipped card held in hand
+
+Malfunctioning Vending Machine - Rare - Gain $5 every time you purchase something
+
 # 2 Decks
 Eric Deck - Start with Eric
 
