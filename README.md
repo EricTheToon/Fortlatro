@@ -1,7 +1,8 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
+# Requires [Steamodded](https://github.com/Steamodded/smods/wiki/) and [Talisman](https://github.com/MathIsFun0/Talisman/tree/main?tab=readme-ov-file)
 featuring as of right now 
-# 31 Jokers
+# 35 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see)
@@ -63,6 +64,14 @@ The Nothing - Common - Destroy 1 random card when blind is selected and gain +2 
 The Flip - Uncommon - Gain X0.2 Mult for each flipped card held in hand
 
 Malfunctioning Vending Machine - Rare - Gain $5 every time you purchase something
+
+Thanos - Rare - 1/8 Chance to destroy half of everything and create a legendary Joker when blind is selected
+
+Rocket Racing - Uncommon - +200 Chips lose 10 for each hand played at 0 chips gain an extra joker slot
+
+50v50 - Common - 1/2 Chance to give +50 Chips else give +50 Mult
+
+Double Pump - Uncommon - Retriggers every scoring played card takes 2 Joker slots instead of 1
 
 # 2 Decks
 Eric Deck - Start with Eric
@@ -137,7 +146,6 @@ Fracture - All played cards are destroyed
 
 Zero Build - Wood, Brick and Metal are debuffed
 
-# Be sure to check config.lua you can enable and disable sounds, cracsounds, cryptid compat, ortalab compat, ceres compat and enhancements.
+# Be sure to check the config tab you can enable and disable sounds, cracsounds, cryptid compat, ortalab compat, and Old Calc or New Calc
 [ortalab](https://github.com/Eremel/Ortalab/tree/12ad0459565911aa5de428288c5d431466f06c73)
 [cryptid](https://github.com/MathIsFun0/Cryptid)
-[ceres](https://github.com/nekojoe/Ceres)
