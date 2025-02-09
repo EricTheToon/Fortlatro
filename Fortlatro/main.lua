@@ -7,7 +7,7 @@
 --- PREFIX: fn
 --- PRIORITY: -69420
 --- DEPENDENCIES: [Steamodded>=0.9.8, Talisman>=2.0.0-beta8,]
---- VERSION: 1.0.8 Pre-Release Beta 
+--- VERSION: 1.0.8 Release 
 ----------------------------------------------
 ------------MOD CODE -------------------------
 SMODS.Atlas({
