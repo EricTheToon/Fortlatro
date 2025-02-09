@@ -1,6 +1,6 @@
+# Requires [Steamodded](https://github.com/Steamodded/smods/wiki/) and [Talisman](https://github.com/MathIsFun0/Talisman/tree/main?tab=readme-ov-file)
 # Fortlatro
 a terrible Fortnite themed Balatro mod
-# Requires [Steamodded](https://github.com/Steamodded/smods/wiki/) and [Talisman](https://github.com/MathIsFun0/Talisman/tree/main?tab=readme-ov-file)
 featuring as of right now 
 # 35 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
