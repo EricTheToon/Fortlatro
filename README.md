@@ -67,7 +67,7 @@ Malfunctioning Vending Machine - Rare - Gain $5 every time you purchase somethin
 
 Thanos - Rare - 1/8 Chance to destroy half of everything and create a legendary Joker when blind is selected
 
-Rocket Racing - Uncommon - +200 Chips lose 10 for each hand played at 0 chips gain an extra joker slot
+Rocket Racing - Uncommon - +200 Chips lose 10 for each hand played at 0 chips gain an extra Joker slot
 
 50v50 - Common - 1/2 Chance to give +50 Chips else give +50 Mult
 
