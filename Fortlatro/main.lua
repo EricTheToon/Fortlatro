@@ -7,7 +7,7 @@
 --- PREFIX: fn
 --- PRIORITY: -69420
 --- DEPENDENCIES: [Steamodded>=0.9.8, Talisman>=2.0.0-beta8,]
---- VERSION: 1.0.7 Release 
+--- VERSION: 1.0.8 Pre-Release Beta 
 ----------------------------------------------
 ------------MOD CODE -------------------------
 SMODS.Atlas({
@@ -17,6 +17,28 @@ SMODS.Atlas({
     py = '34'
 })
 
+SMODS.current_mod.config_tab = function()
+    local scale = 5/6
+    return {n=G.UIT.ROOT, config = {align = "cl", minh = G.ROOM.T.h*0.25, padding = 0.0, r = 0.1, colour = G.C.GREY}, nodes = {
+        {n = G.UIT.R, config = { padding = 0.05 }, nodes = {
+            {n = G.UIT.C, config = { minw = G.ROOM.T.w*0.25, padding = 0.05 }, nodes = {
+                create_toggle{ label = "Toggle SFX", info = {"Enable Sound Effects"}, active_colour = Fortlatro.badge_colour, ref_table = Fortlatro.config, ref_value = "sfx" },
+                create_toggle{ label = "Toggle Crac SFX", info = {"Enable Sound Effects for Crac Joker"}, active_colour = Fortlatro.badge_colour, ref_table = Fortlatro.config, ref_value = "cracsfx" },
+                create_toggle{ label = "Cryptid Compatibility", info = {"Enable if Cryptid Mod is Installed"}, active_colour = Fortlatro.badge_colour, ref_table = Fortlatro.config, ref_value = "cryptidcompat" },
+                create_toggle{ label = "Ortalab Compatibility", info = {"Enable if Ortalab Mod is Installed"}, active_colour = Fortlatro.badge_colour, ref_table = Fortlatro.config, ref_value = "ortalabcompat" },
+                create_toggle{ label = "Old Calc Compatibility", info = {"Enable if using Steamodded Old Calc"}, active_colour = Fortlatro.badge_colour, ref_table = Fortlatro.config, ref_value = "oldcalccompat" },
+                create_toggle{ label = "New Calc Compatibility", info = {"Enable if using Steamodded New Calc"}, active_colour = Fortlatro.badge_colour, ref_table = Fortlatro.config, ref_value = "newcalccompat" }
+            }}
+        }}
+    }}
+end
+
+
+Fortlatro = SMODS.current_mod
+-- Load Options
+Fortlatro_config = Fortlatro.config
+-- This will save the current state even when settings are modified
+Fortlatro.enabled = copy_table(Fortlatro_config)
 
 local config = SMODS.current_mod.config
 ----------------------------------------------
@@ -701,7 +723,7 @@ SMODS.Joker{
     atlas = "Jokers", pos = {x = 3, y = 0},
     cost = 5,
     unlocked = true,
-    discovered = true,
+    discovered = false,
     eternal_compat = true,
     blueprint_compat = true,
     perishable_compat = false,
@@ -1404,7 +1426,7 @@ SMODS.Joker {
         ['en-us'] = {
             name = "Battle Bus",
             text = {
-                "Gains {C:attention}#1#{} {C:chips}Chips{} for each Joker when scoring",
+                "Gains {C:chips}#1#{} Chips for each Joker when scoring",
                 "{C:inactive}Currently{} {C:chips}#2#{} {C:inactive}Chips"
             }
         }
@@ -1908,7 +1930,7 @@ SMODS.Joker{
         ['en-us'] = {
             name = "BluGlo",
             text = {
-                "Every LTM consumable used adds {C:mult}#2#{} Mult",
+                "Every LTM consumable used adds {C:mult}+#2#{} Mult",
                 "Spawn 2 Negative LTM Cards upon obtaining this Joker",
                 "{C:inactive}Currently{} {C:mult}#1# {C:inactive}mult",
             }
@@ -2081,7 +2103,7 @@ SMODS.Joker{
         ['en-us'] = {
             name = "Oscar's Medallion",
             text = {
-                "{C:mult}#1#{} Mult",
+                "{C:mult}+#1#{} Mult",
                 "{C:mult}Destroy{} this Joker if a {C:attention}Flush{} is played",
             }
         }
@@ -2257,7 +2279,7 @@ SMODS.Joker {
         text = {
             "When {C:attention}blind selected{}, {C:mult}destroy{}",
             "every {C:purple}LTM Card{} in your consumable",
-            "area and gain {C:chips}#1# {C:chips}Chips{} per card destroyed",
+            "area and gain {C:chips}+#1# {C:chips}Chips{} per card destroyed",
             "{C:inactive}Currently{} {C:chips}#2# {C:inactive}Chips"
         }
     },
@@ -2267,7 +2289,7 @@ SMODS.Joker {
     atlas = 'Jokers',
     cost = 5,
     unlocked = true,
-    discovered = true,
+    discovered = false,
     blueprint_compat = true,
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.chips_per_card, card.ability.extra.stored_chips}}
@@ -2763,7 +2785,7 @@ SMODS.Joker{
     atlas = "Jokers", pos = {x = 4, y = 12},
     cost = 7,
     unlocked = true,
-    discovered = true,
+    discovered = false,
     eternal_compat = true,
     blueprint_compat = true,
     perishable_compat = false,
@@ -2806,6 +2828,9 @@ SMODS.Joker{
 
 ----------------------------------------------
 ------------THE FLIP CODE END----------------------
+
+----------------------------------------------
+------------MALFUNCTIONING VENDING MACHINE CODE BEGIN----------------------
 
 SMODS.Joker {
     key = 'MVM',
@@ -2856,6 +2881,322 @@ SMODS.Joker {
         end
     end
 }
+
+----------------------------------------------
+------------MALFUNCTIONING VENDING MACHINE CODE END----------------------
+
+----------------------------------------------
+------------THANOS CODE BEGIN----------------------
+
+SMODS.Sound({
+	key = "dust",
+	path = "dust.ogg",
+})
+
+
+SMODS.Joker {
+    name = "Thanos",
+    key = "Thanos",
+    config = {
+        extra = {
+            odds = 8  -- 1 in 8 chance to activate
+        }
+    },
+    pos = {x = 1, y = 13},
+    loc_txt = {
+        name = "Thanos",
+        text = {
+            "When {C:attention}Blind Starts{} {C:green}#2#{} in {C:green}#1#{} chance to",
+            "{C:mult}destroy{} half of everything",
+            "and create a {C:purple}Legendary{} Joker",
+        }
+    },
+    rarity = 3,
+    cost = 6,
+    unlocked = true,
+    discovered = false,
+    blueprint_compat = true,
+    perishable_compat = true,
+    atlas = "Jokers",
+
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.extra.odds,
+                '' .. (G.GAME and G.GAME.probabilities.normal or 1),
+            }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        if context.first_hand_drawn then
+            G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+                local odds = card.ability.extra.odds
+                local chance = G.GAME.probabilities.normal / odds
+
+                if pseudorandom('Thanos') < chance then
+                    -- Collect all cards separately
+                    local jokers, consumables, hand_cards = {}, {}, {}
+
+                    for _, c in ipairs(G.hand.cards) do table.insert(hand_cards, c) end
+                    for _, c in ipairs(G.jokers.cards) do table.insert(jokers, c) end
+                    for _, c in ipairs(G.consumeables.cards) do table.insert(consumables, c) end
+
+                    -- Function to destroy a rounded-up half of a card list
+                    local function destroy_half(card_list)
+                        local num_to_destroy = math.ceil(#card_list / 2)
+                        for i = 1, num_to_destroy do
+                            if #card_list > 0 then
+                                local randomIndex = math.random(#card_list)
+                                local target = card_list[randomIndex]
+                                if config.sfx ~= false then
+									play_sound("fn_dust")
+								end
+                                target:start_dissolve()
+                                table.remove(card_list, randomIndex)
+                            end
+                        end
+                    end
+
+                    -- Destroy cards separately
+                    destroy_half(jokers)
+                    destroy_half(consumables)
+                    destroy_half(hand_cards)
+
+                    -- Create a Legendary Joker
+                    local new_joker = create_card("Joker", G.jokers, true, 4, nil, nil, nil, "")
+                    new_joker:add_to_deck()
+                    new_joker:start_materialize()
+                    G.jokers:emplace(new_joker)
+
+                    return {
+                        message = "Balanced...",
+                        colour = G.C.MAGENTA
+                    }
+                end
+                return true
+            end}))
+        end
+    end
+}
+
+----------------------------------------------
+------------THANOS CODE END----------------------
+
+----------------------------------------------
+------------ROCKET RACING CODE BEGIN----------------------
+
+SMODS.Joker {
+    key = 'Racing',
+    loc_txt = {
+        name = 'Rocket Racing',
+        text = {
+            "{C:chips}#1#{} Chips for each hand played",
+            "At 0, gain an extra Joker slot",
+            "{C:inactive}Currently{} {C:chips}#2# {C:inactive}Chips"
+        }
+    },
+    config = {extra = {stored_chips = 200, chips_per_card = -10, slot_granted = false}},
+    rarity = 2,
+    pos = {x = 2, y = 13},
+    atlas = 'Jokers',
+    cost = 9,
+    unlocked = true,
+    discovered = false,
+    blueprint_compat = true,
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {card.ability.extra.chips_per_card, card.ability.extra.stored_chips}}
+    end,
+
+    calculate = function(self, card, context)
+        if context.joker_main then
+            -- Apply stored chips as a score boost
+            local stored_chips = card.ability.extra.stored_chips
+            local chips_lost = card.ability.extra.chips_per_card
+
+            -- Queue a delayed event to reduce stored chips AFTER scoring
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    -- Reduce stored chips but prevent negatives
+                    local new_stored_chips = math.max(0, stored_chips + chips_lost)
+                    card.ability.extra.stored_chips = new_stored_chips
+
+                    -- Show message as "-10 Chips" (without formatting issues)
+                    SMODS.eval_this(card, {
+                        message = string.format("-%d Chips", math.abs(chips_lost)),
+                        colour = G.C.CHIPS
+                    })
+
+                    -- If stored chips hit zero and slot hasn't been granted, grant an extra Joker slot
+                    if new_stored_chips == 0 and not card.ability.extra.slot_granted then
+                        card.ability.extra.slot_granted = true
+                        G.jokers.config.card_limit = G.jokers.config.card_limit + 1
+
+                        -- Show a message for the new Joker slot
+                        SMODS.eval_this(card, {
+                            message = "Extra Joker Slot!",
+                            colour = G.C.VOUCHER
+                        })
+                    end
+                    return true
+                end
+            }))
+
+            return {
+                message = localize {type = 'variable', key = 'a_chips', vars = {stored_chips}},
+                chip_mod = stored_chips,
+                colour = G.C.CHIPS
+            }
+        end
+    end,
+
+    remove_from_deck = function(self, card)
+        -- Remove the extra slot if the card is removed
+        if card.ability.extra.slot_granted then
+            G.jokers.config.card_limit = G.jokers.config.card_limit - 1
+        end
+    end
+}
+
+----------------------------------------------
+------------ROCKET RACING CODE END----------------------
+
+----------------------------------------------
+------------50v50 CODE BEGIN----------------------
+
+SMODS.Joker {
+    key = '50v50',
+    loc_txt = {
+        name = '50v50',
+        text = {
+            'Has a {C:green,E:1,S:1.1}#1# in #2#{} chance to give {C:chips}+#3#{} Chips',
+			'else give {C:mult}+#4#{} Mult',
+        }
+    },
+    config = {
+        extra = { 
+            chips_per_card = 50,   -- Store chips value
+            mult_per_card = 50,    -- Store multiplier value
+            odds = 2               -- Configuration: 50% chance for chips or multiplier
+        },
+        no_pool_flag = 'gamble',
+    },
+    rarity = 1,
+    pos = {x = 3, y = 13},
+    atlas = 'Jokers',
+    cost = 5,
+    unlocked = true,
+    discovered = false,
+    blueprint_compat = true,
+    loc_vars = function(self, info_queue, card)
+        -- Return the stored chips and multiplier values for localization
+        return {
+            vars = {G.GAME.probabilities.normal, card.ability.extra.odds, card.ability.extra.chips_per_card, card.ability.extra.mult_per_card}
+        }
+    end,
+    calculate = function(self, card, context)
+        -- Joker main scoring logic with the game's probability system
+        if context.joker_main then
+            G.GAME.pool_flags.gamble = true -- Set gamble flag
+
+            -- Using the game's internal probability system (like Double or Nothing)
+            if pseudorandom('50vs50') < G.GAME.probabilities.normal / card.ability.extra.odds then
+                -- Success: Grant +chips_per_card value (50 chips)
+                return {
+                    message = localize {type = 'variable', key = 'a_chips', vars = {card.ability.extra.chips_per_card}},
+                    chip_mod = card.ability.extra.chips_per_card,
+                    colour = G.C.CHIPS
+                }
+            else
+                -- Failure: Grant +mult_per_card value (50 multiplier)
+                return {
+                    message = localize {type = 'variable', key = 'a_mult', vars = {card.ability.extra.mult_per_card}},
+                    mult_mod = card.ability.extra.mult_per_card,
+                    colour = G.C.MULT
+                }
+            end
+        end
+    end
+}
+
+----------------------------------------------
+------------50v50 CODE END----------------------
+
+SMODS.Sound({
+	key = "pump",
+	path = "pump.ogg",
+})
+
+SMODS.Joker{
+    key = "DoublePump",
+    loc_txt = {
+        name = "Double Pump",
+        text = {
+            "Retriggers every scoring played card {C:attention}#1#{} times",
+            "Takes 2 Joker slots instead of 1"
+        }
+    },
+    rarity = 2,
+    atlas = "Jokers",
+    pos = { x = 4, y = 13 },
+    cost = 6,
+    order = 32,
+    no_pool_flag = 'pump',
+    blueprint_compat = true,
+    config = {
+        extra = {
+            repetitions = 1,  -- Number of times scoring cards will retrigger
+        },
+    },
+    
+    loc_vars = function(self, info_queue, card)
+        -- Return the retriggers for each card
+        return {
+            vars = {card.ability.extra.repetitions}
+        }
+    end,
+
+    -- Adjust Joker slots when added
+    add_to_deck = function()
+        if G.jokers then
+            G.jokers.config.card_limit = G.jokers.config.card_limit - 1  -- Uses an extra slot
+        end
+    end,
+
+    -- Restore Joker slot when removed
+    remove_from_deck = function()
+        if G.jokers then
+            G.jokers.config.card_limit = G.jokers.config.card_limit + 1  -- Returns the extra slot
+        end
+    end,
+
+    calculate = function(self, card, context)
+        -- Only trigger retriggering for scoring cards
+        if context.repetition and context.cardarea == G.play then
+            -- Perform retrigger based on card's repetitions
+            for i = 1, card.ability.extra.repetitions do
+                -- Trigger the retrigger process for each repetition
+                G.GAME.pool_flags.pump = true  -- Set 'clam' flag to trigger retrigger
+                -- Play the sound after retriggering
+                if config.sfx ~= false then
+                    play_sound("fn_pump")
+                end
+                return {
+                    message = "Again!",
+                    repetitions = card.ability.extra.repetitions - i + 1,  -- Adjust repetitions left for each retrigger
+                    card = card,
+                }
+            end
+        end
+    end,
+}
+
+
+
+
+
+
 
 
 
@@ -3654,7 +3995,7 @@ SMODS.Consumable{
 ----------------------------------------------
 ------------CRYSTAL CODE BEGIN----------------------
 
-if config.enhancementcompat ~= false then
+if config.oldcalccompat ~= false then
     SMODS.Enhancement({
         loc_txt = {
             name = 'Crystal',
@@ -3702,12 +4043,68 @@ if config.enhancementcompat ~= false then
     })
 end
 
+if config.newcalccompat ~= false then
+    Crystal = SMODS.Enhancement {
+    object_type = "Enhancement",
+    key = "Crystal",
+    loc_txt = {
+        name = "Crystal",
+        text = { 
+            "{X:mult,C:white}X#1#{} Mult {C:chips}#2#{} Chips",
+            "no rank or suit",
+            "{C:green}#4# in #3#{} chance this",
+            "card is {C:red}destroyed",
+            "when triggered"
+        },
+    },
+    atlas = "Jokers",
+    pos = { x = 0, y = 6 },
+    no_rank = true,        -- No rank
+    no_suit = true,        -- No suit
+	replace_base_card = true,
+    always_scores = true,  -- Always scores
+    config = { 
+        extra = {
+            m_mult = 1.5,   -- Multiplier effect
+            chips = 50,     -- Chip bonus
+            odds = 6        -- Odds for shattering the card
+        }
+    },
+    weight = 0,
+    loc_vars = function(self, info_queue, card)
+        return { 
+            vars = { 
+                card.ability.extra.m_mult, 
+                card.ability.extra.chips, 
+                card.ability.extra.odds, 
+                G.GAME.probabilities.normal 
+            }
+        }
+    end,
+    calculate = function(self, card, context)
+        if context.main_scoring and context.cardarea == G.play then
+            -- Apply the multiplier and chip effects
+            return {
+                x_mult = card.ability.extra.m_mult,  -- Apply the multiplier
+                chips = card.ability.extra.chips,   -- Apply the chips bonus
+            }
+        end
+        if context.cardarea == G.play and not context.repetition then
+            -- Chance to shatter the card
+            if pseudorandom('CrystalShatter') < G.GAME.probabilities.normal / card.ability.extra.odds then
+                -- Shatter the card
+                card:shatter()
+            end
+        end
+    end
+}
+end
+
 ----------------------------------------------
 ------------CRYSTAL CODE END----------------------
 
 ----------------------------------------------
 ------------RAINBOW CODE BEGIN----------------------
-if config.enhancementcompat ~= false then
     SMODS.Consumable{
         key = 'LTMRainbow', -- key
         set = 'LTMConsumableType', -- the set of the card: corresponds to a consumable type
@@ -3764,14 +4161,14 @@ if config.enhancementcompat ~= false then
             end
         end,
     }
-end
+
 
 ----------------------------------------------
 ------------RAINBOW CODE END----------------------
 
 ----------------------------------------------
 ------------WOOD CODE BEGIN----------------------
-if config.enhancementcompat ~= false then
+if config.oldcalccompat ~= false then
     SMODS.Enhancement({
         loc_txt = {
             name = 'Wood',
@@ -3807,6 +4204,31 @@ if config.enhancementcompat ~= false then
     })
 end
 
+if config.newcalccompat ~= false then
+    Wood = SMODS.Enhancement {
+    object_type = "Enhancement",
+    key = "Wood",
+    loc_txt = {
+        name = "Wood",
+        text = { "{X:mult,C:white}X#1#{} Mult {C:chips}#2#{} Chips" },
+    },
+    atlas = "Jokers",
+    pos = { x = 3, y = 6 },
+    config = { extra = { m_mult = 1.2, chips = 15 } },
+    weight = 0,
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card.ability.extra.m_mult, card.ability.extra.chips } }
+    end,
+    calculate = function(self, card, context)
+        if context.main_scoring and context.cardarea == G.play then
+            return {
+                x_mult = card.ability.extra.m_mult,  -- Ensure Xmult is directly applied
+                chips = card.ability.extra.chips,   -- Apply the chips bonus
+            }
+        end
+    end
+}
+end
 ----------------------------------------------
 ------------WOOD CODE END----------------------
 
@@ -3818,7 +4240,7 @@ SMODS.Sound({
 	path = "gnome.ogg",
 })
 
-if config.enhancementcompat ~= false then
+if config.oldcalccompat ~= false then
     SMODS.Enhancement({
         loc_txt = {
             name = 'Brick',
@@ -3881,6 +4303,70 @@ if config.enhancementcompat ~= false then
         end,
     })
 end
+
+if config.newcalccompat ~= false then
+    Brick = SMODS.Enhancement {
+    object_type = "Enhancement",
+    key = "Brick",
+    loc_txt = {
+        name = "Brick",
+        text = { 
+            "{X:mult,C:white}X#1#{} Mult {C:chips}#2#{} Chips",
+            "{C:green}#4# in #3#{} chance to",
+            "summon a {C:red}Gnome"
+        },
+    },
+    atlas = "Jokers",
+    pos = { x = 4, y = 6 },
+    config = { 
+        extra = {
+            m_mult = 1.3,   -- Multiplier effect
+            chips = 40,     -- Chip bonus
+            odds = 100      -- Odds for gnome 
+        }
+    },
+    weight = 0,
+    loc_vars = function(self, info_queue, card)
+        return { 
+            vars = { 
+                card.ability.extra.m_mult, 
+                card.ability.extra.chips, 
+                card.ability.extra.odds, 
+                G.GAME.probabilities.normal 
+            }
+        }
+    end,
+    calculate = function(self, card, context)
+        if context.main_scoring and context.cardarea == G.play then
+            -- Apply the multiplier and chip effects
+            return {
+                x_mult = card.ability.extra.m_mult,  -- Apply the multiplier
+                chips = card.ability.extra.chips,   -- Apply the chips bonus
+            }
+        end
+        if context.cardarea == G.play and not context.repetition then
+            -- Chance to summon a gnome
+            if pseudorandom('Gnome') < G.GAME.probabilities.normal / card.ability.extra.odds then
+                -- Summon the gnome
+                G.E_MANAGER:add_event(Event({
+                    func = function() 
+                        local c = create_card(
+                            nil, G.consumeables, nil, nil, nil, nil, 'c_fn_Gnome', 'sup'
+                        )
+                        c:add_to_deck()
+                        G.consumeables:emplace(c)
+                        if config.sfx ~= false then
+                            play_sound("fn_gnome")
+                        end
+                        return true
+                    end
+                }))
+            end
+        end
+    end
+}
+end
+
 
 
 ----------------------------------------------
@@ -3955,7 +4441,7 @@ SMODS.Consumable{
 
 ----------------------------------------------
 ------------METAL CODE BEGIN----------------------
-if config.enhancementcompat ~= false then
+if config.oldcalccompat ~= false then
     SMODS.Enhancement({
         loc_txt = {
             name = 'Metal',
@@ -3991,6 +4477,33 @@ if config.enhancementcompat ~= false then
     })
 end
 
+if config.newcalccompat ~= false then
+    Metal = SMODS.Enhancement {
+    object_type = "Enhancement",
+    key = "Metal",
+    loc_txt = {
+        name = "Metal",
+        text = { "{X:mult,C:white}X#1#{} Mult {C:chips}#2#{} Chips" },
+    },
+    atlas = "Jokers",
+    pos = { x = 1, y = 7 },
+    config = { extra = { m_mult = 1.5, chips = 60 } },
+    weight = 0,
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card.ability.extra.m_mult, card.ability.extra.chips } }
+    end,
+    calculate = function(self, card, context)
+        if context.main_scoring and context.cardarea == G.play then
+            return {
+                x_mult = card.ability.extra.m_mult,  -- Apply the multiplier
+                chips = card.ability.extra.chips,   -- Apply the chips bonus
+            }
+        end
+    end
+}
+end
+
+
 
 ----------------------------------------------
 ------------METAL CODE END----------------------
@@ -4011,7 +4524,6 @@ SMODS.Sound({
 	path = "metal.ogg",
 })
 
-if config.enhancementcompat ~= false then
     SMODS.Consumable{
         key = 'LTMBlueprint', -- key
         set = 'LTMConsumableType', -- the set of the card: corresponds to a consumable type
@@ -4081,7 +4593,7 @@ if config.enhancementcompat ~= false then
             end
         end,
     }
-end
+
 
 ----------------------------------------------
 ------------BLUEPRINT CODE END----------------------
@@ -4118,7 +4630,7 @@ SMODS.Consumable{
     end,
     can_use = function(self, card)
         -- Only allow use when there are cards in hand
-        return G and (#G.hand.cards > 0) and card.ability and card.ability.extra and card.ability.extra.discards
+        return G.STATE == G.STATES.SELECTING_HAND
     end,
     use = function(self, card, area, copier)
         if config.sfx ~= false then
@@ -4387,50 +4899,47 @@ SMODS.Consumable {
         local chips = center and center.ability and center.ability.extra.chips or 0
         return {vars = {math.floor(chips)}}
     end,
-    can_use = function(self) return #G.hand.cards > 0 end,
+    can_use = function(self) 
+        local blind_chips = G.GAME.blind and G.GAME.blind.chips or 0
+        return G.STATE == G.STATES.SELECTING_HAND 
+    end,
     use = function(self, card, area, copier)
         -- Play sound effect
         if config.sfx ~= false then
             play_sound(math.random() < 0.9 and "fn_pizza1" or "fn_pizza2")
         end
-        -- Award chips based on blind requirement
-        G.E_MANAGER:add_event(Event({
-            trigger = 'after',
-            delay = 0.1,
-            func = function()
-                local blind_chips = G.GAME.blind and G.GAME.blind.chips or 0
-                local award_chips = math.floor(blind_chips * 0.25)
-                -- Add chips and update the game state if necessary
-                G.GAME.chips = G.GAME.chips + award_chips
-                G.GAME.pool_flags.ltm_pizza_flag = true
-                (copier or card):juice_up()
+        
+        -- Get blind chips and calculate the reward
+        local blind_chips = G.GAME.blind and G.GAME.blind.chips or 0
+        local award_chips = math.floor(blind_chips * 0.25)
+        
+        -- Award chips immediately
+        G.GAME.chips = G.GAME.chips + award_chips
+        G.GAME.pool_flags.ltm_pizza_flag = true
+        
+        -- Apply juice effect
+        (copier or card):juice_up()
 
-                -- Only trigger end_round if cerescompat is enabled
-                if config.cerescompat ~= false then
-                    if G.GAME.chips >= blind_chips then
-                        G.STATE = G.STATES.HAND_PLAYED
-                        G.STATE_COMPLETE = true
-                        end_round()
-                    end
+        -- Check if the round should end using an immediate event
+        G.E_MANAGER:add_event(Event({
+            trigger = "immediate",
+            func = function()
+                if G.STATE ~= G.STATES.SELECTING_HAND then
+                    return false
                 end
-                
-                -- Return the success message
-                return {message = self.loc_txt.use_msg:gsub("{chips}", award_chips)}
-            end
-        }))
+                if G.GAME.chips >= blind_chips then
+                    G.STATE = G.STATES.HAND_PLAYED
+                    G.STATE_COMPLETE = true
+                    end_round()
+                end
+                return true
+            end,
+        }), "other")
+
+        -- Return success message
+        return {message = self.loc_txt.use_msg:gsub("{chips}", award_chips)}
     end,
 }
-
-
-
-
-
-
-
-
-
-
-
 
 ----------------------------------------------
 ------------PIZZA CODE END----------------------
@@ -4767,7 +5276,7 @@ SMODS.Consumable{
             func = function()
                 if G.jokers then
                     -- Randomly decide if it's legendary or rare (50% chance each)
-                    local is_legendary = math.random() < 0.5  -- 50% chance to be true (legendary)
+                    local is_legendary = math.random() < 0.3  -- 30% chance to be true (legendary)
 
                     -- Create the card: first `true` for legendary, `false` for rare
                     local created_card = create_card("Joker", G.jokers, is_legendary, 4, nil, nil, nil, "")
