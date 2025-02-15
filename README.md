@@ -2,7 +2,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 35 Jokers
+# 38 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see)
@@ -73,6 +73,12 @@ Rocket Racing - Uncommon - +200 Chips lose 10 for each hand played at 0 chips ga
 
 Double Pump - Uncommon - Retriggers every scoring played card takes 2 Joker slots instead of 1
 
+Fortnite Festival - Uncommon - Gains a charge when the condition is met At 2 charges gives X3 Mult condition changes every round
+
+Kinetic Blade - Uncommon - Gains a charge when a hand is played At 3 charges gives X3 Mult
+
+Kado Thorne's Time Machine - Rare - Sell this card to randomize the ante between -2 and +2 
+
 # 2 Decks
 Eric Deck - Start with Eric
 
@@ -140,6 +146,13 @@ Metal - 1.5X Mult +60 Chips
 Ship It! - Gives a free LTM Pack
 
 Ship It Express! - Gives a free MEGA LTM Pack
+
+# 3 Seals
+Storm Seal - Creates an LTM Card when discarded (must have room)
+
+Glitched Seal - Does something random when played and unscoring
+
+Boogie Seal - If played hand contains this seal 1/4 chance not to consume a hand
 
 # 2 Blinds
 Fracture - All played cards are destroyed
