@@ -7,7 +7,7 @@
 --- PREFIX: fn
 --- PRIORITY: -69420
 --- DEPENDENCIES: [Steamodded>=0.9.8, Talisman>=2.0.0-beta8,]
---- VERSION: 1.0.8 Release 
+--- VERSION: 1.0.9 Release 
 ----------------------------------------------
 ------------MOD CODE -------------------------
 SMODS.Atlas({
@@ -43,6 +43,11 @@ Fortlatro.enabled = copy_table(Fortlatro_config)
 local config = SMODS.current_mod.config
 ----------------------------------------------
 ------------ERIC CODE BEGIN----------------------
+
+SMODS.Sound({
+	key = "edie",
+	path = "edie.ogg",
+})
 
 SMODS.Atlas{
     key = 'Jokers', --atlas key
@@ -95,7 +100,7 @@ SMODS.Joker{
 
         if context.setting_blind then
             for i = 1, 3 do
-                local new_card = create_card('Joker', G.jokers, is_soul, nil, nil, nil, nil, "mno")
+                local new_card = create_card('Joker', G.jokers, false, nil, nil, nil, nil, "mno")
                 new_card:add_to_deck()
                 G.jokers:emplace(new_card)
             end
@@ -108,8 +113,13 @@ SMODS.Joker{
     calc_dollar_bonus = function(self, card)
         return -5
     end,
+    remove_from_deck = function(self, card)
+        -- Play removal sound effect when sold or removed
+        if config.sfx ~= false then
+            play_sound("fn_edie") 
+        end
+    end,
 }
-
 
 ----------------------------------------------
 ------------ERIC CODE END----------------------
@@ -293,7 +303,7 @@ SMODS.Joker{
             }
         }
     end,
-
+	
     calculate = function(self, card, context)
         if context.before then
             if pseudorandom('crac') < G.GAME.probabilities.normal / card.ability.extra.odds then
@@ -302,6 +312,7 @@ SMODS.Joker{
                 if outcome == nil then
                     error("Outcome is nil. Something went wrong with the random generation or the way outcome is calculated.")
                 end
+
 
                 if outcome < 0.0667  then
                     -- x0 multiplier logic
@@ -618,17 +629,23 @@ SMODS.Joker{
                 end
             end
         end
-        
+		
         if context.joker_main then
-            return {
-                message = localize {
-                    type = 'variable',
-                    key = 'sj_mult',
-                    vars = { card.ability.extra.mult }
-                },
-                mult_mod = card.ability.extra.mult,
-                card = self
-            }
+        return {
+        message = localize {
+            type = 'variable',
+            key = 'sj_mult',
+            vars = { card.ability.extra.mult }
+        },
+        mult_mod = card.ability.extra.mult,
+        card = self
+        }
+    end
+    end,
+    remove_from_deck = function(self, card)
+        -- Play removal sound effect when sold or removed
+        if config.sfx ~= false then
+            play_sound("fn_edie") 
         end
     end
 }
@@ -646,49 +663,108 @@ SMODS.Atlas{
     py = 95 -- height of one card
 }
 
-SMODS.Joker{
-  key = 'Emily',
-  loc_txt = {
-    name = 'Emily',
-    text = {
-      "Retrigger EVERYTHING"
-    }
-  },
-  atlas = "Jokers",
-  pos = { x = 4, y = 0 },
-  config = {}, -- No need for `extra.odds`
-  rarity = 4,
-  order = 32,
-  cost = 14,
-  no_pool_flag = 'clam',
-  blueprint_compat = true,
-  loc_vars = function(self, info_queue, center)
-    return {
-      vars = { "" .. (G.GAME and G.GAME.probabilities.normal or 1) }
-    }
-  end,
-  calculate = function(self, card, context)
-    -- Check for retrigger conditions
-    if context.retrigger_joker_check and not context.retrigger_joker and context.other_card ~= self then
-      G.GAME.pool_flags.clam = true -- Ensure 'clam' flag is set
-      return {
-        message = "CLAM!",          -- Display "CLAM!" message
-        colour = G.C.RED,           -- Add color if applicable
-        repetitions = 1,            -- Retrigger action
-        card = card,
-      }
-    end
+if config.oldcalccompat ~= false then
+  SMODS.Joker{
+    key = 'Emily',
+    loc_txt = {
+        name = 'Emily',
+        text = {
+            "Retrigger EVERYTHING {C:attention}#1#{} Times"
+        }
+    },
+    atlas = "Jokers",
+    pos = { x = 4, y = 0 },
+    config = {
+        extra = {
+            repetitions = 1, -- Number of times to retrigger for scoring cards and Jokers
+        },
+    },
+    rarity = 4,
+    order = 32,
+    cost = 14,
+    no_pool_flag = 'clam',
+    blueprint_compat = true,
+    loc_vars = function(self, info_queue, center)
+        return {
+            vars = { "" .. self.config.extra.repetitions }
+        }
+    end,
 
-    -- Check for repetition and update game state
-    if context.repetition and context.cardarea == G.play then
-      G.GAME.pool_flags.clam = true
-      return {
-        message = "CLAM!",
-        colour = G.C.RED,
-      }
-    end
-  end,
+    calculate = function(self, card, context)
+        -- Check for retriggering (excluding consumables)
+        if (context.retrigger_joker_check and not context.retrigger_joker and context.other_card ~= self) or
+           context.jokers or (context.repetition and context.cardarea == G.play) then
+
+            -- Loop through the configured repetitions
+            for i = 1, self.config.extra.repetitions do
+                G.GAME.pool_flags.clam = true  -- Ensure 'clam' flag is set
+
+                -- Return a message for each repetition
+                return {
+                    message = "CLAM!",  -- Custom message
+                    colour = G.C.RED,    -- Set the color to red for emphasis
+                    repetitions = self.config.extra.repetitions, -- How many times to retrigger
+                    card = card,         -- Attach the card context
+                }
+            end
+        end
+    end,
 }
+end
+
+
+
+
+if config.newcalccompat ~= false then
+  SMODS.Joker{
+    key = 'Emily',
+    loc_txt = {
+        name = 'Emily',
+        text = {
+            "Retrigger scored cards {C:attention}#1#{} Times"
+            --frankly this shit is broken as hell on newcompat and i dont know how to fix it she just wont fucking trigger other jokers
+            --until one of y'all has a solution im just giving her 5 repetitions of the played hand FUCK new calc man this shit is ass
+        }
+    },
+    atlas = "Jokers",
+    pos = { x = 4, y = 0 },
+    config = {
+        extra = {
+            repetitions = 5, -- Number of times to retrigger for scoring cards and Jokers
+        },
+    },
+    rarity = 4,
+    order = 32,
+    cost = 14,
+    no_pool_flag = 'clam',
+    blueprint_compat = true,
+    loc_vars = function(self, info_queue, center)
+        return {
+            vars = { "" .. self.config.extra.repetitions }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        -- Check for retriggering (excluding consumables)
+        if (context.retrigger_joker_check and not context.retrigger_joker and context.other_card ~= self) or
+           context.jokers or (context.repetition and context.cardarea == G.play) then
+
+            -- Loop through the configured repetitions
+            for i = 1, self.config.extra.repetitions do
+                G.GAME.pool_flags.clam = true  -- Ensure 'clam' flag is set
+
+                -- Return a message for each repetition
+                return {
+                    message = "CLAM!",  -- Custom message
+                    colour = G.C.RED,    -- Set the color to red for emphasis
+                    repetitions = self.config.extra.repetitions, -- How many times to retrigger
+                    card = card,         -- Attach the card context
+                }
+            end
+        end
+    end,
+}
+end
 
 ----------------------------------------------
 ------------EMILY CODE END----------------------
@@ -971,7 +1047,7 @@ SMODS.Joker{
             name = "The Dub",
             text = {
                 "{C:green}#3#{} in {C:green}#2#{} chance to",
-                "create a {C:dark_edition}LTM Card{}",
+                "create a {C:purple}LTM Card{}",
                 "when {C:attention}Blind{} starts",
                 "{C:inactive}(Must have room)"
             }
@@ -1180,7 +1256,7 @@ SMODS.Joker{
             text = {
                 "If {C:attention}first hand{} of round",
                 "has only 4 cards, destroy",
-                "them and earn an {C:dark_edition}LTM Card{}", 
+                "them and earn an {C:purple}LTM Card{}", 
             }
         }
     },
@@ -1812,62 +1888,127 @@ SMODS.Joker{
 ----------------------------------------------
 ------------VBUCKS CODE BEGIN----------------------
 
-SMODS.Joker {
-    key = 'Vbucks',
-    loc_txt = {
-        ['en-us'] = {
-            name = "Vbucks",
-            text = {
-                "{C:green}#3#{} in {C:green}#2#{} chance to",
-                "gain {C:money}$#1#{}",
-                "when {C:attention}Blind{} starts",
+if config.oldcalccompat ~= false then
+    SMODS.Joker {
+        key = 'Vbucks',
+        loc_txt = {
+            ['en-us'] = {
+                name = "Vbucks",
+                text = {
+                    "{C:green}#3#{} in {C:green}#2#{} chance to",
+                    "gain {C:money}$#1#{}",
+                    "when {C:attention}Blind{} starts",
+                }
             }
-        }
-    },
-    atlas = 'Jokers',
-    pos = { x = 1, y = 8 },
-    config = {
-        extra = { 
-            dollars = 10,   -- Fixed Money Granted
-            odds = 3,       -- Odds of getting the money
-        }
-    },
-    rarity = 1,            -- Common joker
-    cost = 10,             -- Cost to purchase
-    blueprint_compat = true,
-
-    loc_vars = function(self, info_queue, card)
-        return {
-            vars = {
-                card.ability.extra.dollars,
-                card.ability.extra.odds,
-                '' .. (G.GAME and G.GAME.probabilities.normal or 1),
+        },
+        atlas = 'Jokers',
+        pos = { x = 1, y = 8 },
+        config = {
+            extra = { 
+                dollars = 10,   -- Fixed Money Granted
+                odds = 3,       -- Odds of getting the money
             }
-        }
-    end,
+        },
+        rarity = 1,            -- Common joker
+        cost = 10,             -- Cost to purchase
+        blueprint_compat = true,
 
-    calculate = function(self, card, context)
-        -- Check if the Blind effect is starting and that conditions are met (no blueprint card or slicing)
-        if context.setting_blind and not (context.blueprint_card or self).getting_sliced then
-            local money = card.ability.extra.dollars
-            local odds = card.ability.extra.odds
+        loc_vars = function(self, info_queue, card)
+            return {
+                vars = {
+                    card.ability.extra.dollars,
+                    card.ability.extra.odds,
+                    '' .. (G.GAME and G.GAME.probabilities.normal or 1),
+                }
+            }
+        end,
 
-            -- Check if you win the money
-            if pseudorandom('Vbucks') < G.GAME.probabilities.normal / odds then
-                if money > 0 then
-                    ease_dollars(money)
-                    G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + money
-                    G.E_MANAGER:add_event(Event({func = (function() G.GAME.dollar_buffer = 0; return true end)}))
-                    return {
-                        message = localize('$') .. money,
-                        dollars = money,
-                        colour = G.C.MONEY
-                    }
+        calculate = function(self, card, context)
+            -- Check if the Blind effect is starting and that conditions are met (no blueprint card or slicing)
+            if context.setting_blind and not (context.blueprint_card or self).getting_sliced then
+                local money = card.ability.extra.dollars
+                local odds = card.ability.extra.odds
+
+                -- Check if you win the money
+                if pseudorandom('Vbucks') < G.GAME.probabilities.normal / odds then
+                    if money > 0 then
+                        ease_dollars(money)
+                        G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + money
+                        G.E_MANAGER:add_event(Event({func = (function() G.GAME.dollar_buffer = 0; return true end)}))
+                        return {
+                            message = localize('$') .. money,
+                            dollars = money,
+                            colour = G.C.MONEY
+                        }
+                    end
                 end
             end
         end
-    end
-}
+    }
+end
+
+
+if config.newcalccompat ~= false then
+    SMODS.Joker {
+        key = 'Vbucks',
+        loc_txt = {
+            ['en-us'] = {
+                name = "Vbucks",
+                text = {
+                    "{C:green}#3#{} in {C:green}#2#{} chance to",
+                    "gain {C:money}$#1#{}",
+                    "when {C:attention}Blind{} starts",
+                }
+            }
+        },
+        atlas = 'Jokers',
+        pos = { x = 1, y = 8 },
+        config = {
+            extra = { 
+                dollars = 10,   -- Fixed Money Granted
+                odds = 3,       -- Odds of getting the money
+            }
+        },
+        rarity = 1,            -- Common joker
+        cost = 10,             -- Cost to purchase
+        blueprint_compat = true,
+
+        loc_vars = function(self, info_queue, card)
+            return {
+                vars = {
+                    card.ability.extra.dollars,
+                    card.ability.extra.odds,
+                    '' .. (G.GAME and G.GAME.probabilities.normal or 1),
+                }
+            }
+        end,
+
+        calculate = function(self, card, context)
+            -- Check if the Blind effect is starting and that conditions are met (no blueprint card or slicing)
+            if context.setting_blind and not (context.blueprint_card or self).getting_sliced then
+                local money = card.ability.extra.dollars
+                local odds = card.ability.extra.odds
+
+                -- Check if you win the money based on odds
+                if pseudorandom('Vbucks') < (G.GAME.probabilities.normal / odds) then
+                    -- Directly give the money without odds
+                    if money > 0 then
+                        ease_dollars(money)
+                        G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + money
+                        G.E_MANAGER:add_event(Event({func = function() 
+                            G.GAME.dollar_buffer = 0
+                            return true 
+                        end}))
+                    end
+                end
+            end
+        end
+    }
+end
+
+
+
+
 
 ----------------------------------------------
 ------------VBUCKS CODE END----------------------
@@ -1931,7 +2072,7 @@ SMODS.Joker{
             name = "BluGlo",
             text = {
                 "Every LTM consumable used adds {C:mult}+#2#{} Mult",
-                "Spawn 2 Negative LTM Cards upon obtaining this Joker",
+                "Spawn 2 Negative {C:purple}LTM Cards{} upon obtaining this Joker",
                 "{C:inactive}Currently{} {C:mult}#1# {C:inactive}mult",
             }
         }
@@ -2778,7 +2919,7 @@ SMODS.Joker{
         text = {
             "This Joker Gains {X:mult,C:white}X#1#{} Mult",
             "for each {C:attention}Flipped{} card held in hand",
-            "{C:inactive}(Currently {X:mult,C:white}X#2#{})"
+            "{C:inactive}(Currently {X:mult,C:white}X#2#{}{C:inactive})"
         }
     },
     rarity = 2,
@@ -2832,55 +2973,96 @@ SMODS.Joker{
 ----------------------------------------------
 ------------MALFUNCTIONING VENDING MACHINE CODE BEGIN----------------------
 
-SMODS.Joker {
-    key = 'MVM',
-    loc_txt = {
-        ['en-us'] = {
-            name = 'Malfunctioning Vending Machine',
-            text = {
-                'Every time you {C:attention}purchase{} something',
-                'gain {C:money}$#1#{}',
+if config.oldcalccompat ~= false then
+    SMODS.Joker {
+        key = 'MVM',
+        loc_txt = {
+            ['en-us'] = {
+                name = 'Malfunctioning Vending Machine',
+                text = {
+                    'Every time you {C:attention}purchase{} something',
+                    'gain {C:money}$#1#{}',
+                }
             }
-        }
-    },
-    atlas = 'Jokers',
-    pos = { x = 0, y = 13 },
-    config = {
-        extra = {
-            dollars = 5,    -- Money granted on purchase
-        }
-    },
-    rarity = 3,           -- Rare joker
-    cost = 10,             -- Cost to purchase
-    blueprint_compat = true,
-
-    loc_vars = function(self, info_queue, card)
-        return {
-            vars = {
-                card.ability.extra.dollars,
+        },
+        atlas = 'Jokers',
+        pos = { x = 0, y = 13 },
+        config = {
+            extra = {
+                dollars = 5,    -- Money granted on purchase
             }
-        }
-    end,
+        },
+        rarity = 3,           -- Rare joker
+        cost = 10,             -- Cost to purchase
+        blueprint_compat = true,
 
-    calculate = function(self, card, context)
-        -- Check if an item is purchased (including reroll or booster)
-        if context.buying_card or context.reroll_shop or context.open_booster then
-            local money = card.ability.extra.dollars
+        loc_vars = function(self, info_queue, card)
+            return {
+                vars = {
+                    card.ability.extra.dollars,
+                }
+            }
+        end,
 
-            -- Directly give the money without odds
-            if money > 0 then
-                ease_dollars(money)
-                G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + money
-                G.E_MANAGER:add_event(Event({func = (function() G.GAME.dollar_buffer = 0; return true end)}))
+        calculate = function(self, card, context)
+            -- Check if an item is purchased (including reroll or booster)
+            if context.buying_card or context.reroll_shop or context.open_booster then
+                local money = card.ability.extra.dollars
+
+                -- Directly give the money without odds
+                if money > 0 then
+                    ease_dollars(money)
+                    G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + money
+                    G.E_MANAGER:add_event(Event({func = (function() G.GAME.dollar_buffer = 0; return true end)}))
+                end
+            end
+        end
+    }
+end
+
+
+if config.newcalccompat ~= false then
+    SMODS.Joker {
+        key = 'MVM',
+        loc_txt = {
+            ['en-us'] = {
+                name = 'Malfunctioning Vending Machine',
+                text = {
+                    'Every time you {C:attention}purchase{} something',
+                    'gain {C:money}$#1#{}',
+                }
+            }
+        },
+        atlas = 'Jokers',
+        pos = { x = 0, y = 13 },
+        config = {
+            extra = {
+                dollars = 5,    -- Money granted on purchase
+            }
+        },
+        rarity = 3,           -- Rare joker
+        cost = 10,             -- Cost to purchase
+        blueprint_compat = true,
+
+        loc_vars = function(self, info_queue, card)
+            return {
+                vars = {
+                    card.ability.extra.dollars,
+                }
+            }
+        end,
+
+        calculate = function(self, card, context)
+            -- Trigger when an item is purchased (card, reroll, or booster)
+            if context.buying_card or context.reroll_shop or context.open_booster then
                 return {
-                    message = localize('$') .. money,
-                    dollars = money,
+                    dollars = card.ability.extra.dollars,
                     colour = G.C.MONEY
                 }
             end
         end
-    end
-}
+    }
+end
 
 ----------------------------------------------
 ------------MALFUNCTIONING VENDING MACHINE CODE END----------------------
@@ -3123,6 +3305,9 @@ SMODS.Joker {
 ----------------------------------------------
 ------------50v50 CODE END----------------------
 
+----------------------------------------------
+------------DOUBLE PUMP CODE BEGIN----------------------
+
 SMODS.Sound({
 	key = "pump",
 	path = "pump.ogg",
@@ -3192,10 +3377,279 @@ SMODS.Joker{
     end,
 }
 
+----------------------------------------------
+------------DOUBLE PUMP CODE END----------------------
+
+----------------------------------------------
+------------FESTIVAL CODE BEGIN----------------------
+
+SMODS.Sound({
+	key = "charge",
+	path = "charge.ogg",
+})
+
+SMODS.Sound({
+	key = "song1",
+	path = "song1.ogg",
+})
+
+SMODS.Sound({
+	key = "song2",
+	path = "song2.ogg",
+})
+
+SMODS.Sound({
+	key = "song3",
+	path = "song3.ogg",
+})
+
+SMODS.Sound({
+	key = "song4",
+	path = "song4.ogg",
+})
+
+SMODS.Sound({
+	key = "song5",
+	path = "song5.ogg",
+})
 
 
+SMODS.Joker{
+  key = 'Festival',
+  loc_txt = {
+    name = 'Fortnite Festival',
+    text = {
+      "This Joker Gains a charge when the condition is met",
+      "At 2 charges gives {X:mult,C:white}X#1#{} Mult",
+      "Current charges: {C:attention}#2#",
+      "Current condition: {C:attention}#3#",
+      "{C:inactive} changes every round"
+    }
+  },
+  rarity = 2,
+  atlas = "Jokers", pos = {x = 0, y = 14},
+  cost = 5,
+  unlocked = true,
+  discovered = false,
+  eternal_compat = true,
+  blueprint_compat = true,
+  perishable_compat = false,
+  config = {extra = {Xmult = 3, charge = 0, required_hand = "High Card"}}, -- Default to a valid hand
+
+  loc_vars = function(self, info_queue, card)
+    return {vars = {card.ability.extra.Xmult, card.ability.extra.charge, card.ability.extra.required_hand}}
+  end,
+
+  -- Function to set a new random required hand
+  set_new_hand = function(self, card)
+    local available_hands = {}
+
+    -- Get all valid poker hands from the game
+    for hand_name, hand_data in pairs(G.GAME.hands) do
+      if hand_data.visible then
+        table.insert(available_hands, hand_name)
+      end
+    end
+
+    -- Ensure a different hand is chosen each round
+    if #available_hands > 1 then  -- Prevent infinite loop if only one hand type is valid
+      local old_hand = card.ability.extra.required_hand
+      local new_hand = old_hand
+
+      while new_hand == old_hand do
+        new_hand = pseudorandom_element(available_hands, pseudoseed('festival_hand'))
+      end
+
+      card.ability.extra.required_hand = new_hand
+    end
+  end,
+
+  calculate = function(self, card, context)
+    -- Ensure the required hand is set at creation if it somehow wasn't initialized
+    if not card.ability.extra.required_hand then
+      self:set_new_hand(card)
+    end
+
+    -- Set a new required hand when the first hand is drawn
+    if context.first_hand_drawn then
+      self:set_new_hand(card)
+    end
+
+    -- Gain charge when the required hand is played
+    if context.cardarea == G.jokers and context.before and not context.blueprint then 
+      if context.scoring_name == card.ability.extra.required_hand then
+        -- Increment charge counter
+        card.ability.extra.charge = (card.ability.extra.charge or 0) + 1
+
+        -- Play charge sound effect
+        if config.sfx ~= false then
+          play_sound("fn_charge")
+        end
+
+        -- Check if charges >= 2 and play the activation sound if necessary
+        if card.ability.extra.charge >= 2 then
+          if config.sfx ~= false then
+            local songs = {"fn_song1", "fn_song2", "fn_song3", "fn_song4"}
+            local chosen_song = pseudorandom_element(songs, pseudoseed('festival_song'))
+            play_sound(chosen_song)
+          end
+        end
+
+        return {
+          message = "Charge Gained! (" .. card.ability.extra.charge .. "/2)",
+          colour = G.C.Mult,
+          card = card
+        }
+      end
+    end
+
+    -- Activate the Joker if it has 2 charges
+    if context.joker_main and card.ability.extra.charge >= 2 then
+      local mult_value = card.ability.extra.Xmult
+
+      -- Reset charge counter after activation
+      card.ability.extra.charge = 0
+
+      return {
+        message = localize{type='variable',key='a_xmult',vars={mult_value}},
+        Xmult_mod = mult_value
+      }
+    end
+  end,
+
+  remove_from_deck = function(self, card)
+    -- Play removal sound effect when sold or removed
+    if config.sfx ~= false then
+      play_sound("fn_song5")
+    end
+  end,
+}
+
+----------------------------------------------
+------------FESTIVAL CODE END----------------------
+
+----------------------------------------------
+------------KINETIC BLADE CODE BEGIN----------------------
+
+SMODS.Sound({
+	key = "bladecharge",
+	path = "bladecharge.ogg",
+})
+
+SMODS.Sound({
+	key = "kblade",
+	path = "kblade.ogg",
+})
+
+SMODS.Sound({
+	key = "bladebreak",
+	path = "bladebreak.ogg",
+})
 
 
+SMODS.Joker{
+  key = 'KineticBlade',
+  loc_txt = {
+    name = 'Kinetic Blade',
+    text = {
+      "Gains a charge when a hand is played",
+      "At 3 charges gives {X:mult,C:white}X#1#{} Mult",
+      "Current charges: {C:attention}#2#",
+    }
+  },
+  rarity = 2,
+  atlas = "Jokers", pos = {x = 1, y = 14},
+  cost = 5,
+  unlocked = true,
+  discovered = false,
+  eternal_compat = true,
+  blueprint_compat = true,
+  perishable_compat = false,
+  config = {extra = {Xmult = 3, charge = 0}},
+
+  loc_vars = function(self, info_queue, card)
+    return {vars = {card.ability.extra.Xmult, card.ability.extra.charge}}
+  end,
+
+  calculate = function(self, card, context)
+    -- Gain charge when any hand is played
+    if context.cardarea == G.jokers and context.before and not context.blueprint then
+      card.ability.extra.charge = card.ability.extra.charge + 1
+
+      -- Play charge sound effect
+      if config.sfx ~= false then play_sound("fn_bladecharge") end
+
+      -- Play activation sound at 3 charges
+      if card.ability.extra.charge == 3 and config.sfx ~= false then
+        play_sound("fn_kblade")
+      end
+
+      return {message = "Charge Gained! (" .. card.ability.extra.charge .. "/3)", colour = G.C.Mult, card = card}
+    end
+
+    -- Activate at 3 charges
+    if context.joker_main and card.ability.extra.charge >= 3 then
+      local mult_value = card.ability.extra.Xmult
+      card.ability.extra.charge = 0  -- Reset charge counter
+
+      return {message = localize{type='variable',key='a_xmult',vars={mult_value}}, Xmult_mod = mult_value}
+    end
+  end,
+
+  remove_from_deck = function(self, card)
+    if config.sfx ~= false then play_sound("fn_bladebreak") end
+  end,
+}
+
+----------------------------------------------
+------------KINETIC BLADE CODE END----------------------
+
+----------------------------------------------
+------------KADO THORNE'S TIME MACHINE CODE BEGIN----------------------
+
+SMODS.Sound({
+	key = "time",
+	path = "time.ogg",
+})
+
+SMODS.Joker{
+  key = 'Kado',
+  loc_txt = {
+    name = "Kado Thorne's Time Machine",
+    text = {
+      "Sell this card to randomize the ante between {C:attention}-2{} and {C:attention}+2{}.",
+    }
+  },
+  rarity = 3,
+  atlas = "Jokers", pos = {x = 2, y = 14},
+  cost = 10,
+  unlocked = true,
+  discovered = false,
+  eternal_compat = true,
+  blueprint_compat = true,
+  perishable_compat = false,
+
+  calculate = function(self, card, context)
+    if context.selling_self then
+      -- Play sound effect when selling
+      if self.config.sfx ~= false then 
+        play_sound("fn_time") 
+      end
+
+      -- Randomize ante between -2 and +2, but never 0
+      local ante_shift = ({-2, -1, 1, 2})[math.random(4)]
+
+      ease_ante(ante_shift)
+
+      -- Ensure the ante properly updates in game state
+      G.GAME.round_resets.blind_ante = G.GAME.round_resets.blind_ante or G.GAME.round_resets.ante
+      G.GAME.round_resets.blind_ante = math.max(1, G.GAME.round_resets.blind_ante + ante_shift)
+    end
+  end
+}
+
+----------------------------------------------
+------------KADO THORNE'S TIME MACHINE CODE END----------------------
 
 
 
@@ -3780,10 +4234,8 @@ SMODS.Consumable{
         return {vars = {}}
     end,
     can_use = function(self, card)
-        if G and G.deck and #G.deck.cards > 0 and card.ability and card.ability.extra and card.ability.extra.copies then
-            return true
-        end
-        return false
+        -- Only allow use when there are cards in hand
+        return G and (#G.hand.cards > 0 and #G.deck.cards > 0)
     end,
     use = function(self, card, area, copier)
         if config.sfx ~= false then
@@ -4768,12 +5220,6 @@ SMODS.Consumable{
     end,
 }
 
-
-
-
-
-
-
 ----------------------------------------------
 ------------BOOM BOX CODE END----------------------
 
@@ -5723,6 +6169,189 @@ end
 
 ----------------------------------------------
 ------------ZERO BUILD CODE END----------------------
+
+----------------------------------------------
+------------STORM SEAL CODE BEGIN----------------------
+
+SMODS.Seal {
+    name = "Storm Seal",
+    key = "StormSeal",
+    badge_colour = HEX("9500f3"),
+    loc_txt = {
+        label = 'Storm Seal',
+        name = 'Storm Seal',
+        text = {
+            "Creates a {C:purple}LTM Card{}",
+            "when {C:attention}discarded{}",
+			"{C:inactive}(Must have room){}"
+        }
+    },
+    atlas = "Jokers",
+    pos = {x=2, y=2},
+    calculate = function(self, card, context)
+        if context.discard then
+			G.E_MANAGER:add_event(Event({
+				trigger = "after",
+				func = function()
+					if G.consumeables.config.card_limit > #G.consumeables.cards then
+						local c = create_card("LTMConsumableType", G.consumeables, nil, nil, nil, nil, nil, "fn_ltm_sword")
+						c:add_to_deck()
+						G.consumeables:emplace(c)
+						card:juice_up()
+					end
+					return true
+				end,
+			}))
+			return true
+		end
+	end,
+}
+
+----------------------------------------------
+------------STORM SEAL CODE END----------------------
+
+----------------------------------------------
+------------GLITCHED SEAL CODE BEGIN----------------------
+
+SMODS.Seal {
+    name = "Glitched Seal",
+    key = "GlitchedSeal",
+    badge_colour = HEX("603d65"),
+    loc_txt = {
+        label = 'Glitched Seal',
+        name = 'Glitched Seal',
+        text = {
+            "Does something random",
+            "when {C:attention}played and unscoring{}",
+        }
+    },
+    atlas = "Jokers",
+    pos = {x=3, y=2},
+    calculate = function(self, card, context)
+        -- Check if extra is nil or not and initialize if necessary
+        if not card.ability.extra then
+            card.ability.extra = {hands = 1, discards = 1}
+        end
+
+        if context.unscoring then
+            local rand = math.random(1, 8) -- Pick a random effect (now 8 options)
+
+            if rand == 1 then
+                -- Create a random LTM consumable (no limit check)
+                local consumable = create_card("LTMConsumableType", G.consumeables, nil, nil, nil, nil, nil, "fn_ltm_sword")
+                if consumable then
+                    consumable:add_to_deck()
+                    G.consumeables:emplace(consumable)
+                end
+
+            elseif rand == 2 then
+                -- Give $5
+                ease_dollars(5)
+                G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + 5
+                G.E_MANAGER:add_event(Event({func = (function() G.GAME.dollar_buffer = 0; return true end)}))
+
+            elseif rand == 3 then
+                -- Add a random tarot card
+                local consumable = create_card("Tarot", G.consumeables, nil, nil, nil, nil, nil, "c_fool")
+                if consumable then
+                    consumable:add_to_deck()
+                    G.consumeables:emplace(consumable)
+                end
+
+            elseif rand == 4 then
+                -- Give +1 hand this round
+                ease_hands_played(1)
+
+            elseif rand == 5 then
+                -- Give +1 discard this round
+                ease_discard(1)
+
+            elseif rand == 6 then
+                -- Create a random spectral card
+                local consumable = create_card("Spectral", G.consumeables, nil, nil, nil, nil, nil, "c_fool")
+                if consumable then
+                    consumable:add_to_deck()
+                    G.consumeables:emplace(consumable)
+                end
+
+            elseif rand == 7 then
+                -- Return the card to hand
+                draw_card(G.play, G.hand, 100, 'up', true, card, 0, false, false, 1, false)
+
+            elseif rand == 8 then
+                -- Give a random tag
+                local random_tags = {"tag_fn_LTMTag1", "tag_fn_LTMTag2", 'tag_uncommon', 'tag_rare', 'tag_negative', 'tag_foil', 'tag_holo', 'tag_polychrome', 'tag_investment', 'tag_voucher', 'tag_boss', 'tag_standard', 'tag_charm', 'tag_meteor', 'tag_buffoon', 'tag_handy', 'tag_garbage', 'tag_ethereal', 'tag_coupon', 'tag_double', 'tag_juggle', 'tag_d_six', 'tag_top_up', 'tag_skip', 'tag_orbital', 'tag_economy'}
+                local chosen_tag = random_tags[math.random(#random_tags)]
+                
+                G.E_MANAGER:add_event(Event({
+                    func = (function()
+                        add_tag(Tag(chosen_tag))
+                        play_sound('generic1', 0.9 + math.random() * 0.1, 0.8)
+                        play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
+                        return true
+                    end)
+                }))
+            end
+
+            card:juice_up()
+            return true
+        end
+        return false
+    end,
+}
+
+----------------------------------------------
+------------GLITCHED SEAL CODE END----------------------
+
+----------------------------------------------
+------------BOOGIE SEAL CODE BEGIN----------------------
+
+SMODS.Sound({
+	key = "boogie",
+	path = "boogie.ogg",
+})
+
+SMODS.Seal {
+    name = "Boogie Seal",
+    key = 'BoogieSeal',
+    config = {
+        extra = { odds = 4, stored_hands = nil },
+    },
+    atlas = 'Jokers',
+    pos = { x = 4, y = 2 },
+    badge_colour = HEX("2e2b2e"),
+    loc_txt = {
+        label = 'Boogie Seal',
+        name = 'Boogie Seal',
+        text = {
+            'If {C:attention}Played Hand{} contains this seal, ',
+            '{C:green,E:1,S:1.1}#2# in #1#{} chance to not consume a hand',
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { self.config.extra.odds, G.GAME.probabilities.normal, self.config.extra.stored_hands } }
+    end,
+    calculate = function(self, card, context)
+        local round = G.GAME.current_round
+        if context.cardarea == G.play and not context.repetition and not context.blueprint then
+            -- Store the current hands left if not already stored
+            if not self.config.extra.stored_hands then
+                self.config.extra.stored_hands = round.hands_left
+            end
+
+            -- If the effect triggers, reset the hand count to what it was before playing
+            if pseudorandom('boogie_seal') < (1 / self.config.extra.odds) then
+                round.hands_left = self.config.extra.stored_hands +1
+				if config.sfx ~= false then
+					play_sound("fn_boogie") 
+				end
+            end
+        end
+    end
+}
+
+----------------------------------------------
+------------BOOGIE SEAL CODE END----------------------
 
 ----------------------------------------------
 ------------CRAC DECK CODE BEGIN----------------------
