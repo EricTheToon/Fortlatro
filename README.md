@@ -2,7 +2,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 38 Jokers
+# 44 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see)
@@ -79,6 +79,18 @@ Kinetic Blade - Uncommon - Gains a charge when a hand is played At 3 charges giv
 
 Kado Thorne's Time Machine - Rare - Sell this card to randomize the ante between -2 and +2 
 
+Typhoon Blade - Rare - Sell this card to instantly win a non-boss blind and gain 3 free rerolls in the next shop
+
+Fletcher Kane - Uncommon - Retrigger all Gold cards
+
+Dill Bit - Uncommon - Gain mult equal to the sell value of all owned jokers and consumables
+
+Vulture Boon - Common - Each discarded card has a 1/3 chance to gain +10 chips
+
+Cassidy Quinn - Uncommon - When blind selected create a random Heart or Spade card
+
+Thermite - Common - Each discarded card has a 1/3 chance to be destroyed instead granting +10 chips
+
 # 2 Decks
 Eric Deck - Start with Eric
 
@@ -133,7 +145,7 @@ Chest - Create 1 random low tier Joker (must have room)
 
 Rare Chest - Create 1 random high tier Joker (must have room)
 
-# 4 Enhancements
+# 5 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
 
 Wood - 1.2X Mult +15 Chips
@@ -141,6 +153,8 @@ Wood - 1.2X Mult +15 Chips
 Brick - 1.3X Mult +40 Chips 1/100 chance to summon a Gnome
 
 Metal - 1.5X Mult +60 Chips
+
+Storm Surge - +10 Mult +100 Chips per Ante
 
 # 2 Tags
 Ship It! - Gives a free LTM Pack
