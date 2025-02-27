@@ -3773,17 +3773,22 @@ SMODS.Joker{
     calculate_sell_cost = function(self)
         local sell_cost = 0
 
-        -- Sum sell cost of all Jokers (excluding itself)
-        for _, joker in ipairs(G.jokers.cards) do
-            if joker ~= self and joker.area == G.jokers then
-                sell_cost = sell_cost + (joker.sell_cost or 0)
+        -- Safeguard: Ensure G.jokers and G.consumeables exist before accessing them
+        if G.jokers and G.jokers.cards then
+            -- Sum sell cost of all Jokers (excluding itself)
+            for _, joker in ipairs(G.jokers.cards) do
+                if joker ~= self and joker.area == G.jokers then
+                    sell_cost = sell_cost + (joker.sell_cost or 0)
+                end
             end
         end
 
-        -- Sum sell cost of all Consumables
-        for _, consumable in ipairs(G.consumeables.cards) do
-            if consumable.area == G.consumeables then
-                sell_cost = sell_cost + (consumable.sell_cost or 0)
+        if G.consumeables and G.consumeables.cards then
+            -- Sum sell cost of all Consumables
+            for _, consumable in ipairs(G.consumeables.cards) do
+                if consumable.area == G.consumeables then
+                    sell_cost = sell_cost + (consumable.sell_cost or 0)
+                end
             end
         end
 
@@ -3807,7 +3812,6 @@ SMODS.Joker{
         end
     end
 }
-
 
 ----------------------------------------------
 ------------DILL BIT CODE END----------------------
