@@ -7,7 +7,7 @@
 --- PREFIX: fn
 --- PRIORITY: -69420
 --- DEPENDENCIES: [Steamodded>=0.9.8, Talisman>=2.0.0-beta8,]
---- VERSION: 1.0.9 Release 
+--- VERSION: 1.1.0 Release
 ----------------------------------------------
 ------------MOD CODE -------------------------
 SMODS.Atlas({
@@ -2596,7 +2596,7 @@ SMODS.Joker {
                 end
             end
 
-            -- Self-destruct if 2 or more Aces
+            -- Self-destruct if 9999 or more Aces if you actually triggered this how and why wtf are you doing bruh 
             if ace_count >= 9999 then
                 card:start_dissolve()
                 return
@@ -2656,13 +2656,12 @@ SMODS.Joker {
 
 ----------------------------------------------
 ------------MIKU CODE BEGIN----------------------
-
-SMODS.Joker {
+SMODS.Joker({
     key = 'Miku',
     loc_txt = {
         name = 'Hatsune Miku',
         text = {
-            "{X:mult,C:white}X#1#{} Mult for each scoring {C:attention}3{} or {C:attention}9{} in played hand",
+            "Played {C:attention}3{}'s and {C:attention}9{}'s give {X:mult,C:white}X#1#{} Mult when scored",
         }
     },
     rarity = 3,
@@ -2674,57 +2673,39 @@ SMODS.Joker {
     eternal_compat = true,
     blueprint_compat = true,
     perishable_compat = false,
-    ability = {
+    config = {
         extra = {
-            xmultmod = 1.39,
-            xmult = 0, -- Ensure xmult starts as 0
+            Xmult = 1.39,  -- Multiplier for scoring 3 or 9
         },
     },
 
     loc_vars = function(self, info_queue, card)
-        if not card.ability.extra then
-            card.ability.extra = { xmult = 0, xmultmod = 1.39 }
-        end
-
         return {
-            vars = {
-                card.ability.extra.xmultmod,
-                card.ability.extra.xmult
-            }
+            vars = {card.ability.extra.Xmult}  -- Refer to multiplier correctly
         }
     end,
 
     calculate = function(self, card, context)
-        if context.joker_main or context.cardarea == G.play then
-            -- Count 3s and 9s in the scoring hand
-            local count = 0
-            for _, scoring_card in ipairs(context.scoring_hand) do
-                local card_id = scoring_card:get_id()
-                if card_id == 3 or card_id == 9 then
-                    count = count + 1
-                end
-            end
-
-            -- Apply the multiplier based on the count
-            if count > 0 then
-                card.ability.extra.xmult = count * card.ability.extra.xmultmod
-            end
+        -- Ensure extra values are set (for safety)
+        if not card.ability.extra then
+            card.ability.extra = { Xmult = 1.39 }
         end
 
-        -- Pass xmult value if this Joker is the main scorer
-        if context.joker_main then
-            local extra = card.ability.extra
-            if extra and extra.xmult and extra.xmult > 0 then
-                local result = {
-                    message = localize{type='variable', key='a_xmult', vars={extra.xmult}},
-                    Xmult_mod = extra.xmult,
+        -- Apply multiplier individually for each card based on its ID
+        if context.individual and context.cardarea == G.play then
+            local card_id = context.other_card:get_id()
+            if card_id == 3 or card_id == 9 then
+                return {
+                    x_mult = card.ability.extra.Xmult,  -- Apply multiplier to the current card
+                    card = card
                 }
-                extra.xmult = 0 -- Reset xmult to 0
-                return result
             end
         end
+
+        return nil  -- No multiplier if the card isn't a 3 or 9
     end,
-}
+})
+
 
 ----------------------------------------------
 ------------MIKU CODE END----------------------
@@ -3564,7 +3545,7 @@ SMODS.Joker{
   discovered = false,
   eternal_compat = true,
   blueprint_compat = true,
-  perishable_compat = false,
+  perishable_compat = true,
   config = {extra = {Xmult = 3, charge = 0}},
 
   loc_vars = function(self, info_queue, card)
@@ -3626,7 +3607,7 @@ SMODS.Joker{
   unlocked = true,
   discovered = false,
   eternal_compat = true,
-  blueprint_compat = true,
+  blueprint_compat = false,
   perishable_compat = false,
 
   calculate = function(self, card, context)
@@ -3651,11 +3632,377 @@ SMODS.Joker{
 ----------------------------------------------
 ------------KADO THORNE'S TIME MACHINE CODE END----------------------
 
+----------------------------------------------
+------------TYPHOON BLADE CODE BEGIN----------------------
+SMODS.Joker{
+  key = 'TyphoonBlade',
+  loc_txt = {
+    name = "Typhoon Blade",
+    text = {
+      "Sell this card to instantly win a non-boss blind",
+      "and get {C:attention}3{} free {C:green}rerolls{} on the next shop",
+    }
+  },
+  rarity = 3,
+  atlas = "Jokers", pos = {x = 3, y = 14},
+  cost = 10,
+  unlocked = true,
+  discovered = false,
+  eternal_compat = true,
+  blueprint_compat = false,
+  perishable_compat = false,
+
+  calculate = function(self, card, context)
+    if context.selling_self then
+        G.E_MANAGER:add_event(Event({
+            trigger = "immediate",
+            func = function()
+                if G.STATE == G.STATES.SELECTING_HAND and not G.GAME.blind.boss then
+                    -- Ensure the player has enough chips to win the blind
+                    local blind_chips = G.GAME.blind.chips
+                    G.GAME.chips = math.max(G.GAME.chips, blind_chips)
+
+                    -- End the round successfully
+                    G.STATE = G.STATES.HAND_PLAYED
+                    G.STATE_COMPLETE = true
+                    end_round()
+
+                    -- Grant 3 free rerolls, using Chaos the Clown's method
+                    for i = 1, 3 do
+                        G.GAME.current_round.free_rerolls = G.GAME.current_round.free_rerolls + 1
+                        calculate_reroll_cost(true)
+                    end
+                end
+                return true
+            end
+        }), "other")
+    end
+  end
+}
+
+----------------------------------------------
+------------TYPHOON BLADE CODE END----------------------
+
+----------------------------------------------
+------------FLETCHER KANE CODE BEGIN----------------------
+SMODS.Joker({
+    key = "Kane",
+    loc_txt = {
+        name = "Fletcher Kane",
+        text = {
+            "Retriggers every {C:money}Gold{} card {C:attention}#1#{} times",
+        }
+    },
+    rarity = 2,
+    atlas = "Jokers",
+    pos = { x = 0, y = 15 },
+    cost = 6,
+    unlocked = true,
+    discovered = false,
+    blueprint_compat = true,
+    eternal_compat = true,
+    perishable_compat = true,
+    config = { extra = { repetitions = 1 } },
+
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card.ability.extra.repetitions } }
+    end,
+
+    calculate = function(self, card, context)
+        -- Check if a Gold Card is played or in hand
+        if context.repetition and context.cardarea == G.play then
+            if context.other_card and context.other_card.ability.name == 'Gold Card' then
+                return {
+                    repetitions = card.ability.extra.repetitions,
+                    message = localize('k_again_ex'),
+                    card = card
+                }
+            end
+        end
+
+        -- Handle Gold cards in hand
+        if context.cardarea == G.hand then
+            for i = 1, #G.hand.cards do
+                if context.other_card and context.other_card.ability.name == 'Gold Card' then
+                    return {
+                        repetitions = card.ability.extra.repetitions,
+                        message = localize('k_again_ex'),
+                        card = card
+                    }
+                end
+            end
+        end
+    end
+})
+
+----------------------------------------------
+------------FLETCHER KANE CODE END----------------------
+
+----------------------------------------------
+------------DILL BIT CODE BEGIN----------------------
+
+SMODS.Joker{
+    key = 'DB',
+    loc_txt = {
+        ['en-us'] = {
+            name = "Dill Bit",
+            text = {
+                "Adds the sell value of all owned",
+                "{C:attention}Jokers{} and {C:attention}Consumables{} to mult",
+                "{C:inactive}Currently +{C:mult}#1#{} {C:inactive}Mult{}",
+            }
+        }
+    },
+    atlas = 'Jokers',
+    pos = { x = 1, y = 15 },
+    config = {
+        extra = { mult = 0 } -- Mult value
+    },
+    rarity = 2,
+    cost = 5,
+    blueprint_compat = true,
+
+    loc_vars = function(self, info_queue, card)
+        -- Ensure displayed value is always correct
+        card.ability.extra.mult = self:calculate_sell_cost()
+        return {
+            vars = { card.ability.extra.mult }
+        }
+    end,
+
+    calculate_sell_cost = function(self)
+        local sell_cost = 0
+
+        -- Sum sell cost of all Jokers (excluding itself)
+        for _, joker in ipairs(G.jokers.cards) do
+            if joker ~= self and joker.area == G.jokers then
+                sell_cost = sell_cost + (joker.sell_cost or 0)
+            end
+        end
+
+        -- Sum sell cost of all Consumables
+        for _, consumable in ipairs(G.consumeables.cards) do
+            if consumable.area == G.consumeables then
+                sell_cost = sell_cost + (consumable.sell_cost or 0)
+            end
+        end
+
+        return sell_cost
+    end,
+
+    calculate = function(self, card, context)
+        -- Always update the value
+        card.ability.extra.mult = self:calculate_sell_cost()
+
+        if context.joker_main then
+            return {
+                message = localize {
+                    type = 'variable',
+                    key = 'sj_mult',
+                    vars = { card.ability.extra.mult }
+                },
+                mult_mod = card.ability.extra.mult,
+                card = self
+            }
+        end
+    end
+}
+
+
+----------------------------------------------
+------------DILL BIT CODE END----------------------
+
+----------------------------------------------
+------------VULTURE BOON CODE BEGIN----------------------
+SMODS.Joker{
+    key = 'Vulture',
+    loc_txt = {
+        name = 'Vulture Boon',
+        text = {
+            "Each discarded card has a {C:green}#1# in #2#{} chance",
+            "to permanently gain +{C:chips}#3#{} chips",
+        }
+    },
+    config = {
+        extra = { 
+            chips = 10,  -- Permanent chip gain per triggered discard
+            odds = 3     -- 1 in 3 chance per discarded card
+        }
+    },
+    rarity = 1,
+    pos = {x = 2, y = 15},
+    atlas = 'Jokers',
+    cost = 5,
+    unlocked = true,
+    discovered = false,
+    blueprint_compat = true,
+
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {G.GAME.probabilities.normal, card.ability.extra.odds, card.ability.extra.chips}
+        }
+    end,
+
+    calculate = function(self, card, context)
+        if context.discard and context.other_card then  -- Trigger only on discarded cards
+            local discardedCard = context.other_card  -- Get the discarded card
+            if pseudorandom('vulture') < G.GAME.probabilities.normal/card.ability.extra.odds then
+                -- Apply permanent chip bonus
+                discardedCard.ability.perma_bonus = (discardedCard.ability.perma_bonus or 0) + card.ability.extra.chips
+
+                -- Ensure visual effect applies
+                discardedCard:juice_up()
+
+                return {
+                    extra = { message = "Upgrade!", colour = G.C.CHIPS },
+                    colour = G.C.CHIPS,
+                    card = discardedCard
+                }
+            end
+        end
+    end,
+}
+
+
+----------------------------------------------
+------------VULTURE BOON CODE END----------------------
+
+----------------------------------------------
+------------JANE BALATRO CODE BEGIN----------------------
+
+SMODS.Joker {
+    key = 'CassidyQuinn',
+    loc_txt = {
+        name = 'Cassidy Quinn',
+        text = {
+            "When {C:attention}blind selected{},",
+            "Create {C:attention}#1#{} random cards in hand with {C:hearts}Hearts{} or {C:spades}Spades{}"
+        }
+    },
+    config = {extra = {cards = 1}},
+    rarity = 2,
+    pos = {x = 3, y = 15},
+    atlas = 'Jokers',
+    cost = 5,
+    unlocked = true,
+    discovered = false,
+    blueprint_compat = true,
+    loc_vars = function(self, info_queue, card)
+        return {vars = {card.ability.extra.cards}}
+    end,
+    calculate = function(self, card, context)
+        if context.first_hand_drawn then
+            G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+                    local num_cards = card.ability.extra.cards or 1  -- Default to 1 if nil
+                    for _ = 1, num_cards do
+                        -- Pick a random Hearts or Spades card
+                        local valid_cards = {}
+                        for _, v in pairs(G.P_CARDS) do
+                            if v.suit == 'Hearts' or v.suit == 'Spades' then
+                                table.insert(valid_cards, v)
+                            end
+                        end
+
+                        if #valid_cards > 0 then
+                            local chosen_card = pseudorandom_element(valid_cards, pseudoseed('cassidy_quinn'))
+                            local new_card = create_playing_card(
+                                {
+                                    front = chosen_card,
+                                    center = G.P_CENTERS.c_base
+                                },
+                                G.hand
+                            )
+
+                            -- Visual & sound feedback
+                            new_card:juice_up(0.3, 0.3)
+                            play_sound('card1', 1.1)
+                        end
+                    end
+
+                    return true
+                end
+            }))
+        end
+    end
+}
+
+----------------------------------------------
+------------JANE BALATRO CODE END----------------------
+
+SMODS.Joker{
+    key = 'Termite',
+    loc_txt = {
+        name = 'Thermite',
+        text = {
+            "Each discarded card has a {C:green}#1# in #2#{} chance",
+            "to be {C:mult}destroyed{} instead, granting {C:chips}+#3#{} chips",
+            "{C:inactive}Currently{} {C:chips}#4# {C:inactive}Chips"
+        }
+    },
+    config = {
+        extra = { 
+            chips_per_card = 10,  -- Chips gained per destroyed card
+            odds = 3,             -- 1 in 3 chance per discarded card
+            stored_chips = 0      -- Tracks accumulated chips
+        }
+    },
+    rarity = 1,
+    pos = {x = 4, y = 15},
+    atlas = 'Jokers',
+    cost = 5,
+    unlocked = true,
+    discovered = false,
+    blueprint_compat = true,
+
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                G.GAME.probabilities.normal, 
+                card.ability.extra.odds, 
+                card.ability.extra.chips_per_card, 
+                card.ability.extra.stored_chips
+            }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        if context.discard and context.other_card then  -- Trigger only on discarded cards
+            local discardedCard = context.other_card
+            if pseudorandom('termite') < G.GAME.probabilities.normal / card.ability.extra.odds then
+                -- Destroy the discarded card
+                discardedCard:start_dissolve()
+
+                -- Increase Joker's stored chips
+                card.ability.extra.stored_chips = card.ability.extra.stored_chips + card.ability.extra.chips_per_card
+
+                -- Ensure visual effect
+                card:juice_up()
+
+                -- Display effect
+                return {
+                    extra = { message = "Burnt Up!", colour = G.C.CHIPS },
+                    colour = G.C.CHIPS,
+                    card = card
+                }
+            end
+        end
+
+        -- Joker main scoring logic (adds stored chips when scored)
+        if context.joker_main then
+            return {
+                message = localize {type = 'variable', key = 'a_chips', vars = {card.ability.extra.stored_chips}},
+                chip_mod = card.ability.extra.stored_chips,
+                colour = G.C.CHIPS
+            }
+        end
+    end
+}
+
 
 
 
 ----------------------------------------------
-------------GLASSES CODE END----------------------
+------------GLASSES CODE BEGIN----------------------
 
 if config.ortalabcompat ~= false then
     SMODS.Consumable{
@@ -3702,7 +4049,6 @@ end
 
 ----------------------------------------------
 ------------GLASSES CODE END----------------------
-
 ----------------------------------------------
 ------------BLOOD CODE BEGIN----------------------
 
@@ -4959,6 +5305,92 @@ end
 
 ----------------------------------------------
 ------------METAL CODE END----------------------
+
+if config.oldcalccompat ~= false then
+    SMODS.Enhancement({
+        loc_txt = {
+            name = "Storm Surge",
+            text = {
+                "Gains +{C:mult}#1#{} Mult and +{C:chips}#2#{} Chips per {C:attention}Ante{}",
+                "{C:inactive}Currently {C:mult}#3#{} {C:inactive}Mult {C:chips}#4#{} {C:inactive}Chips"
+            },
+        },
+        key = "StormSurge",
+        atlas = "Jokers",
+        pos = { x = 4, y = 14 },
+        discovered = false,
+        no_rank = false,
+        no_suit = false,
+        replace_base_card = false,
+        always_scores = false,
+        config = { extra = { mult = 10, chips = 100 } }, -- Removed scaled values, since they should be dynamic
+        loc_vars = function(self, info_queue, card)
+            local ante_count = G.GAME.round_resets.ante
+            local card_ability = card and card.ability or self.config
+            local scaled_mult = card_ability.extra.mult * ante_count
+            local scaled_chips = card_ability.extra.chips * ante_count
+            return {
+                vars = {
+                    card_ability.extra.mult,
+                    card_ability.extra.chips,
+                    scaled_mult,
+                    scaled_chips
+                }
+            }
+        end,
+        calculate = function(self, card, context, effect)
+            if context.cardarea == G.play and not context.repetition then
+                local ante_count = G.GAME.round_resets.ante
+                effect.mult = self.config.extra.mult * ante_count
+                effect.chips = self.config.extra.chips * ante_count
+            end
+        end
+    })
+end
+
+
+if config.newcalccompat ~= false then
+    Storm = SMODS.Enhancement {
+        object_type = "Enhancement",
+        key = "StormSurge",
+        loc_txt = {
+            name = "Storm Surge",
+            text = {
+                "Gains +{C:mult}#1#{} Mult and +{C:chips}#2#{} Chips per {C:attention}Ante{}",
+                "{C:inactive}Currently {C:mult}#3#{} {C:inactive}Mult {C:chips}#4#{} {C:inactive}Chips"
+            },
+        },
+        atlas = "Jokers",
+        pos = { x = 4, y = 14 },
+        config = { extra = { mult = 10, chips = 100 } },
+        weight = 0,
+        loc_vars = function(self, info_queue, card)
+            local ante_count = G.GAME.round_resets.ante
+            local scaled_mult = card.ability.extra.mult * ante_count
+            local scaled_chips = card.ability.extra.chips * ante_count
+            return {
+                vars = {
+                    card.ability.extra.mult,
+                    card.ability.extra.chips,
+                    scaled_mult,
+                    scaled_chips
+                }
+            }
+        end,
+        calculate = function(self, card, context)
+            if context.main_scoring and context.cardarea == G.play then
+                local ante_count = G.GAME.round_resets.ante
+                return {
+                    mult = card.ability.extra.mult * ante_count,  -- Apply the multiplier
+                    chips = card.ability.extra.chips * ante_count,  -- Apply the chips bonus
+                }
+            end
+        end
+    }
+end
+
+
+
 
 ----------------------------------------------
 ------------BLUEPRINT CODE BEGIN----------------------
