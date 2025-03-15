@@ -184,9 +184,9 @@ Air Strike - Destroy all Even cards in your deck
 
 Bottle Rockets - Destroy all Odd cards in your deck
 
-Mystic Goldfish - Destroy all Face cards in your deck
+Mythic Goldfish - Destroy all Face cards in your deck
 
-Paint Bombs - Destroy all cards of a random suit in your deck
+Paint Grenades - Destroy all cards of a random suit in your deck
 
 # 7 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
