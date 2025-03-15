@@ -2,7 +2,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 44 Jokers
+# 53 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see)
@@ -13,7 +13,7 @@ Toilet Gang - Uncommon - Gains x0.2 mult every time played hand contains a Flush
 
 Ground Game - Common - Applies Glitched to EVERYTHING if you score a 6, 7, 2, 2, and 3 in the same hand
 
-The Dub - Common - 1/4 chance to create an LTM card when blind starts (must have room)
+The Dub - Common - 1/2 chance to create an LTM card when blind starts (must have room)
 
 Flush Factory - Uncommon - If played hand contains a Flush summon a Planet card for that hand
 
@@ -27,7 +27,7 @@ Solid Gold - Common - 1/4 chance to turn each scored card gold
 
 Battle Bus - Common - Gains 4 chips for each Joker during scoring
 
-Save The World - Rare - Gains 0.5x mult if you do not purchase anything at the shop resets if you do
+Save The World - Rare - Gains 0.5x mult if you do not purchase anything at the shop loses 0.25x if you do
 
 The Loop - Common - 1/4 chance to give each scored card Echo
 
@@ -91,15 +91,44 @@ Cassidy Quinn - Uncommon - When blind selected create a random Heart or Spade ca
 
 Thermite - Common - Each discarded card has a 1/3 chance to be destroyed instead granting +10 chips
 
+Shadow Logo - Uncommon - This joker gains +8 Mult if played hand is a dark suit flush
+
+Ghost Logo - Uncommon This joker gains +50 Chips if played hand a light suit flush
+
+Battle Lab - Rare - When blind is selected, create a copy of 3 random cards in deck and draw them to hand.
+
+Tent - Uncommon - Leaving a shop without rerolling in it will spawn 2 LTM cards. (Must have room.)
+
+Shopping Cart - Common - When blind is selected, set Discards to 1. Gain $2 for every discard removed this way.
+
+Card Vaulting - Common - When a Debuffed card is played, Destroy it. This Joker gains +15 Chips and +1 Mult for every card destroyed this way. 
+
+Fishing Rod - Common - If discarded hand contains a Flush, create an LTM card. (Must have room.)
+
+Slurp Series - Common - This Joker gains +2 Mult for every unused Hand at end of round.
+
+Lava Series - Common - This Joker gains +15 Chips for every unused Discard at end of round. 
+
 # 2 Decks
 Eric Deck - Start with Eric
 
 Crac Deck - Start with 4 Cracs that ALWAYS trigger from Infinity
 
-# 2 Tarots
+# 7 Tarots
 Left Handed Death - its just death but backwards i made it specifically to fuck with Crac since he keeps messing it up and then he installed a persona tarot card mod so now its a persona death tarot
 
-Glitched - Create 2 random LTM cards (must have room)
+Glitched - Create 0-4 random LTM cards (no need to have room)
+
+The Lumberjack: Convert 2 cards into Wood cards
+
+The Miner: Convert 2 cards into Brick cards
+
+The Blacksmith: Convert 2 cards into Metal cards
+
+The Runic Portal: Convert 2 cards into Cubic cards
+
+Supremacy: Convert 1 card into a Legendary card
+
 # 1 Spectral
 Double or Nothing - 1/2 chance to get 2 Spectral packs else give nothing
 # 21 Consumables
@@ -111,7 +140,7 @@ Eric's Blood - Apply glitched to up to 3 selected Cards, Jokers, or Consumables
 
 Perk Up - Apply a random Enhancement to up to 5 selected Cards
 
-Card Supercharger - Add a random Seal to up to 2 selected Cards
+Card Supercharger - Add a random Seal to up to 3 selected Cards
 
 Card Flip - Flips up to 3 selected Cards, Jokers, or Consumables
 
@@ -125,9 +154,9 @@ Polychrome Splash - Convert 1 random Card, Joker, or Consumable into Polychrome 
 
 Rainbow Crystal - Apply Crystal and Polychrome to 1 Selected Cards
 
-Gnome - 1/10 chance to summon an eternal copy of Eric, Crac, Emily, or Zorlodo else give nothing
+Gnome - 1/8 chance to summon an eternal copy of Eric, Crac, Emily, or Zorlodo else give nothing
 
-Blueprint - Enhances 1 selected card into Wood, Brick, or Metal
+Blueprint - Enhances 5 selected cards into Wood, Brick, or Metal
 
 Slap Juice - Gives 1 Hand and 1 Discard
 
@@ -145,6 +174,20 @@ Chest - Create 1 random low tier Joker (must have room)
 
 Rare Chest - Create 1 random high tier Joker (must have room)
 
+Earth Sprite - Randomize the suit and rank of up to 5 selected cards, then convert them into Legendary Cards
+
+C4 - Destroy 5 random cards in your full deck Create a random Tag
+
+Cube Fragment - Cannot be used. While held, selecting a blind converts 1 random card in deck into Cubic cards
+
+Air Strike - Destroy all Even cards in your deck
+
+Bottle Rockets - Destroy all Odd cards in your deck
+
+Mystic Goldfish - Destroy all Face cards in your deck
+
+Paint Bombs - Destroy all cards of a random suit in your deck
+
 # 5 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
 
@@ -155,6 +198,10 @@ Brick - 1.3X Mult +40 Chips 1/100 chance to summon a Gnome
 Metal - 1.5X Mult +60 Chips
 
 Storm Surge - +10 Mult +100 Chips per Ante
+
+Legendary - X1 Mult. Gains X0.4 Mult when scored
+
+Cubic - X3 Chips, X0.6 Mult
 
 # 2 Tags
 Ship It! - Gives a free LTM Pack
