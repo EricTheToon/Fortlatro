@@ -2,6 +2,7 @@
 return {
     sfx = true, --toggle the other sound effects 
     cracsfx = true, --toggle sound effects for specifically the Crac Joker
+    deathcompat = false,
     cryptidcompat = false, --toggle Cryptid compatability ONLY ENABLE IF CRYPTID IS INSTALLED
     ortalabcompat = false, --toggle Ortalab compatability ONLY ENABLE IF ORTALAB IS INSTALLED
     oldcalccompat = true, --toggle old calc for enhancements ONLY ENABLE IF ON STEAMODDED OLD CALC
