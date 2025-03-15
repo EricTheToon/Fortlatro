@@ -119,15 +119,15 @@ Left Handed Death - its just death but backwards i made it specifically to fuck 
 
 Glitched - Create 0-4 random LTM cards (no need to have room)
 
-The Lumberjack: Convert 2 cards into Wood cards
+The Lumberjack - Convert 2 cards into Wood cards
 
-The Miner: Convert 2 cards into Brick cards
+The Miner - Convert 2 cards into Brick cards
 
-The Blacksmith: Convert 2 cards into Metal cards
+The Blacksmith - Convert 2 cards into Metal cards
 
-The Runic Portal: Convert 2 cards into Cubic cards
+The Runic Portal - Convert 2 cards into Cubic cards
 
-Supremacy: Convert 1 card into a Legendary card
+Supremacy - Convert 1 card into a Legendary card
 
 # 1 Spectral
 Double or Nothing - 1/2 chance to get 2 Spectral packs else give nothing
