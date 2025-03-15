@@ -131,7 +131,7 @@ Supremacy: Convert 1 card into a Legendary card
 
 # 1 Spectral
 Double or Nothing - 1/2 chance to get 2 Spectral packs else give nothing
-# 21 Consumables
+# 28 Consumables
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -188,7 +188,7 @@ Mystic Goldfish - Destroy all Face cards in your deck
 
 Paint Bombs - Destroy all cards of a random suit in your deck
 
-# 5 Enhancements
+# 7 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
 
 Wood - 1.2X Mult +15 Chips
