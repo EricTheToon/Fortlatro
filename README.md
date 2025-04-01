@@ -2,7 +2,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 53 Jokers
+# 59 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see)
@@ -95,26 +95,38 @@ Shadow Logo - Uncommon - This joker gains +8 Mult if played hand is a dark suit 
 
 Ghost Logo - Uncommon This joker gains +50 Chips if played hand a light suit flush
 
-Battle Lab - Rare - When blind is selected, create a copy of 3 random cards in deck and draw them to hand.
+Battle Lab - Rare - When blind is selected, create a copy of 3 random cards in deck and draw them to hand
 
-Tent - Uncommon - Leaving a shop without rerolling in it will spawn 2 LTM cards. (Must have room.)
+Tent - Uncommon - Leaving a shop without rerolling in it will spawn 2 LTM cards (Must have room)
 
-Shopping Cart - Common - When blind is selected, set Discards to 1. Gain $2 for every discard removed this way.
+Shopping Cart - Common - When blind is selected, set Discards to 1. Gain $2 for every discard removed this way
 
-Card Vaulting - Common - When a Debuffed card is played, Destroy it. This Joker gains +15 Chips and +1 Mult for every card destroyed this way. 
+Card Vaulting - Common - When a Debuffed card is played, Destroy it. This Joker gains +15 Chips and +1 Mult for every card destroyed this way
 
-Fishing Rod - Common - If discarded hand contains a Flush, create an LTM card. (Must have room.)
+Fishing Rod - Common - If discarded hand contains a Flush, create an LTM card (Must have room)
 
-Slurp Series - Common - This Joker gains +2 Mult for every unused Hand at end of round.
+Slurp Series - Common - This Joker gains +2 Mult for every unused Hand at end of round
 
-Lava Series - Common - This Joker gains +15 Chips for every unused Discard at end of round. 
+Lava Series - Common - This Joker gains +15 Chips for every unused Discard at end of round
+
+ATK - Common - Sell this Joker to add a random seal enhancement and edition to all selected cards $-2 for each card modified this way
+
+Aimbot - Common - X5 Mult 1/5 chance to instantly die
+
+Better Aimbot - Rare - X5 Mult 1/1000 chance to instantly die $100 monthly subscription
+
+Skibidi Toilet - Uncommon - If played hand is a Flush create a random Face card in hand
+
+Bot Lobby - Common - When selecting a blind Debuffed cards are instead Discarded
+
+NickEh30 - Common - Gain +1 mult for each unscored card resets if no unscored cards
 
 # 2 Decks
 Eric Deck - Start with Eric
 
 Crac Deck - Start with 4 Cracs that ALWAYS trigger from Infinity
 
-# 7 Tarots
+# 11 Tarots
 Left Handed Death - its just death but backwards i made it specifically to fuck with Crac since he keeps messing it up and then he installed a persona tarot card mod so now its a persona death tarot
 
 Glitched - Create 0-4 random LTM cards (no need to have room)
@@ -129,9 +141,20 @@ The Runic Portal - Convert 2 cards into Cubic cards
 
 Supremacy - Convert 1 card into a Legendary card
 
-# 1 Spectral
+Split Personality - Create 2 copies of 1 random card copies have a random suit
+
+Popcorn - Split 20 permanant mult across all selected cards
+
+Midas Touch - Select up to 3 Cards and earn $2 for each card destroyed
+
+Cursed Hand - Destroy all cards in hand and draw a new hand
+
+# 2 Spectrals
 Double or Nothing - 1/2 chance to get 2 Spectral packs else give nothing
-# 28 Consumables
+
+Queue - Randomize the seals of all sealed cards in the deck
+
+# 29 Consumables
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -187,6 +210,8 @@ Bottle Rockets - Destroy all Odd cards in your deck
 Mythic Goldfish - Destroy all Face cards in your deck
 
 Paint Grenades - Destroy all cards of a random suit in your deck
+
+Slap Berry - Instantly win the blind 1/6 chance to instantly die returns to consumables on use
 
 # 7 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
