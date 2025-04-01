@@ -8708,6 +8708,7 @@ local disabled = {
 	c_fn_LTMBottle = true,
 	c_fn_LTMFish = true,
 	c_fn_LTMPaint = true,
+	c_fn_LTMBerry = true,
 }
 
 SMODS.Booster({
@@ -8825,6 +8826,7 @@ local disabled = {
 	c_fn_LTMBottle = true,
 	c_fn_LTMFish = true,
 	c_fn_LTMPaint = true,
+	c_fn_LTMBerry = true,
 }
 
 SMODS.Booster({
