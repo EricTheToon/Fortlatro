@@ -21,7 +21,7 @@ Victory Crown - Uncommon - Scored cards gain a permanant Chip bonus equal to the
 
 Fortnite Trading Card - Uncommon - If first hand of round has only 4 cards destroy them and give an LTM card
 
-Zorlodo - Rare - Copies the abilities of the left and right joker but halves them if applicable
+Zorlodo - Legendary - Copies the abilities of the left and right joker by BEING them
 
 Solid Gold - Common - 1/4 chance to turn each scored card gold
 
