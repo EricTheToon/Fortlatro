@@ -7,7 +7,7 @@ Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the en
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see)
 
-Emily - Legendary - Retrigger EVERYTHING
+Emily - Legendary - Retrigger all played cards 5 times
 
 Toilet Gang - Uncommon - Gains x0.2 mult every time played hand contains a Flush
 
