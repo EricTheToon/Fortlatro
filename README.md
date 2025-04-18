@@ -269,6 +269,6 @@ Fracture - All played cards are destroyed
 
 Zero Build - Wood, Brick and Metal are debuffed
 
-# Be sure to check the config tab you can enable and disable sounds, cracsounds, cryptid compat, ortalab compat, and Old Calc or New Calc
+# Be sure to check the config tab you can enable and disable sounds, blinds, cryptid content, ortalab content, and Old Calc or New Calc
 [ortalab](https://github.com/Eremel/Ortalab/tree/12ad0459565911aa5de428288c5d431466f06c73)
 [cryptid](https://github.com/MathIsFun0/Cryptid)
