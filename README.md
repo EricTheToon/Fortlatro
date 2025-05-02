@@ -2,12 +2,12 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 70 Jokers
+# 78 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see)
 
-Emily - Legendary - Retrigger all played cards 5 times
+Emily - Legendary - Retrigger everything
 
 Toilet Gang - Uncommon - Gains x0.2 mult every time played hand contains a Flush
 
@@ -129,7 +129,7 @@ Brick Fox - Uncommon - Retrigger played hand if it contains a Brick card if the 
 
 Metal LLama - Uncommon - Retrigger played hand if it contains a Metal card if the played hand is fully Metal cards retrigger it twice
 
-Hide and Seek - Uncommon - +3 Mult if played hand has exactly (random number 0-4) unscored cards
+Hide and Seek - Uncommon - Gains +3 Mult if played hand has exactly (random number 0-4) unscored cards
 
 Kevin the Cube - Uncommon - +2 Mult for every Cubic card in the full deck
 
@@ -143,12 +143,28 @@ Fashion Show - Uncommon - Cards with editions each give X1.75 Mult
 
 Piece Control - Rare - Played Wood cards have a 1 in 3 chance to become Metal Played Brick cards have a 1 in 2 chance to become Metal
 
+Battle Pass - Rare - Gain 0.2X Mult for every different hand type played when all hand types have been played gain 3x and reset
+
+Infinity Blade - Legendary - +1 Hand +1 Discard +4 Handsize +1 Card Slots in the shop +1 Boosters in the shop
+
+Default Joker - Uncommon - If played hand contains no modified cards gain +4 Mult
+
+Recon Scanner - Uncommon - Shows the top 5 cards of the deck
+
+Whiplash - Common - +20 Mult if played hand is the same as the final hand of the previous round
+
+Quadcrasher - Common - +200 Chips if played hand is the same as the final hand of the previous round
+
+Daily Quest - Uncommon - Gain X0.25 Mult after 3 consecutive same hands
+
+Void Oni Mask - Uncommon - 1 Random played card returns to hand
+
 # 2 Decks
 Eric Deck - Start with Eric
 
 Crac Deck - Start with 4 Cracs that ALWAYS trigger from Infinity
 
-# 11 Tarots
+# 17 Tarots
 Left Handed Death - its just death but backwards i made it specifically to fuck with Crac since he keeps messing it up and then he installed a persona tarot card mod so now its a persona death tarot
 
 Glitched - Create 0-4 random LTM cards (no need to have room)
@@ -171,12 +187,24 @@ Midas Touch - Select up to 3 Cards and earn $2 for each card destroyed
 
 Cursed Hand - Destroy all cards in hand and draw a new hand
 
+Minutemen - Convert up to 2 cards to Medium Ammo cards
+
+Backline - Convert up to 2 cards to Heavy Ammo cards
+
+Frontline - Convert up to 2 cards to Shell Ammo cards
+
+Flank - Convert up to 2 cards to Light Ammo cards
+
+Artillery - Convert up to 2 cards to Rocket Ammo cards
+
+Cosmic Swine - Create 1 planet card for your most used hand (must have room)
+
 # 2 Spectrals
 Double or Nothing - 1/2 chance to get 2 Spectral packs else give nothing
 
 Queue - Randomize the seals of all sealed cards in the deck
 
-# 29 Consumables
+# 38 Consumables
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -235,7 +263,25 @@ Paint Grenades - Destroy all cards of a random suit in your deck
 
 Slap Berry - Instantly win the blind 1/6 chance to instantly die returns to consumables on use
 
-# 7 Enhancements
+Hop Rock - Add a Hop Seal to up to 2 selected cards
+
+Nitro Splash - Apply Nitro to up to 2 selected cards
+
+Ammo Box - Convert all cards in hand into random Ammo cards
+
+Zero Point Fish - Add a Zero Point Seal to up to 2 selected cards
+
+Clinger - Select up to 2 cards to destroy adjacent cards have a 1/2 chance to be destroyed
+
+Grenade - Select up to 3 cards selected and adjacent cards have a 1/2 chance to be destroyed
+
+Shockwave Grenade - Apply Shockwaved to up to 2 selected cards
+
+Boogie Bomb - Add a Boogie Seal to up to 2 selected cards
+
+Forecast Tower - Add a Storm Seal to 1 selected card
+
+# 12 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
 
 Wood - 1.2X Mult +15 Chips
@@ -250,12 +296,22 @@ Legendary - X1 Mult. Gains X0.4 Mult when scored
 
 Cubic - X3 Chips, X0.6 Mult
 
+Shell Ammo - X1.2 Mult retriggers once per Hand used this round
+
+Heavy Ammo - +10 Mult retriggers once per remaining Hand
+
+Light Ammo - +75 Chips retriggers once per Discard used this round
+
+Medium Ammo - X1.1 Chips retriggers once per remaining Discard
+
+Rocket Ammo - Retriggers 1 time gain +1 retriggers if held in hand at end of round
+
 # 2 Tags
 Ship It! - Gives a free LTM Pack
 
 Ship It Express! - Gives a free MEGA LTM Pack
 
-# 4 Seals
+# 5 Seals
 Storm Seal - Creates an LTM Card when discarded (must have room)
 
 Glitched Seal - Does something random when played and unscoring
@@ -263,6 +319,13 @@ Glitched Seal - Does something random when played and unscoring
 Boogie Seal - If played hand contains this seal 1/4 chance not to consume a hand
 
 Hop Seal - When scoring this card 1/3 chance to gain +1 Discard
+
+Zero Point Seal - When drawn draw 2 additional cards
+
+# 2 Editions
+Nitro - +2 handsize resets at end of round
+
+Shockwaved - 1/3 chance to to retrigger adjacent jokers retrigger adjacent playing cards
 
 # 2 Blinds
 Fracture - All played cards are destroyed
