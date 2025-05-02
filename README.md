@@ -306,6 +306,11 @@ Medium Ammo - X1.1 Chips retriggers once per remaining Discard
 
 Rocket Ammo - Retriggers 1 time gain +1 retriggers if held in hand at end of round
 
+# 2 Editions
+Nitro - +2 handsize resets at end of round
+
+Shockwaved - 1/3 chance to to retrigger adjacent jokers retrigger adjacent playing cards
+
 # 2 Tags
 Ship It! - Gives a free LTM Pack
 
@@ -322,10 +327,6 @@ Hop Seal - When scoring this card 1/3 chance to gain +1 Discard
 
 Zero Point Seal - When drawn draw 2 additional cards
 
-# 2 Editions
-Nitro - +2 handsize resets at end of round
-
-Shockwaved - 1/3 chance to to retrigger adjacent jokers retrigger adjacent playing cards
 
 # 2 Blinds
 Fracture - All played cards are destroyed
