@@ -120,8 +120,8 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
         cos(length(field_part3) / 27.193) * sin(field_part3.x / 21.92) ))/2.;
 
     float res = (.5 + .5* cos( (nitro.x) * 2.612 + ( field + -.5 ) *3.14));
-	hsl.x = 0.05;  // Hue for Fortnite Nitro orange
-	hsl.y = hsl.y * 0.85; // Slightly lower saturation
+	hsl.x = 0.05;  //
+	hsl.y = hsl.y * 0.85; //
 	hsl.z = hsl.z * 0.4 + 0.35 * sin(hsl.z/2.5 - res/4. + sin(nitro.y)/8. + 0.5)/1.2; // Boost lightness
 
 
