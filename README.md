@@ -2,7 +2,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 78 Jokers
+# 90 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see)
@@ -159,12 +159,36 @@ Daily Quest - Uncommon - Gain X0.25 Mult after 3 consecutive same hands
 
 Void Oni Mask - Uncommon - 1 Random played card returns to hand
 
+Double G Bomb - Rare - When a Boogie Seal triggers gain $3 Discarded cards have a 1/5 chance to gain a Boogie Seal
+
+Clickbait Thumbnail - Common - Gain X1 Mult when a Gnome is created from a Brick Card
+
+4 Noobs vs 1 Pro - Uncommon - If played hand has 4 cards without editions and 1 with an edition give the edition to a random card in the deck
+
+Dark Series - Rare - Earn $1 at end of round for each unique ltm card used this run
+
+Frozen Series - Uncommon -  Gain X0.5 for each unique consumable type used this run
+
+DC Series - Legendary -  Gain X0.5 for each unique consumable used this run
+
+OG Pass - Uncommon - Vanilla Jokers give X1.5 Mult
+
+Reload - Uncommon - If all Hands are used gain +1 Hands and +1 Rerolls
+
+Storm Circle - Uncommon - X2.5 Mult if this is the middlemost Joker
+
+Storm Circle - Uncommon - X2.5 Mult if you have 2 or more Hands left
+
+Jam Track - Rare - Gain $5 if played hand scores atleast 50% of blind requirement 
+
+[Title Card] - Uncommon - Fortlatro Jokers give X1.5 Mult
+
 # 2 Decks
 Eric Deck - Start with Eric
 
 Crac Deck - Start with 4 Cracs that ALWAYS trigger from Infinity
 
-# 17 Tarots
+# 22 Tarots
 Left Handed Death - its just death but backwards i made it specifically to fuck with Crac since he keeps messing it up and then he installed a persona tarot card mod so now its a persona death tarot
 
 Glitched - Create 0-4 random LTM cards (no need to have room)
@@ -199,12 +223,22 @@ Artillery - Convert up to 2 cards to Rocket Ammo cards
 
 Cosmic Swine - Create 1 planet card for your most used hand (must have room)
 
+Shady Deal - Select up to 3 cards earn money equal to a 3rd of their chip value
+
+Patchwork Grimoire - Select up to 2 cards give them Red Seal and Perishable
+
+New Heir - Select up to 2 cards turn them into Face cards
+
+Metal Moshpit - Select up to 3 cards if they have an enhancement replace it with Steel
+
+Loot Llama - Create a random Fortlatro Joker (Must have room)
+
 # 2 Spectrals
 Double or Nothing - 1/2 chance to get 2 Spectral packs else give nothing
 
 Queue - Randomize the seals of all sealed cards in the deck
 
-# 38 Consumables
+# 39 Consumables
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -281,6 +315,8 @@ Boogie Bomb - Add a Boogie Seal to up to 2 selected cards
 
 Forecast Tower - Add a Storm Seal to 1 selected card
 
+Key - Remove Eternal from 1 selected Joker
+
 # 12 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
 
@@ -316,7 +352,7 @@ Ship It! - Gives a free LTM Pack
 
 Ship It Express! - Gives a free MEGA LTM Pack
 
-# 5 Seals
+# 6 Seals
 Storm Seal - Creates an LTM Card when discarded (must have room)
 
 Glitched Seal - Does something random when played and unscoring
@@ -327,6 +363,7 @@ Hop Seal - When scoring this card 1/3 chance to gain +1 Discard
 
 Zero Point Seal - When drawn draw 2 additional cards
 
+Heavy Seal - When drawn this card is flipped
 
 # 2 Blinds
 Fracture - All played cards are destroyed
