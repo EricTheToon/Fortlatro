@@ -2,7 +2,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 90 Jokers
+# 94 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see)
@@ -183,10 +183,43 @@ Jam Track - Rare - Gain $5 if played hand scores atleast 50% of blind requiremen
 
 [Title Card] - Uncommon - Fortlatro Jokers give X1.5 Mult
 
+Banana Smoothie - Uncommon - 10X Mult if this is the rightmost joker self destruct on use
+
+Sprite Duping - Rare - All skip rewards are doubled
+
+Prebuild - Uncommon - When adding a new Joker gain a random consumable
+
+Shogun X - Uncommon - Gain +50 chips for every consumable card used this ante
+
 # 2 Decks
 Eric Deck - Start with Eric
 
 Crac Deck - Start with 4 Cracs that ALWAYS trigger from Infinity
+
+# 12 Vouchers
+Dumpster Diving - 1/3 Chance to spawn a random consumable at the end of the round (no need to have room)
+
+Trash Tycoon - Spawn a random consumable at the end of the round (no need to have room)
+
+Riftjector Seat - The next time you would die destroy this voucher instead
+
+Failsafe Riftjector - The next time you would die survive 25% this voucher is destroyed
+
+Rarity Check - Common and Uncommon Jokers give +4 Mult
+
+Prestige Check - Rare and Legendary Jokers give +8 Mult
+
+Last Shots - Last 2 Hands of the round give +5 Mult and +50 Chips
+
+Extended Mag - Last 2 Hands of the round give +10 Mult and +100 Chips
+
+Danger Hero - Final Hand of round gives X2 Chips
+
+Last Stand - Final Hand of round gives X2 Mult
+
+Trash Talk - X2 Blind Payout -1 Discards
+
+Toxicity - X2 Blind Payout -1 Hands
 
 # 22 Tarots
 Left Handed Death - its just death but backwards i made it specifically to fuck with Crac since he keeps messing it up and then he installed a persona tarot card mod so now its a persona death tarot
@@ -205,7 +238,7 @@ Supremacy - Convert 1 card into a Legendary card
 
 Split Personality - Create 2 copies of 1 random card copies have a random suit
 
-Popcorn - Split 20 permanant mult across all selected cards
+Popcorn - Split 20 permanant mult across all cards held in hand
 
 Midas Touch - Select up to 3 Cards and earn $2 for each card destroyed
 
@@ -238,7 +271,7 @@ Double or Nothing - 1/2 chance to get 2 Spectral packs else give nothing
 
 Queue - Randomize the seals of all sealed cards in the deck
 
-# 39 Consumables
+# 41 Consumables
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -316,6 +349,10 @@ Boogie Bomb - Add a Boogie Seal to up to 2 selected cards
 Forecast Tower - Add a Storm Seal to 1 selected card
 
 Key - Remove Eternal from 1 selected Joker
+
+Shop Reset - Reset the Shop
+
+Gold Splash - Split $20 permanately across all cards held in hand
 
 # 12 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
