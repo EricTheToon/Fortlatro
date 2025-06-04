@@ -7,13 +7,14 @@
 --- PREFIX: fn
 --- PRIORITY: -69420
 --- DEPENDENCIES: [Steamodded>=0.9.8, Talisman>=2.0.0-beta8,]
---- VERSION: 1.1.5 Release
+--- VERSION: 1.1.6 Release
 ----------------------------------------------
 ------------MOD CODE -------------------------
 SMODS.optional_features.cardareas.unscored = true
 SMODS.current_mod.optional_features = function()
     return {
-        retrigger_joker = true
+        retrigger_joker = true,
+		post_trigger = true,
     }
 end
 
@@ -217,6 +218,7 @@ SMODS.Consumable{
         end
         return {vars = {}}
     end,
+	
     can_use = function(self, card)
         if G and G.hand and G.hand.highlighted and card.ability and card.ability.extra and card.ability.extra.cards then
             if #G.hand.highlighted > 0 and #G.hand.highlighted <= card.ability.extra.cards then
@@ -237,9 +239,6 @@ SMODS.Consumable{
         end
     end,
 }
-
-
-
 
 ----------------------------------------------
 ------------ERIC SWORD CODE END----------------------
@@ -1684,6 +1683,12 @@ SMODS.Joker{
     
     -- Calculate function for applying the Joker's effect
     calculate = function(self, card, context)
+	
+		if context.first_hand_drawn and not context.blueprint then
+            local eval = function() return G.GAME.current_round.hands_played == 0 and not G.RESET_JIGGLES end
+            juice_card_until(card, eval, true)
+        end
+		
         if context.joker_main then
             -- Check if the current round has not played any hands yet
             if G.GAME.current_round.hands_played == 0 then
@@ -8543,6 +8548,9 @@ SMODS.Joker{
 ----------------------------------------------
 ------------JAM TRACK CODE END----------------------
 
+----------------------------------------------
+------------[TITLE CARD] CODE BEGIN----------------------
+
 -- Define the list of Fortlatro jokers by their keys
 local fortlatro_jokers = {
     j_fn_Eric = true,
@@ -8635,6 +8643,10 @@ local fortlatro_jokers = {
     j_fn_Circle2 = true,
     j_fn_Jam = true,
     j_fn_Fortnite = true,
+	j_fn_Smoothie = true,
+	j_fn_Sprite = true,
+	j_fn_Prebuild = true,
+	j_fn_Shogun = true,
 }
 
 SMODS.Joker({
@@ -8680,6 +8692,206 @@ SMODS.Joker({
         return nil  -- No multiplier if the card isn't a vanilla joker
     end,
 })
+
+----------------------------------------------
+------------[TITLE CARD] CODE END----------------------
+
+----------------------------------------------
+------------SMOOTHIE CODE BEGIN----------------------
+
+SMODS.Sound({
+	key = "drink",
+	path = "drink.ogg",
+})
+
+SMODS.Joker{
+    key = 'Smoothie',
+    loc_txt = {
+        name = 'Banana Smoothie',
+        text = {
+            "{X:mult,C:white}X#1#{} Mult if this is the {C:attention}Rightmost{} Joker",
+			"{C:mult}Self-destruct{} after use",
+			"Idea: {C:inactive}kxttyfrickfish",
+        }
+    },
+    rarity = 2,
+    atlas = "Jokers",
+    pos = {x = 2, y = 36},
+    cost = 8,
+    unlocked = true,
+    discovered = false,
+    eternal_compat = true,
+    blueprint_compat = true,
+    perishable_compat = false,
+    config = {extra = {Xmult = 10}},
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {card.ability.extra.Xmult}}
+    end,
+
+    calculate = function(self, card, context)
+    if context.joker_main then
+        -- Check if this is the rightmost Joker
+        if G.jokers and #G.jokers.cards > 0 then
+            if G.jokers.cards[#G.jokers.cards] == card then
+                -- Schedule delayed destruction
+                G.E_MANAGER:add_event(Event({
+                    func = function()
+						if config.sfx ~= false then
+							play_sound("fn_drink")
+						end
+                        card:start_dissolve()
+                        return true
+                    end,
+                    delay = 0.5
+                }), 'base')
+
+                return {
+                    message = localize{type='variable', key='a_xmult', vars={card.ability.extra.Xmult}},
+                    Xmult_mod = card.ability.extra.Xmult,
+                }
+            end
+        end
+    end
+end
+}
+
+----------------------------------------------
+------------SMOOTHIE CODE END----------------------
+
+----------------------------------------------
+------------SPRITE CODE BEGIN----------------------
+
+SMODS.Joker({
+    key = 'Sprite',
+    loc_txt = {
+        name = 'Sprite Duping',
+        text = {
+            "All {C:attention}Skip{} rewards are doubled",
+        }
+    },
+    rarity = 3,
+    atlas = "Jokers",
+    pos = {x = 2, y = 38},
+    cost = 9,
+    unlocked = true,
+    discovered = false,
+    eternal_compat = true,
+    blueprint_compat = true,
+    perishable_compat = false,
+	
+	add_to_deck = function(self, card)
+        add_tag(Tag('tag_double'))
+    end,
+
+    calculate = function(self, card, context)
+		-- check if skipping blind
+		if context.skip_blind then
+			G.GAME.skips = G.GAME.skips + 1
+			add_tag(Tag('tag_double'))
+		end
+    end,
+})
+
+----------------------------------------------
+------------SPRITE CODE END----------------------
+
+----------------------------------------------
+------------PREBUILD CODE BEGIN----------------------
+
+SMODS.Joker({
+    key = 'Prebuild',
+    loc_txt = {
+        name = 'Prebuild',
+        text = {
+            "When adding a new {C:attention}Joker{}",
+			"Gain a random {C:attention}Consumable{}",
+			"{C:inactive}(Must have room)",
+			"Idea: {C:inactive}kxttyfrickfish",
+        }
+    },
+    rarity = 2,
+    atlas = "Jokers",
+    pos = {x = 3, y = 38},
+    cost = 7,
+    unlocked = true,
+    discovered = false,
+    eternal_compat = true,
+    blueprint_compat = true,
+    perishable_compat = false,
+
+	calculate = function(self, card, context)
+        if context.card_added then
+            if context.card ~= card and context.card.ability.set == 'Joker' then
+				if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+					local new_card = create_card('Consumeables', G.consumeables)
+					new_card:add_to_deck()
+					G.consumeables:emplace(new_card)
+				end
+            end
+        end
+    end,
+})
+
+----------------------------------------------
+------------PREBUILD CODE END----------------------
+
+SMODS.Joker {
+    key = 'Shogun',
+    loc_txt = {
+        name = 'Shogun X',
+        text = {
+            "Gain {C:chips}+#1#{} Chips per {C:attention}Consumable{} used this Ante",
+            "{C:inactive}Currently{} {C:chips}+#2# {C:inactive}Chips",
+			"Idea: {C:inactive}kxttyfrickfish",
+        }
+    },
+    config = {extra = {stored_chips = 0, chips_per_card = 50}},
+    rarity = 2,
+    pos = {x = 4, y = 38},
+    atlas = 'Jokers',
+    cost = 5,
+    unlocked = true,
+    discovered = false,
+    blueprint_compat = true,
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.chips_per_card, card.ability.extra.stored_chips}}
+    end,
+    calculate = function(self, card, context)
+	
+		if context.end_of_round and context.main_eval and not context.blueprint then
+            -- Check if it's a boss blind
+            if G.GAME.blind and G.GAME.blind.boss then
+				-- Reset on boss blind
+                card.ability.extra.stored_chips = 0
+                return {
+                    message = localize('k_reset'),
+                    card = card
+                }
+			end
+		end
+	
+		
+        -- check is using a consumable
+        if context.using_consumeable then
+            card.ability.extra.stored_chips = card.ability.extra.stored_chips + card.ability.extra.chips_per_card
+            return {
+				message = localize('k_upgrade_ex'),
+				colour = G.C.Mult,
+				card = card
+            }
+        end
+
+        -- Joker main scoring logic (after destruction and chip calculation)
+        if context.joker_main then
+            return {
+                message = localize {type = 'variable', key = 'a_chips', vars = {card.ability.extra.stored_chips}},
+                chip_mod = card.ability.extra.stored_chips,
+                colour = G.C.CHIPS
+            }
+        end
+    end
+}	
 
 ----------------------------------------------
 ------------GLASSES CODE BEGIN----------------------
@@ -9002,8 +9214,7 @@ SMODS.Consumable{
             add_tag(Tag('tag_ethereal'))
 
             -- Display success message on the consumable
-            SMODS.eval_this('card_eval_status_text', {
-                card = card, -- Reference the consumable card
+            card_eval_status_text(card, 'extra', nil, nil, nil, {
                 message = "DOUBLE!", -- Display "DOUBLE!" message
                 colour = G.C.GREEN,
             })
@@ -9013,8 +9224,7 @@ SMODS.Consumable{
 			if config.sfx ~= false then
 				play_sound("fn_sad")
 			end
-            SMODS.eval_this('card_eval_status_text', {
-                card = card, -- Reference the consumable card
+            card_eval_status_text(card, 'extra', nil, nil, nil, {
                 message = "NOTHING!", -- Display "NOTHING!" message
                 colour = G.C.RED,
             })
@@ -9910,8 +10120,7 @@ SMODS.Consumable{
 			if config.sfx ~= false then
 				play_sound("fn_happy")
 			end
-            SMODS.eval_this('card_eval_status_text', {
-                card = card, -- Reference the consumable card
+            card_eval_status_text(card, 'extra', nil, nil, nil, {
                 message = "Friends!", -- Display "Friends!" message
                 colour = G.C.PURPLE,
             })
@@ -9921,9 +10130,8 @@ SMODS.Consumable{
 			if config.sfx ~= false then
 				play_sound("fn_sad")
 			end
-            SMODS.eval_this('card_eval_status_text', {
-                card = card, -- Reference the consumable card
-                message = "NOTHING!", -- Display "NOTHING!" message
+            card_eval_status_text(card, 'extra', nil, nil, nil, {
+				message = "NOTHING!",
                 colour = G.C.RED,
             })
         end
@@ -12489,13 +12697,14 @@ SMODS.Consumable{
                         for _ = 1, self.config.extra.copies do
                             local copy = copy_card(target_card)
                             G.hand:emplace(copy)
+							copy:add_to_deck()
+							G.deck.config.card_limit = G.deck.config.card_limit + 1
+							table.insert(G.playing_cards, copy)
                             copy:start_materialize(nil, nil)
 
                             -- **Use SMODS.change_base to set a random suit**
                             local new_suit = suits[math.random(#suits)]
                             SMODS.change_base(copy, new_suit)
-
-                            table.insert(new_cards, copy)
                         end
                     end
 
@@ -12522,38 +12731,47 @@ SMODS.Consumable{
     loc_txt = {
         name = 'Popcorn',
         text = {
-            'Split {C:mult}+20{} permanent Mult across {C:attention}all selected cards{}',
+            'Split {C:mult}+20{} permanent Mult across {C:attention}all cards in hand{}',
         }
     },
     config = {
-        extra = {} -- No selection limit needed
+        extra = {}
     },
     loc_vars = function(self, info_queue, center)
         return {vars = {}}
     end,
     can_use = function(self, card)
-        return G and G.hand and G.hand.highlighted and #G.hand.highlighted > 0
+        return G and G.hand and #G.hand.cards > 0
     end,
     use = function(self, card, area, copier)
-        if G and G.hand and G.hand.highlighted and #G.hand.highlighted > 0 then
-            -- Calculate split multiplier
-            local split_mult = math.floor(20 / #G.hand.highlighted)
+        if G and G.hand and G.hand.cards and #G.hand.cards > 0 then
+            local cards_in_hand = G.hand.cards
+            local total = 20
+            local num_cards = #cards_in_hand
+            local base = math.floor(total / num_cards)
+            local remainder = total - base * num_cards
 
-            for _, target_card in ipairs(G.hand.highlighted) do
-                -- Apply split permanent multiplier
-                target_card.ability.perma_mult = (target_card.ability.perma_mult or 0) + split_mult
+            -- Shuffle so the leftover goes to random cards
+            cards_in_hand = pseudoshuffle(G.hand.cards)
 
-                -- Juice-up effect for feedback
+            for i, hand_card in ipairs(G.hand.cards) do
+                local extra = (i <= remainder) and 1 or 0
+                hand_card.ability.perma_mult = (hand_card.ability.perma_mult or 0) + base + extra
+
                 G.E_MANAGER:add_event(Event({
                     func = function()
-                        target_card:juice_up()
+                        hand_card:juice_up()
                         return true
                     end
                 }))
             end
+
+            -- Optional: sound or popup feedback
+            play_sound("tarot1")
         end
     end,
 }
+
 
 ----------------------------------------------
 ------------POPCORN CODE END----------------------
@@ -14118,6 +14336,9 @@ SMODS.Consumable{
 ----------------------------------------------
 ------------MOSHPIT CODE END----------------------
 
+----------------------------------------------
+------------LOOT LLAMA CODE BEGIN----------------------
+
 SMODS.Consumable {
     key = 'LootLlama',
     set = 'Tarot',
@@ -14171,21 +14392,124 @@ SMODS.Consumable {
             'j_fn_Jar', 'j_fn_Jar', 'j_fn_Fashion', 'j_fn_Fashion', 'j_fn_Control', 'j_fn_BP', 'j_fn_IBlade', 'j_fn_Default', 'j_fn_Recon', 'j_fn_Default', 'j_fn_Recon',
             'j_fn_Whiplash', 'j_fn_Whiplash', 'j_fn_Whiplash', 'j_fn_Quadcrasher', 'j_fn_Quadcrasher', 'j_fn_Quadcrasher', 'j_fn_Daily', 'j_fn_Void', 'j_fn_Void', 'j_fn_GG', 'j_fn_Clickbait', 'j_fn_Clickbait', 'j_fn_Clickbait', 'j_fn_Clickbait', 'j_fn_Noobs', 'j_fn_Noobs',
             'j_fn_Dark', 'j_fn_Frozen', 'j_fn_Frozen', 'j_fn_DC', 'j_fn_OGPass', 'j_fn_OGPass', 'j_fn_Reload', 'j_fn_Reload', 'j_fn_Circle', 'j_fn_Circle2', 'j_fn_Circle', 'j_fn_Circle2',
-            'j_fn_Jam', 'j_fn_Fortnite', 'j_fn_Fortnite'
+            'j_fn_Jam', 'j_fn_Fortnite', 'j_fn_Fortnite, j_fn_Smoothie, j_fn_Smoothie, j_fn_Sprite, j_fn_Prebuild, j_fn_Prebuild, j_fn_Shogun, j_fn_Shogun,'
         }
 
         local jokers_to_create = card.ability.extra.jokers or 1
         for _ = 1, jokers_to_create do
             local selected_joker = fortlatro_jokers[math.random(#fortlatro_jokers)]
             local joker_card = create_card('Joker', G.Jokers, nil, nil, nil, nil, selected_joker)
-            joker_card.sell_cost = 0
+            --joker_card.sell_cost = 0--
             joker_card:add_to_deck()
             G.jokers:emplace(joker_card)
         end
     end,
 }
 
+----------------------------------------------
+------------LOOT LLAMA CODE END----------------------
 
+----------------------------------------------
+------------SHOP RESET CODE BEGIN----------------------
+
+SMODS.Consumable{
+    key = 'LTMReset',
+    set = 'LTMConsumableType',
+    atlas = 'Jokers',
+    pos = {x = 4, y = 35},
+    loc_txt = {
+        name = 'Shop Reset',
+        text = {
+            '{C:attention}Reset{} the {C:green}Shop{}',
+        }
+    },
+    
+    can_use = function(self, card)
+        return G.STATE == G.STATES.SHOP
+    end,
+    
+    use = function(self, card, area, copier)
+    
+    if G.STATE == 6 then
+        
+        G.E_MANAGER:add_event(Event({
+            trigger = 'immediate',
+            func = function()
+                
+                if G.shop then
+                    G.shop:remove()
+                    G.shop = nil
+                else
+                    print("G.shop was nil.")
+                end
+
+                G.GAME.current_round.used_packs = nil
+				G.GAME.current_round.reroll_cost = 5
+                G.STATE_COMPLETE = false
+
+                return true
+            end
+        }))
+    else
+        print("Not in shop state. Current state: " .. tostring(G.STATE))
+    end
+end
+}
+
+----------------------------------------------
+------------SHOP RESET CODE END----------------------
+
+SMODS.Consumable{
+    key = 'LTMGSplash',
+    set = 'LTMConsumableType',
+    atlas = 'Jokers',
+    pos = {x = 0, y = 37},
+    loc_txt = {
+        name = 'Gold Splash',
+        text = {
+            'Split {C:money}$20{} permanently across {C:attention}all cards in hand{}',
+        }
+    },
+    config = {
+        extra = {} -- No selection limit needed
+    },
+    loc_vars = function(self, info_queue, center)
+        return {vars = {}}
+    end,
+    can_use = function(self, card)
+        return G and G.hand and #G.hand.cards > 0
+    end,
+    use = function(self, card, area, copier)
+		if config.sfx ~= false then
+			play_sound("fn_nsplash")
+		end
+        if G and G.hand and G.hand.cards and #G.hand.cards > 0 then
+            local cards_in_hand = G.hand.cards
+            local total = 20
+            local num_cards = #cards_in_hand
+            local base = math.floor(total / num_cards)
+            local remainder = total - base * num_cards
+
+            -- Shuffle so the leftover goes to random cards
+            cards_in_hand = pseudoshuffle(G.hand.cards)
+
+            for i, hand_card in ipairs(G.hand.cards) do
+                local extra = (i <= remainder) and 1 or 0
+                hand_card.ability.perma_p_dollars = (hand_card.ability.perma_p_dollars or 0) + base + extra
+
+                G.E_MANAGER:add_event(Event({
+                    func = function()
+                        hand_card:juice_up()
+                        return true
+                    end
+                }))
+            end
+
+            -- Optional: sound or popup feedback
+            play_sound("tarot1")
+        end
+    end,
+}
 
 ----------------------------------------------
 ------------DUMPSTER DIVER CODE BEGIN----------------------
@@ -14194,9 +14518,7 @@ SMODS.Sound({
 	key = "trash",
 	path = "trash.ogg",
 })
---yeah i tried vouchers and for some reason they will brick your game if you restart--
---you are free to enable these by removing the --[[ and --]] but like you will have to redisable these if you want to restart--
---[[
+
 SMODS.Voucher {
     key = 'Dumpster',
     loc_txt = {
@@ -14241,7 +14563,7 @@ SMODS.Voucher {
         text = { 'Spawn a random consumable at {C:attention}end of round{}', '{C:inactive}(No need to have room)'}
     },
     atlas = 'Jokers',
-    requires = 'v_fn_Dumpster',
+    requires = {'v_fn_Dumpster'},
     pos = {
         x = 1,
         y = 32,
@@ -14258,9 +14580,413 @@ SMODS.Voucher {
         end
     end
 }
---]]
+
 ----------------------------------------------
 ------------DUMPSTER DIVER CODE END----------------------
+
+----------------------------------------------
+------------RIFTJECTOR SEAT CODE BEGIN----------------------
+
+SMODS.Voucher {
+    key = 'Riftjector',
+    loc_txt = {
+        name = 'Rift-jector Seat',
+        text = { 'The next time you would die', '{C:mult}destroy{} this voucher instead'}
+    },
+    atlas = 'Jokers',
+    pos = {
+        x = 0,
+        y = 36,
+    },
+    
+    calculate = function(self, card, context)
+        if context.end_of_round and not context.blueprint and context.game_over then
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    -- Visual feedback for chips
+                    G.hand_text_area.blind_chips:juice_up()
+                    G.hand_text_area.game_chips:juice_up()
+
+                    -- Play a sound effect
+                    if config.sfx ~= false then
+                        play_sound('fn_rift')
+                    end
+
+                    -- Prevent the game over
+                    context.game_over = false
+                    card:start_dissolve()
+
+                    return true
+                end
+            }))
+
+            return {
+                message = localize('k_saved_ex'),
+                saved = true,
+                colour = G.C.RED
+            }
+        end
+    end
+}
+
+SMODS.Voucher {
+    key = 'Riftjector2',
+    loc_txt = {
+        name = 'Failsafe Rift-jector',
+        text = { 'The next time you would die', 'survive and {C:green}25% chance{} this voucher is not {C:mult}destroyed{}' }
+    },
+    atlas = 'Jokers',
+    requires = { 'v_fn_Riftjector' },
+    pos = {
+        x = 1,
+        y = 36,
+    },
+
+    calculate = function(self, card, context)
+        if context.end_of_round and not context.blueprint and context.game_over and not context.saved_by_riftjector then
+            context.saved_by_riftjector = true
+
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    -- Visual feedback
+                    G.hand_text_area.blind_chips:juice_up()
+                    G.hand_text_area.game_chips:juice_up()
+
+                    -- Sound effect
+                    if config.sfx ~= false then
+                        play_sound('fn_rift')
+                    end
+
+                    -- Prevent the game over
+                    context.game_over = false
+
+                    -- 25% chance to not destroy
+                    if pseudorandom('rift') >= 1/4 then
+                        card:start_dissolve()
+                    end
+
+                    return true
+                end
+            }))
+
+            return {
+                message = localize('k_saved_ex'),
+                saved = true,
+                colour = G.C.RED
+            }
+        end
+    end
+}
+
+----------------------------------------------
+------------RIFTJECTOR SEAT CODE END----------------------
+
+----------------------------------------------
+------------RARITY CHECK CODE BEGIN----------------------
+
+SMODS.Voucher {
+    key = 'Rarity',
+    loc_txt = {
+        name = 'Rarity Check',
+        text = { '{C:common}Common{} and {C:uncommon}Uncommon{} Jokers{}', 'Each give {C:mult}+#1#{} Mult', 'Idea: {C:attention}MushiJutsu{}' }
+    },
+    atlas = 'Jokers',
+    pos = {
+        x = 3,
+        y = 36,
+    },
+    config = {
+        extra = {
+            mult = 4,
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = { card.ability.extra.mult }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        local joker = context.other_joker
+        if joker and (
+            joker.config.center.rarity == 1 or joker.config.center.rarity == "Common" or
+            joker.config.center.rarity == 2 or joker.config.center.rarity == "Uncommon"
+        ) then
+            return {
+                mult = card.ability.extra.mult,
+            }
+        end
+    end,
+}
+
+SMODS.Voucher {
+    key = 'Rarity2',
+    loc_txt = {
+        name = 'Prestige Check',
+        text = { '{C:rare}Rare{} and {C:legendary}Legendary{} Jokers{}', 'Each give {C:mult}+#1#{} Mult' }
+    },
+    atlas = 'Jokers',
+	requires = { 'v_fn_Rarity' },
+    pos = {
+        x = 4,
+        y = 36,
+    },
+    config = {
+        extra = {
+            mult = 8,
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = { card.ability.extra.mult }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        local joker = context.other_joker
+        if joker and (
+            joker.config.center.rarity == 3 or joker.config.center.rarity == "Rare" or
+            joker.config.center.rarity == 4 or joker.config.center.rarity == "Legendary"
+        ) then
+            return {
+                mult = card.ability.extra.mult,
+            }
+        end
+    end,
+}
+
+----------------------------------------------
+------------RARITY CHECK CODE END----------------------
+
+----------------------------------------------
+------------LAST SHOTS CODE BEGIN----------------------
+
+SMODS.Voucher {
+    key = 'Last',
+    loc_txt = {
+        name = 'Last Shots',
+        text = { '{C:attention}Last 2 Hands{} of round give {C:mult}+#1#{} Mult and {C:chips}+#2#{} Chips', 'Idea: {C:attention}MushiJutsu{}' }
+    },
+    atlas = 'Jokers',
+    pos = {
+        x = 1,
+        y = 37,
+    },
+    config = {
+        extra = {
+            mult = 5,
+			chips = 50,
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = { card.ability.extra.mult, card.ability.extra.chips }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        if context.joker_main and G.GAME.current_round.hands_left == 0 then
+            return {
+				mult = card.ability.extra.mult,
+                chips = card.ability.extra.chips,
+            }
+        end
+		
+		if context.joker_main and G.GAME.current_round.hands_left == 1 then
+            return {
+                mult = card.ability.extra.mult,
+                chips = card.ability.extra.chips,
+            }
+        end
+	end
+}
+
+
+SMODS.Voucher {
+    key = 'Last2',
+    loc_txt = {
+        name = 'Extended Mag',
+        text = { '{C:attention}Last 2 Hands{} of round give {C:mult}+#1#{} Mult and {C:chips}+#2#{} Chips' }
+    },
+    atlas = 'Jokers',
+	requires = { 'v_fn_Last' },
+    pos = {
+        x = 2,
+        y = 37,
+    },
+    config = {
+        extra = {
+            mult = 10,
+			chips = 100,
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = { card.ability.extra.mult, card.ability.extra.chips }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        if context.joker_main and G.GAME.current_round.hands_left == 0 then
+            return {
+				mult = card.ability.extra.mult,
+                chips = card.ability.extra.chips,
+            }
+        end
+		
+		if context.joker_main and G.GAME.current_round.hands_left == 1 then
+            return {
+                mult = card.ability.extra.mult,
+                chips = card.ability.extra.chips,
+            }
+        end
+	end
+}
+
+----------------------------------------------
+------------LAST SHOTS CODE END----------------------
+
+----------------------------------------------
+------------DANGER HERO CODE BEGIN----------------------
+
+SMODS.Voucher {
+    key = 'Danger',
+    loc_txt = {
+        name = 'Danger Hero',
+        text = { '{C:attention}Final Hand{} of round gives {X:chips,C:white}X#1#{} Chips' }
+    },
+    atlas = 'Jokers',
+    pos = {
+        x = 3,
+        y = 37,
+    },
+    config = {
+        extra = {
+            x_chips = 2,
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = { card.ability.extra.x_chips }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        if context.joker_main and G.GAME.current_round.hands_left == 0 then
+            return {
+                x_chips = card.ability.extra.x_chips
+            }
+        end
+    end
+}
+
+SMODS.Voucher {
+    key = 'Danger2',
+    loc_txt = {
+        name = 'Last Stand',
+        text = { '{C:attention}Final Hand{} of round gives {X:mult,C:white}X#1#{} Mult' }
+    },
+    atlas = 'Jokers',
+	requires = { 'v_fn_Danger' },
+    pos = {
+        x = 4,
+        y = 37,
+    },
+    config = {
+        extra = {
+            x_mult = 2,
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = { card.ability.extra.x_mult }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        if context.joker_main and G.GAME.current_round.hands_left == 0 then
+            return {
+                x_mult = card.ability.extra.x_mult
+            }
+        end
+    end
+}
+
+----------------------------------------------
+------------DANGER HERO CODE END----------------------
+
+SMODS.Voucher {
+    key = 'Talk',
+    loc_txt = {
+        name = 'Trash Talk',
+        text = { '{X:attention,C:white}X#1#{} {C:attention}Blind Payout{}', '{C:mult}-#2# Discards{}', 'Idea: BoiRowan' }
+    },
+    atlas = 'Jokers',
+    pos = {
+        x = 0,
+        y = 38,
+    },
+    config = {
+        extra = {
+            payout = 2,
+			discards = 1,
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = { card.ability.extra.payout, card.ability.extra.discards }
+        }
+    end,
+	
+	redeem = function(self, card)
+        local e = card.ability.extra
+        G.GAME.round_resets.discards = G.GAME.round_resets.discards - e.discards
+        ease_discard(-e.discards)
+    end,
+	
+    calculate = function(self, card, context)
+        if context.setting_blind then
+            G.GAME.blind.dollars = G.GAME.blind.dollars * card.ability.extra.payout
+        end
+	end
+}
+
+SMODS.Voucher {
+    key = 'Talk2uh', -- spit on that thing
+    loc_txt = {
+        name = 'Toxicity',
+        text = { '{X:attention,C:white}X#1#{} {C:attention}Blind Payout{}', '{C:chips}-#2# Hands{}', 'Idea: BoiRowan' }
+    },
+    atlas = 'Jokers',
+	requires = { 'v_fn_Talk' },
+    pos = {
+        x = 1,
+        y = 38,
+    },
+    config = {
+        extra = {
+            payout = 2,
+			hands = 1,
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = { card.ability.extra.payout, card.ability.extra.hands }
+        }
+    end,
+	
+	redeem = function(self, card)
+        local e = card.ability.extra
+        G.GAME.round_resets.hands = G.GAME.round_resets.hands - e.hands
+        ease_hands_played(-e.hands)
+    end,
+	
+    calculate = function(self, card, context)
+        if context.setting_blind then
+            G.GAME.blind.dollars = G.GAME.blind.dollars * card.ability.extra.payout
+        end
+	end
+}
 
 ----------------------------------------------
 ------------BOOSTER CODE BEGIN----------------------
@@ -14281,6 +15007,7 @@ local disabled = {
 	c_fn_LTMFish = true,
 	c_fn_LTMPaint = true,
 	c_fn_LTMBerry = true,
+	c_fn_LTMReset = true,
 }
 
 SMODS.Booster({
@@ -14399,6 +15126,7 @@ local disabled = {
 	c_fn_LTMFish = true,
 	c_fn_LTMPaint = true,
 	c_fn_LTMBerry = true,
+	c_fn_LTMReset = true,
 }
 
 SMODS.Booster({
@@ -14647,7 +15375,7 @@ if config.blinds ~= false then
         end,
 
         calculate = function(self, card, context)
-            if context.destroy_card and context.cardarea == G.play or context.cardarea == "unscored" then
+            if context.destroy_card and context.cardarea == G.play and not G.GAME.blind.disabled or context.cardarea == "unscored" and not G.GAME.blind.disabled then
                 return {remove = true}
             end
         end,
@@ -15211,13 +15939,13 @@ SMODS.Seal {
 		if not card.ability.extra then
 			card.ability.extra = {cards = 2, drawn = 0}
 		end
-        if context.hand_drawn then  -- Check if a hand is drawn
+        if context.hand_drawn and card.area == G.hand then  -- Check if a hand is drawn
             if card.ability.extra.drawn < 1 then
                 G.FUNCS.draw_from_deck_to_hand(card.ability.extra.cards)
                 card.ability.extra.drawn = 1
             end
         end
-        if context.discard or context.cardarea == "unscored" and context.main_scoring or context.end_of_round or context.cardarea == G.play and not context.repetition and not context.blueprint then
+        if context.end_of_round then
             card.ability.extra.drawn = 0
         end
     end
@@ -15339,7 +16067,7 @@ SMODS.Back{
 
 ----------------------------------------------
 ------------ERIC DECK CODE BEGIN----------------------
-function joker_add(jKey)
+function joker_add2(jKey)
 
     if type(jKey) == 'string' then
         
@@ -15352,6 +16080,7 @@ function joker_add(jKey)
 
 
         SMODS.Stickers["eternal"]:apply(j, true)
+		SMODS.Stickers["rental"]:apply(j, true)
 
     end
 end
@@ -15378,7 +16107,7 @@ SMODS.Back{
             func = function ()
 
                 -- Add Eric
-                joker_add('j_fn_Eric')
+                joker_add2('j_fn_Eric')
 
                 return true
             end
