@@ -2,7 +2,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 94 Jokers
+# 99 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see)
@@ -191,12 +191,27 @@ Prebuild - Uncommon - When adding a new Joker gain a random consumable
 
 Shogun X - Uncommon - Gain +50 chips for every consumable card used this ante
 
-# 2 Decks
+Killswitch Revolvers - Uncommon - Lower Gamespeed to gain Mult
+
+Hero Rank - Uncommon - Gain X1 Mult after 1 antes (increases when met)
+
+NBA Glitch - Rare - Draw 8 cards on play or discard
+
+Tempest Gateway - Common - Each discarded Lego card is instead destroyed and gives $3
+
+Griddy - Uncommon - Double the values of the joker to the right
+
+# 3 Decks
 Eric Deck - Start with Eric
 
-Crac Deck - Start with 4 Cracs that ALWAYS trigger from Infinity
+Crac Deck - 13 handsize - Start with Crac and Reality Augment
 
-# 12 Vouchers
+Rebooted Deck - Start with Aimbot and Bandage Bazooka 50% chance to respawn and halve chips on death
+
+# 1 [Card Sleeve](https://github.com/larswijn/CardSleeves)
+Crac Sleeve - Start with a Crac that always triggers
+
+# 14 Vouchers
 Dumpster Diving - 1/3 Chance to spawn a random consumable at the end of the round (no need to have room)
 
 Trash Tycoon - Spawn a random consumable at the end of the round (no need to have room)
@@ -221,7 +236,11 @@ Trash Talk - X2 Blind Payout -1 Discards
 
 Toxicity - X2 Blind Payout -1 Hands
 
-# 22 Tarots
+Forecast - LTM Cards appear X2 more frequently
+
+Storm Mark - LTM Cards appear X4 more frequently
+
+# 23 Tarots
 Left Handed Death - its just death but backwards i made it specifically to fuck with Crac since he keeps messing it up and then he installed a persona tarot card mod so now its a persona death tarot
 
 Glitched - Create 0-4 random LTM cards (no need to have room)
@@ -266,12 +285,20 @@ Metal Moshpit - Select up to 3 cards if they have an enhancement replace it with
 
 Loot Llama - Create a random Fortlatro Joker (Must have room)
 
-# 2 Spectrals
+Grindset - Destroy all currently held Diamond cards replace them with Creator Code cards
+
+# 5 Spectrals
 Double or Nothing - 1/2 chance to get 2 Spectral packs else give nothing
 
 Queue - Randomize the seals of all sealed cards in the deck
 
-# 41 Consumables
+Capital Gains - 1/3 chance to give all cards in hand Sponsorship Seals else lose all money
+
+Enlightenment - Apply Mythic to 1 Joker -1 Hand
+
+Breakthrough - Apply Mythic to up to 5 Cards  -1 Discard
+
+# 43 Consumables
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -282,7 +309,7 @@ Perk Up - Apply a random Enhancement to up to 5 selected Cards
 
 Card Supercharger - Add a random Seal to up to 3 selected Cards
 
-Card Flip - Flips up to 3 selected Cards, Jokers, or Consumables
+Card Flip - Flips up to 5 selected Cards, Jokers, or Consumables
 
 Kinetic Ore - Applies Stone and Astral to 1 selected Card
 
@@ -354,7 +381,11 @@ Shop Reset - Reset the Shop
 
 Gold Splash - Split $20 permanately across all cards held in hand
 
-# 12 Enhancements
+FTC Lawsuit - 1/20 chance to gain $200
+
+Bandage Bazooka - Cannot be used prevent death once
+
+# 14 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
 
 Wood - 1.2X Mult +15 Chips
@@ -379,17 +410,23 @@ Medium Ammo - X1.1 Chips retriggers once per remaining Discard
 
 Rocket Ammo - Retriggers 1 time gain +1 retriggers if held in hand at end of round
 
-# 2 Editions
+Lego - Lose $3 and create a copy of this card when played
+
+Creator Code - Retrigger 1 time 1/5 chance to spread to right card (chance decreases each successful activation)
+
+# 3 Editions
 Nitro - +2 handsize resets at end of round
 
 Shockwaved - 1/3 chance to to retrigger adjacent jokers retrigger adjacent playing cards
+
+Mythic - X4 to all values on this card - 1 slot / -2 handsize
 
 # 2 Tags
 Ship It! - Gives a free LTM Pack
 
 Ship It Express! - Gives a free MEGA LTM Pack
 
-# 6 Seals
+# 7 Seals
 Storm Seal - Creates an LTM Card when discarded (must have room)
 
 Glitched Seal - Does something random when played and unscoring
@@ -402,10 +439,14 @@ Zero Point Seal - When drawn draw 2 additional cards
 
 Heavy Seal - When drawn this card is flipped
 
-# 2 Blinds
+Sponsorship Seal - While held each scored card gives $1 increase this by 0.1 for each card scored
+
+# 3 Blinds
 Fracture - All played cards are destroyed
 
 Zero Build - Wood, Brick and Metal are debuffed
+
+Tornado - Jokers are constantly shuffled randomly
 
 # Be sure to check the config tab you can enable and disable sounds, blinds, cryptid content, ortalab content, and Old Calc or New Calc
 [ortalab](https://github.com/Eremel/Ortalab/tree/12ad0459565911aa5de428288c5d431466f06c73)
