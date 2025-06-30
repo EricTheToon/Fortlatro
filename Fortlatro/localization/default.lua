@@ -7,6 +7,7 @@ return {
 		['labels'] = {
 			fn_Nitro = 'Nitro',
 			fn_Shockwaved = 'Shockwaved',
+			fn_Mythic = 'Mythic'
 		}
     }
 }
