@@ -1,0 +1,21 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -1
+# patch for ltm packs and regular packs
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+match_indent = true
+position = 'after'
+pattern = '''
+booster_obj = self.config.center
+'''
+payload = '''
+if self.config.center and self.config.center.key == 'p_fn_LTMBooster1' or self.config.center and self.config.center.key == 'p_fn_LTMBooster2' then
+    self.ability.extra = self.ability.extra + G.GAME.ltm_choices
+end
+if self.config.center and self.config.center.key ~= 'p_fn_LTMBooster1' and self.config.center.key ~= 'p_fn_LTMBooster2' then
+	self.ability.extra = self.ability.extra + G.GAME.regular_choices
+end
+'''
