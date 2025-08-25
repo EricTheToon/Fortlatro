@@ -8762,6 +8762,8 @@ SMODS.Joker{
 local fortlatro_jokers = {
     j_fn_Eric = true,
     j_fn_Crac = true,
+	j_fn_Crac2 = true,
+	j_fn_Crac3 = true,
     j_fn_Emily = true,
     j_fn_Toilet= true,
     j_fn_GroundGame = true,
