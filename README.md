@@ -2,10 +2,12 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 99 Jokers
+# 115 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
-Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see)
+Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see) (can turn into GOOD or EVIL Crac)
+GOOD Crac - Rare - 1/13 chance to do something good from the original Crac's abilities (can turn back into Crac)
+EVIL Crac - Rare - 1/13 chance to do something bad from the original Crac's abilities (can turn back into Crac)
 
 Emily - Legendary - Retrigger everything
 
@@ -201,17 +203,55 @@ Tempest Gateway - Common - Each discarded Lego card is instead destroyed and giv
 
 Griddy - Uncommon - Double the values of the joker to the right
 
-# 3 Decks
+CS2 - Common - -1 Mult
+
+Forecast Storm - Uncommon - 50% chance to halve blind 49% chance to double blind 1% chance to set blind to 1
+
+Fortbyte - Common - +2 Mult for every Fortlatro voucher redeemed 
+
+Flowberry Fizz - Uncommon - Draw 1 additional card when any consumable is used
+
+Epic Games Launcher - Uncommon - X5 Mult if you have Fortnite installed
+
+Marvel Series - Legendary - Gains X0.5 for every unique Joker obtained this run
+
+Cluster Clinger - Uncommon - When a card is destroyed also destroy adjacent cards
+
+Helios - Rare - 2.5X Mult Only exists during Boss Blinds
+
+Icon Series - Legendary - Gains X1.25 Mult for every unique Seal obtained this run
+
+Gaming Legends Series - Legendary - Gains X1.25 Mult for every unique Edition obtained this run
+
+Who Remembers The Infinity Stones? - Common - +1 Mult for every year since the infinity stones were in fortnite
+
+Star Wars Series - Legendary - Gains X1 Mult for every unique Edition obtained this run
+
+Chewbacca Spawner - Rare - Create 1 random fortlatro joker when (random rank of random suit) is played (changes every round) (no need to have room)
+
+Fortnite Crew - Rare - Scaling Jokers have a 1/2 chance to retrigger
+
+
+
+
+# 6 Decks
 Eric Deck - Start with Eric
 
 Crac Deck - 13 handsize - Start with Crac and Reality Augment
 
 Rebooted Deck - Start with Aimbot and Bandage Bazooka 50% chance to respawn and halve chips on death
 
+Zorlodo Deck - Every ante acts a random other deck
+
+OG Deck - +2 Joker slots Vouchers CANNOT spawn in the shop
+
+Zero Build Deck - Vouchers restock after every round and are half price -2 Joker slots
+
+
 # 1 [Card Sleeve](https://github.com/larswijn/CardSleeves)
 Crac Sleeve - Start with a Crac that always triggers
 
-# 14 Vouchers
+# 20 Vouchers
 Dumpster Diving - 1/3 Chance to spawn a random consumable at the end of the round (no need to have room)
 
 Trash Tycoon - Spawn a random consumable at the end of the round (no need to have room)
@@ -240,7 +280,19 @@ Forecast - LTM Cards appear X2 more frequently
 
 Storm Mark - LTM Cards appear X4 more frequently
 
-# 23 Tarots
+Bush Warrior - Each held card gives $1
+
+Shrub Mud - Each held card gains +5 chips
+
+Nostalgia Glasses - Spawns an extra LTM Pack in every shop
+
+Better Times - All packs have 2 extra options LTM packs have 3 extra options instead
+
+Supply Drop - Arcana Packs always contain one of the Ammo tarot cards
+
+Big Ammo Box - Ammo tarot cards can target 2 addition cards
+
+# 25 Tarots
 Left Handed Death - its just death but backwards i made it specifically to fuck with Crac since he keeps messing it up and then he installed a persona tarot card mod so now its a persona death tarot
 
 Glitched - Create 0-4 random LTM cards (no need to have room)
@@ -287,7 +339,11 @@ Loot Llama - Create a random Fortlatro Joker (Must have room)
 
 Grindset - Destroy all currently held Diamond cards replace them with Creator Code cards
 
-# 5 Spectrals
+Save Point Device - Creates the last LTM Card used during this run (must have room)
+
+Education - Convert 1 card into an Xp Boost card
+
+# 6 Spectrals
 Double or Nothing - 1/2 chance to get 2 Spectral packs else give nothing
 
 Queue - Randomize the seals of all sealed cards in the deck
@@ -298,7 +354,9 @@ Enlightenment - Apply Mythic to 1 Joker -1 Hand
 
 Breakthrough - Apply Mythic to up to 5 Cards  -1 Discard
 
-# 43 Consumables
+The Great Turtle - Create a copy of 1 random destroyed Joker (must have room)
+
+# 47 LTM Cards
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -385,7 +443,15 @@ FTC Lawsuit - 1/20 chance to gain $200
 
 Bandage Bazooka - Cannot be used prevent death once
 
-# 14 Enhancements
+Battle Pass Boost - Convert all Enhanced cards in hand into Xp Boost cards
+
+Bug Blaster - Add a random edition to 1 random thing
+
+Super Launch Pad - Draw 4 additional cards
+
+Combat Cache - Add a random voucher to this shop
+
+# 15 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
 
 Wood - 1.2X Mult +15 Chips
@@ -414,17 +480,7 @@ Lego - Lose $3 and create a copy of this card when played
 
 Creator Code - Retrigger 1 time 1/5 chance to spread to right card (chance decreases each successful activation)
 
-# 3 Editions
-Nitro - +2 handsize resets at end of round
-
-Shockwaved - 1/3 chance to to retrigger adjacent jokers retrigger adjacent playing cards
-
-Mythic - X4 to all values on this card - 1 slot / -2 handsize
-
-# 2 Tags
-Ship It! - Gives a free LTM Pack
-
-Ship It Express! - Gives a free MEGA LTM Pack
+Xp Boost - X2 the base Chips and Mult of played hand while this is held in hand
 
 # 7 Seals
 Storm Seal - Creates an LTM Card when discarded (must have room)
@@ -437,16 +493,36 @@ Hop Seal - When scoring this card 1/3 chance to gain +1 Discard
 
 Zero Point Seal - When drawn draw 2 additional cards
 
-Heavy Seal - When drawn this card is flipped
+Heavy Seal - This card is always flipped
 
 Sponsorship Seal - While held each scored card gives $1 increase this by 0.1 for each card scored
 
-# 3 Blinds
+# 3 Editions
+Nitro - +2 handsize resets at end of round
+
+Shockwaved - 1/3 chance to to retrigger adjacent jokers retrigger adjacent playing cards
+
+Mythic - X4 to all values on this card - 1 slot / -2 handsize
+
+# 4 Tags
+Ship It! - Gives a free LTM Pack
+
+Ship It Express! - Gives a free MEGA LTM Pack
+
+Reality Augmentation Device - Gives a free Augment Pack
+
+Dual Reality Augmentation Device - Gives a free MEGA Augment Pack
+
+# 5 Blinds
 Fracture - All played cards are destroyed
 
 Zero Build - Wood, Brick and Metal are debuffed
 
 Tornado - Jokers are constantly shuffled randomly
+
+MrBlockU - All Fortlatro content debuffed
+
+Peely Party - All Jokers replaced with Gros Michel
 
 # Be sure to check the config tab you can enable and disable sounds, blinds, cryptid content, ortalab content, and Old Calc or New Calc
 [ortalab](https://github.com/Eremel/Ortalab/tree/12ad0459565911aa5de428288c5d431466f06c73)
