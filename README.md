@@ -6,7 +6,9 @@ featuring as of right now
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see) (can turn into GOOD or EVIL Crac)
+
 GOOD Crac - Rare - 1/13 chance to do something good from the original Crac's abilities (can turn back into Crac)
+
 EVIL Crac - Rare - 1/13 chance to do something bad from the original Crac's abilities (can turn back into Crac)
 
 Emily - Legendary - Retrigger everything
