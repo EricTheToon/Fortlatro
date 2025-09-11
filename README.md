@@ -557,6 +557,7 @@ MrBlockU - All Fortlatro content debuffed
 
 Peely Party - All Jokers replaced with Gros Michel
 
-# Be sure to check the config tab you can enable and disable sounds, blinds, cryptid content, ortalab content, and Old Calc or New Calc
-[ortalab](https://github.com/Eremel/Ortalab/tree/12ad0459565911aa5de428288c5d431466f06c73)
+# Be sure to check the config tab you can enable and disable sounds and blinds
+additional content with:
+[ortalab](https://github.com/EremelMods/Ortalab/tree/498cbebaa0226853b76a8d2475717ad393fa5682)
 [cryptid](https://github.com/MathIsFun0/Cryptid)
