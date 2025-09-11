@@ -2,7 +2,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 115 Jokers
+# 120 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see) (can turn into GOOD or EVIL Crac)
@@ -12,6 +12,12 @@ GOOD Crac - Rare - 1/13 chance to do something good from the original Crac's abi
 EVIL Crac - Rare - 1/13 chance to do something bad from the original Crac's abilities (can turn back into Crac)
 
 Emily - Legendary - Retrigger everything
+
+Zorlodo Blue - Legendary - Gain +1 joker slots every ante
+
+Zorlodo Red - Rare - Destroy the joker on the right and replace it with another random joker every round
+
+Dr.AV - Rare - When an LTM Card is used 1/2 chance to create a copy (Copies cannot be copied)
 
 Toilet Gang - Uncommon - Gains x0.2 mult every time played hand contains a Flush
 
@@ -24,8 +30,6 @@ Flush Factory - Uncommon - If played hand contains a Flush summon a Planet card 
 Victory Crown - Uncommon - Scored cards gain a permanant Chip bonus equal to their rank
 
 Fortnite Trading Card - Uncommon - If first hand of round has only 4 cards destroy them and give an LTM card
-
-Zorlodo - Legendary - Copies the abilities of the left and right joker by BEING them
 
 Solid Gold - Common - 1/4 chance to turn each scored card gold
 
@@ -233,8 +237,13 @@ Chewbacca Spawner - Rare - Create 1 random fortlatro joker when (random rank of 
 
 Fortnite Crew - Rare - Scaling Jokers have a 1/2 chance to retrigger
 
+Jules Glider Gun - Legendary - Scored cards are shuffled back into the deck cards with enhancements cannot be debuffed
 
+Solid Snake - Uncommon - Gain X0.5 for every c4 used this run
 
+Spectral Blade - Rare - Held Spectral cards give X3 Mult
+
+Llama Jewel - Rare - +3 handsize 50% ANY blind is replaced with a boss blind
 
 # 6 Decks
 Eric Deck - Start with Eric
@@ -294,7 +303,7 @@ Supply Drop - Arcana Packs always contain one of the Ammo tarot cards
 
 Big Ammo Box - Ammo tarot cards can target 2 addition cards
 
-# 25 Tarots
+# 26 Tarots
 Left Handed Death - its just death but backwards i made it specifically to fuck with Crac since he keeps messing it up and then he installed a persona tarot card mod so now its a persona death tarot
 
 Glitched - Create 0-4 random LTM cards (no need to have room)
@@ -345,6 +354,8 @@ Save Point Device - Creates the last LTM Card used during this run (must have ro
 
 Education - Convert 1 card into an Xp Boost card
 
+Comet - Select 1 card to turn into a King
+
 # 6 Spectrals
 Double or Nothing - 1/2 chance to get 2 Spectral packs else give nothing
 
@@ -358,7 +369,7 @@ Breakthrough - Apply Mythic to up to 5 Cards  -1 Discard
 
 The Great Turtle - Create a copy of 1 random destroyed Joker (must have room)
 
-# 47 LTM Cards
+# 52 LTM Cards
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -453,6 +464,16 @@ Super Launch Pad - Draw 4 additional cards
 
 Combat Cache - Add a random voucher to this shop
 
+Big Bush Bomb - Add a Bush seal to 1 card
+
+Shield Bubble - Apply Overshielded to 2 cards
+
+Cube Dice - Apply the Luck Aura to 1 selected thing
+
+Apple - Remove debuffs from 1 random card
+
+Ride The Lightning - 1/5 chance to Apply the Fire Aura to a random card in the deck
+
 # 15 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
 
@@ -484,7 +505,7 @@ Creator Code - Retrigger 1 time 1/5 chance to spread to right card (chance decre
 
 Xp Boost - X2 the base Chips and Mult of played hand while this is held in hand
 
-# 7 Seals
+# 8 Seals
 Storm Seal - Creates an LTM Card when discarded (must have room)
 
 Glitched Seal - Does something random when played and unscoring
@@ -499,12 +520,22 @@ Heavy Seal - This card is always flipped
 
 Sponsorship Seal - While held each scored card gives $1 increase this by 0.1 for each card scored
 
-# 3 Editions
+Bush Seal - +30 chips while held in deck
+
+# 4 Editions
 Nitro - +2 handsize resets at end of round
 
 Shockwaved - 1/3 chance to to retrigger adjacent jokers retrigger adjacent playing cards
 
 Mythic - X4 to all values on this card - 1 slot / -2 handsize
+
+Overshielded - Cannot be debuffed prevent adjacent cards from being debuffed
+
+# 2 Auras
+
+Luck Aura - All probabilities are guarenteed
+
+Fire Aura - ^2 Chips
 
 # 4 Tags
 Ship It! - Gives a free LTM Pack
