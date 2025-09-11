@@ -1,0 +1,77 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -1
+
+# All Blinds - 50% Chance Boss Replacement if Jewel >= 1 
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "G.GAME.round_resets.blind_choices.Boss = get_new_boss()"
+position = "before"
+payload = '''
+-- Only apply 50% boss chance if Jewel >= 1
+if G.GAME.Jewel == 1 then
+    -- Reset to defaults
+    G.GAME.round_resets.blind_choices.Small = 'bl_small'
+    G.GAME.round_resets.blind_choices.Big = 'bl_big'
+    G.GAME.round_resets.blind_choices.Boss = 'bl_boss'
+
+    -- Roll for Small
+    if pseudorandom('blind_small_boss') < 0.5 then
+        G.GAME.round_resets.blind_choices.Small = get_new_boss()
+    end
+
+    -- Roll for Big
+    if pseudorandom('blind_big_boss') < 0.5 then
+        G.GAME.round_resets.blind_choices.Big = get_new_boss()
+    end
+
+    -- Roll for Boss
+    if pseudorandom('blind_boss_boss') < 0.5 then
+        G.GAME.round_resets.blind_choices.Boss = get_new_boss()
+    end
+end
+'''
+match_indent = true
+
+
+# Big blind doesn't increase ante
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "if G.GAME.blind:get_type() == 'Boss' then"
+position = "at"
+payload = "if G.GAME.blind_on_deck == 'Boss' then"
+match_indent = true
+
+# Win on any ante above win_ante
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "if G.GAME.round_resets.ante == G.GAME.win_ante and G.GAME.blind:get_type() == 'Boss' then"
+position = "at"
+payload = "if G.GAME.round_resets.ante >= G.GAME.win_ante and G.GAME.blind_on_deck == 'Boss' then"
+match_indent = true
+
+
+# Mark small blind as defeated
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "if G.GAME.round_resets.blind == G.P_BLINDS.bl_small then"
+position = "at"
+payload = "if G.GAME.blind_on_deck == 'Small' then"
+match_indent = true
+
+# Mark big blind as defeated
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "elseif G.GAME.round_resets.blind == G.P_BLINDS.bl_big then"
+position = "at"
+payload = "elseif G.GAME.blind_on_deck == 'Big' then"
+match_indent = true
+
+
