@@ -47,7 +47,7 @@ Mini Shield - Common - Copies a fourth of hands at the start of the round if you
 
 Vbucks - Uncommon - 1/3 Chance to gain $10 when blind starts
 
-Reality Augment - Rare - All chances are guarenteed
+Reality Augment - Rare - All chances are guaranteed
 
 Bluglo - Uncommon - Every used LTM consumable adds +4 to mult instantly gives 2 negative LTM consumables
 
