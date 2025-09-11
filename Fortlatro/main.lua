@@ -7487,6 +7487,8 @@ local fortlatro_jokers = {
 	j_fn_Jules = true,
 	j_fn_Drav = true,
 	j_fn_Snake = true,
+	j_fn_SBlade = true,
+	j_fn_Jewel = true,
 	
 }
 
@@ -18521,7 +18523,7 @@ if config.blinds ~= false then
             -- Seals
             local seals = {
                 'fn_StormSeal','fn_GlitchedSeal','fn_BoogieSeal',
-                'fn_HopSeal','fn_ZeroSeal','fn_HeavySeal','fn_SponsorSeal'
+                'fn_HopSeal','fn_ZeroSeal','fn_HeavySeal','fn_SponsorSeal', 'fn_BushSeal'
             }
             if card.seal then
 				for _, seal in ipairs(seals) do
