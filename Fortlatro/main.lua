@@ -8307,6 +8307,11 @@ SMODS.Joker{
 			'v_fn_Supply',
 			'v_fn_Supply2',
 			'v_fn_Damage',
+			'v_fn_Influx',
+			'v_fn_Cannon',
+			'v_fn_Availability',
+			'v_fn_Availability2',
+			
             -- Add more voucher keys here
         }
 
@@ -18906,6 +18911,9 @@ local enabled = {
 	v_fn_Supply2 = true,
 	v_fn_Damage = true,
 	v_fn_Influx = true,
+	v_fn_Cannon = true,
+	v_fn_Availability = true,
+	v_fn_Availability2 = true,
 }
 
 SMODS.Booster({
@@ -18978,6 +18986,9 @@ local enabled = {
 	v_fn_Supply2 = true,
 	v_fn_Damage = true,
 	v_fn_Influx = true,
+	v_fn_Cannon = true,
+	v_fn_Availability = true,
+	v_fn_Availability2 = true,
 }
 
 
@@ -19498,7 +19509,12 @@ if config.blinds ~= false then
                 'v_fn_Forecast','v_fn_Forecast2',
                 'v_fn_Bush','v_fn_Bush2',
                 'v_fn_Nostalgia','v_fn_Nostalgia2',
-                'v_fn_Supply','v_fn_Supply2'
+                'v_fn_Supply','v_fn_Supply2',
+				'v_fn_Damage',
+				'v_fn_Influx',
+				'v_fn_Cannon',
+				'v_fn_Availability', 'v_fn_Availability2',
+				
             }
 
             local should_debuff = false
