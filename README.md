@@ -2,7 +2,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 120 Jokers
+# 128 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see) (can turn into GOOD or EVIL Crac)
@@ -18,6 +18,8 @@ Zorlodo Blue - Legendary - Gain +1 joker slots every ante
 Zorlodo Red - Rare - Destroy the joker on the right and replace it with another random joker every round
 
 Dr.AV - Rare - When an LTM Card is used 1/2 chance to create a copy (Copies cannot be copied)
+
+Kxtty - Legendary - Adjacent Jokers become negative when blind is selected
 
 Toilet Gang - Uncommon - Gains x0.2 mult every time played hand contains a Flush
 
@@ -245,6 +247,18 @@ Spectral Blade - Rare - Held Spectral cards give X3 Mult
 
 Llama Jewel - Rare - +3 handsize 50% ANY blind is replaced with a boss blind
 
+Young-hee - Uncommon - Gain X0.1 Mult for every consecutive successful round of redlight greenlight
+
+Creative Sword - Common - +2 Mult
+
+Scooby Snacks - Common - Gain +12.5 Chips every round
+
+Brainrot - Common - X1 Mult for every owned Brainrot (can appear multiple times)
+
+Purchase History - Uncommon - Based on the rarity of the last obtained Joker grant the following Common: +150 Chips Uncommon: +30 Mult Rare: X3 Mult Legendary: All of the above
+
+Dan_Ham - Uncommon - Whenever the music changes 1/3 chance to gain a random consumable
+
 # 6 Decks
 Eric Deck - Start with Eric
 
@@ -262,7 +276,7 @@ Zero Build Deck - Vouchers restock after every round and are half price -2 Joker
 # 1 [Card Sleeve](https://github.com/larswijn/CardSleeves)
 Crac Sleeve - Start with a Crac that always triggers
 
-# 20 Vouchers
+# 25 Vouchers
 Dumpster Diving - 1/3 Chance to spawn a random consumable at the end of the round (no need to have room)
 
 Trash Tycoon - Spawn a random consumable at the end of the round (no need to have room)
@@ -302,6 +316,16 @@ Better Times - All packs have 2 extra options LTM packs have 3 extra options ins
 Supply Drop - Arcana Packs always contain one of the Ammo tarot cards
 
 Big Ammo Box - Ammo tarot cards can target 2 addition cards
+
+Cursed: Random Damage - Each hands base chips and mult are randomized between X0.25 and X3
+
+Cursed: Monster Part Influx - Gain $100 start next round with only 1 hand this voucher can appear multiple times
+
+Cursed: Glass Cannon - Double all Joker values Double all Blind Requirements as well
+
+Monster Part Availability - ALL blinds payout $10 earn no interest
+
+Resourceful Respite - ALL blinds payout $15 earn no interest remaining hands and discards no longer give money
 
 # 26 Tarots
 Left Handed Death - its just death but backwards i made it specifically to fuck with Crac since he keeps messing it up and then he installed a persona tarot card mod so now its a persona death tarot
@@ -369,7 +393,7 @@ Breakthrough - Apply Mythic to up to 5 Cards  -1 Discard
 
 The Great Turtle - Create a copy of 1 random destroyed Joker (must have room)
 
-# 52 LTM Cards
+# 54 LTM Cards
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -464,15 +488,19 @@ Super Launch Pad - Draw 4 additional cards
 
 Combat Cache - Add a random voucher to this shop
 
-Big Bush Bomb - Add a Bush seal to 1 card
+Big Bush Bomb - Add a Bush seal to 3 cards
 
 Shield Bubble - Apply Overshielded to 2 cards
 
 Cube Dice - Apply the Luck Aura to 1 selected thing
 
-Apple - Remove debuffs from 1 random card
+Apple - Remove debuffs from 2 random cards
 
 Ride The Lightning - 1/5 chance to Apply the Fire Aura to a random card in the deck
+
+Sub Wafer - Next hand is worth 50% more
+
+Smoke Bomb - Disable blind for 2 turns
 
 # 15 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
@@ -527,7 +555,7 @@ Nitro - +2 handsize resets at end of round
 
 Shockwaved - 1/3 chance to to retrigger adjacent jokers retrigger adjacent playing cards
 
-Mythic - X4 to all values on this card - 1 slot / -2 handsize
+Mythic - X4 to all values on this card - 1 slot 
 
 Overshielded - Cannot be debuffed prevent adjacent cards from being debuffed
 
@@ -546,7 +574,7 @@ Reality Augmentation Device - Gives a free Augment Pack
 
 Dual Reality Augmentation Device - Gives a free MEGA Augment Pack
 
-# 5 Blinds
+# 8 Blinds
 Fracture - All played cards are destroyed
 
 Zero Build - Wood, Brick and Metal are debuffed
@@ -556,6 +584,12 @@ Tornado - Jokers are constantly shuffled randomly
 MrBlockU - All Fortlatro content debuffed
 
 Peely Party - All Jokers replaced with Gros Michel
+
+Hotfix - All blind selected effects disabled
+
+Blank - All Jokers must trigger
+
+Comp Player - All Joker values are halved
 
 # Be sure to check the config tab you can enable and disable sounds and blinds
 additional content with:
