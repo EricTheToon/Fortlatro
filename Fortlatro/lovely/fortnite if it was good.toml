@@ -16,6 +16,9 @@ if self.config.center and self.config.center.key == 'p_fn_LTMBooster1' or self.c
     self.ability.extra = self.ability.extra + G.GAME.ltm_choices
 end
 if self.config.center and self.config.center.key ~= 'p_fn_LTMBooster1' and self.config.center.key ~= 'p_fn_LTMBooster2' then
-	self.ability.extra = self.ability.extra + G.GAME.regular_choices
+end
+--count the music for daniel while you're here
+if self.config.center and self.config.center.key ~= 'p_fn_LTMBooster1' and self.config.center.key ~= 'p_fn_LTMBooster2' and self.config.center.key ~= 'p_yahimod_booster_yahiworld' and self.config.center.key ~= 'p_yahimod_booster_yahiworld2' and self.config.center.key ~= 'p_yahimod_booster_yahiworld3' and self.config.center.key ~= 'p_yahimod_booster_yahiworld4' and self.config.center.key ~= 'p_cry_code_normal_1' and self.config.center.key ~= 'p_cry_code_normal_2' and self.config.center.key ~= 'p_cry_code_jumbo_1' and self.config.center.key ~= 'p_cry_code_mega_1' and self.config.center.key ~= 'p_paperback_minor_arcana_normal_1' and self.config.center.key ~= 'p_paperback_minor_arcana_normal_2' and self.config.center.key ~= 'p_paperback_minor_arcana_normal_3' and self.config.center.key ~= 'p_paperback_minor_arcana_jumbo' and self.config.center.key ~= 'p_paperback_minor_arcana_mega' then
+	G.GAME.music_changes = (G.GAME.music_changes or 0) + 1
 end
 '''

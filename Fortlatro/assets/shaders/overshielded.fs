@@ -1,7 +1,7 @@
 #if defined(VERTEX) || __VERSION__ > 100 || defined(GL_FRAGMENT_PRECISION_HIGH)
-    #define MY_HIGHP_OR_MEDIUMP highp
+	#define MY_HIGHP_OR_MEDIUMP highp
 #else
-    #define MY_HIGHP_OR_MEDIUMP mediump
+	#define MY_HIGHP_OR_MEDIUMP mediump
 #endif
 
 extern MY_HIGHP_OR_MEDIUMP vec2 overshielded;
@@ -21,13 +21,13 @@ vec4 dissolve_mask(vec4 tex, vec2 texture_coords, vec2 uv)
 
     float adjusted_dissolve = (dissolve*dissolve*(3.-2.*dissolve))*1.02 - 0.01;
 
-    float t = time * 10.0 + 2003.;
-    vec2 floored_uv = (floor((uv*texture_details.ba)))/max(texture_details.b, texture_details.a);
+	float t = time * 10.0 + 2003.;
+	vec2 floored_uv = (floor((uv*texture_details.ba)))/max(texture_details.b, texture_details.a);
     vec2 uv_scaled_centered = (floored_uv - 0.5) * 2.3 * max(texture_details.b, texture_details.a);
 
-    vec2 field_part1 = uv_scaled_centered + 50.*vec2(sin(-t / 143.6340), cos(-t / 99.4324));
-    vec2 field_part2 = uv_scaled_centered + 50.*vec2(cos( t / 53.1532),  cos( t / 61.4532));
-    vec2 field_part3 = uv_scaled_centered + 50.*vec2(sin(-t / 87.53218), sin(-t / 49.0000));
+	vec2 field_part1 = uv_scaled_centered + 50.*vec2(sin(-t / 143.6340), cos(-t / 99.4324));
+	vec2 field_part2 = uv_scaled_centered + 50.*vec2(cos( t / 53.1532),  cos( t / 61.4532));
+	vec2 field_part3 = uv_scaled_centered + 50.*vec2(sin(-t / 87.53218), sin(-t / 49.0000));
 
     float field = (1.+ (
         cos(length(field_part1) / 19.483) + sin(length(field_part2) / 33.155) * cos(field_part2.y / 15.73) +
@@ -53,85 +53,116 @@ vec4 dissolve_mask(vec4 tex, vec2 texture_coords, vec2 uv)
 
 number hue(number s, number t, number h)
 {
-    number hs = mod(h, 1.)*6.;
-    if (hs < 1.) return (t-s) * hs + s;
-    if (hs < 3.) return t;
-    if (hs < 4.) return (t-s) * (4.-hs) + s;
-    return s;
+	number hs = mod(h, 1.)*6.;
+	if (hs < 1.) return (t-s) * hs + s;
+	if (hs < 3.) return t;
+	if (hs < 4.) return (t-s) * (4.-hs) + s;
+	return s;
 }
 
 vec4 RGB(vec4 c)
 {
-    if (c.y < 0.0001)
-        return vec4(vec3(c.z), c.a);
+	if (c.y < 0.0001)
+		return vec4(vec3(c.z), c.a);
 
-    number t = (c.z < .5) ? c.y*c.z + c.z : -c.y*c.z + (c.y+c.z);
-    number s = 2.0 * c.z - t;
-    return vec4(hue(s,t,c.x + 1./3.), hue(s,t,c.x), hue(s,t,c.x - 1./3.), c.w);
+	number t = (c.z < .5) ? c.y*c.z + c.z : -c.y*c.z + (c.y+c.z);
+	number s = 2.0 * c.z - t;
+	return vec4(hue(s,t,c.x + 1./3.), hue(s,t,c.x), hue(s,t,c.x - 1./3.), c.w);
 }
 
 vec4 HSL(vec4 c)
 {
-    number low = min(c.r, min(c.g, c.b));
-    number high = max(c.r, max(c.g, c.b));
-    number delta = high - low;
-    number sum = high+low;
+	number low = min(c.r, min(c.g, c.b));
+	number high = max(c.r, max(c.g, c.b));
+	number delta = high - low;
+	number sum = high+low;
 
-    vec4 hsl = vec4(.0, .0, .5 * sum, c.a);
-    if (delta == .0)
-        return hsl;
+	vec4 hsl = vec4(.0, .0, .5 * sum, c.a);
+	if (delta == .0)
+		return hsl;
 
-    hsl.y = (hsl.z < .5) ? delta / sum : delta / (2.0 - sum);
+	hsl.y = (hsl.z < .5) ? delta / sum : delta / (2.0 - sum);
 
-    if (high == c.r)
-        hsl.x = (c.g - c.b) / delta;
-    else if (high == c.g)
-        hsl.x = (c.b - c.r) / delta + 2.0;
-    else
-        hsl.x = (c.r - c.g) / delta + 4.0;
+	if (high == c.r)
+		hsl.x = (c.g - c.b) / delta;
+	else if (high == c.g)
+		hsl.x = (c.b - c.r) / delta + 2.0;
+	else
+		hsl.x = (c.r - c.g) / delta + 4.0;
 
-    hsl.x = mod(hsl.x / 6., 1.);
-    return hsl;
+	hsl.x = mod(hsl.x / 6., 1.);
+	return hsl;
 }
 
 vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords )
 {
     vec4 tex = Texel(texture, texture_coords);
-    vec2 uv = (((texture_coords)*(image_details)) - texture_details.xy*texture_details.ba)/texture_details.ba;
+	vec2 uv = (((texture_coords)*(image_details)) - texture_details.xy*texture_details.ba)/texture_details.ba;
 
-    number low = min(tex.r, min(tex.g, tex.b));
-    number high = max(tex.r, max(tex.g, tex.b));
-    number delta = high - low;
+	// Overshield energy parameters
+	float t = time * 1.2;
+	vec2 floored_uv = (floor((uv*texture_details.ba)))/texture_details.ba;
+    vec2 uv_scaled_centered = (floored_uv - 0.5) * 45.;
 
-    number saturation_fac = 1. - max(0., 0.05*(1.1-delta));
+	// Lightning field generation - multiple layers for complex electric arcs
+	vec2 lightning_1 = uv_scaled_centered + 40.*vec2(sin(-t / 45.0 + uv.y * 15.0), cos(-t / 55.0));
+	vec2 lightning_2 = uv_scaled_centered + 35.*vec2(cos( t / 38.0 + uv.x * 12.0),  sin( t / 48.0));
+	vec2 lightning_3 = uv_scaled_centered + 42.*vec2(sin(-t / 52.0), cos(-t / 42.0 + uv.y * 10.0));
+	vec2 lightning_4 = uv_scaled_centered + 38.*vec2(cos( t / 60.0 + uv.x * 8.0), sin( t / 35.0));
 
-    vec4 hsl = HSL(vec4(tex.r*saturation_fac, tex.g*saturation_fac, tex.b, tex.a));
-
-    float t = overshielded.y*2.221 + mod(time,1.);
-    vec2 floored_uv = (floor((uv*texture_details.ba)))/texture_details.ba;
-    vec2 uv_scaled_centered = (floored_uv - 0.5) * 50.;
-
-    vec2 field_part1 = uv_scaled_centered + 50.*vec2(sin(-t / 143.6340), cos(-t / 99.4324));
-    vec2 field_part2 = uv_scaled_centered + 50.*vec2(cos( t / 53.1532),  cos( t / 61.4532));
-    vec2 field_part3 = uv_scaled_centered + 50.*vec2(sin(-t / 87.53218), sin(-t / 49.0000));
-
+	// Create electric field with sharp, lightning-like patterns
     float field = (1.+ (
-        cos(length(field_part1) / 19.483) + sin(length(field_part2) / 33.155) * cos(field_part2.y / 15.73) +
-        cos(length(field_part3) / 27.193) * sin(field_part3.x / 21.92) ))/2.;
+        sin(length(lightning_1) / 12.0) * 1.5 + 
+		cos(length(lightning_2) / 15.0) * sin(lightning_2.y / 8.0) * 1.3 +
+        sin(length(lightning_3) / 10.0) * cos(lightning_3.x / 11.0) * 1.4 +
+		cos(length(lightning_4) / 13.0) * 1.2
+		))/4.;
 
-    float res = (.5 + .5* cos( (overshielded.x) * 2.612 + ( field + -.5 ) *3.14));
+	// Slower pulses for subtle effect
+	float pulse = sin(t * 2.0) * 0.15 + 0.7;
+	float electric_crackle = sin(t * 3.5 + field * 8.0) * 0.12 + 0.85;
 
-    // --- LIGHT BLUE MODIFICATION ---
-    hsl.x = 0.55;          // Hue set to cyan/light blue
-    hsl.y = hsl.y * 0.6;    // Slightly desaturated
-    hsl.z = hsl.z * 0.7 + 0.25; // Slightly brighter
+	// Energy shimmer calculation
+	float shimmer = (.5 + .5* cos( (overshielded.x) * 3.14 + ( field + -.5 ) * 3.14));
+
+	// Uniform cube pattern overlay across entire surface
+	vec2 cube_uv = uv * 8.0;
+	vec2 cube_pos = fract(cube_uv);
+	// Create uniform grid lines
+	float cube_line_x = step(0.9, cube_pos.x) + step(cube_pos.x, 0.1);
+	float cube_line_y = step(0.9, cube_pos.y) + step(cube_pos.y, 0.1);
+	float cube_grid = max(cube_line_x, cube_line_y);
+	float cube_pattern = cube_grid * 0.35 * (sin(t * 1.5 + floor(cube_uv.x) + floor(cube_uv.y)) * 0.3 + 0.7);
+	
+	// Subtle edge glow
+	vec2 edge_dist = abs(floored_uv - 0.5) * 2.0;
+	float edge_glow = (1.0 - max(edge_dist.x, edge_dist.y)) * 0.2 * pulse;
+
+	// Convert to HSL for color manipulation
+	vec4 hsl = HSL(vec4(tex.rgb, tex.a));
+	
+	// Bright cyan-blue hue (190-200° range) like the joker card
+	hsl.x = 0.53 + shimmer * 0.03;
+	
+	// High saturation for vibrant cyan-blue
+	hsl.y = hsl.y * 0.3 + 0.85;
+	
+	// Darker, more transparent base with subtle pulses
+	hsl.z = hsl.z * 0.25 + 0.3 * pulse + shimmer * 0.15 * electric_crackle + cube_pattern + edge_glow;
 
     tex.rgb = RGB(hsl).rgb;
 
-    if (tex[3] < 0.7)
-        tex[3] = tex[3]/3.;
+	// Cyan-blue overlay (no white) with cube highlights
+	float cyan_boost = pulse * electric_crackle;
+	tex.rgb += vec3(0.1 * cyan_boost, 0.25 * cyan_boost, 0.35 * cyan_boost);
+	
+	// Cyan-blue cube highlights (no white)
+	tex.rgb += vec3(cube_pattern * 0.15, cube_pattern * 0.3, cube_pattern * 0.45);
+	
+	// Reduce overall opacity for transparency
+	tex.a *= 0.6 + shimmer * 0.15;
 
-    return dissolve_mask(tex*colour, texture_coords, uv);
+	return dissolve_mask(tex*colour, texture_coords, uv);
 }
 
 extern MY_HIGHP_OR_MEDIUMP vec2 mouse_screen_pos;

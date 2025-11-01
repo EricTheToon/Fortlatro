@@ -13,7 +13,23 @@ extern bool shadow;
 extern MY_HIGHP_OR_MEDIUMP vec4 burn_colour_1;
 extern MY_HIGHP_OR_MEDIUMP vec4 burn_colour_2;
 
-vec4 dissolve_mask(vec4 tex, vec2 texture_coords, vec2 uv)
+// Noise function for flame movement
+float noise(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+float fbm(vec2 p) {
+    float value = 0.0;
+    float amplitude = 0.5;
+    for (int i = 0; i < 4; i++) {
+        value += amplitude * noise(p);
+        p *= 2.0;
+        amplitude *= 0.5;
+    }
+    return value;
+}
+
+vec4 flame_mask(vec4 tex, vec2 texture_coords, vec2 uv)
 {
     if (dissolve < 0.001) {
         return vec4(shadow ? vec3(0.,0.,0.) : tex.xyz, shadow ? tex.a*0.3: tex.a);
@@ -21,28 +37,39 @@ vec4 dissolve_mask(vec4 tex, vec2 texture_coords, vec2 uv)
 
     float adjusted_dissolve = (dissolve*dissolve*(3.-2.*dissolve))*1.02 - 0.01;
 
-	float t = time * 10.0 + 2003.;
+	float t = time * 8.0 + 1500.;
 	vec2 floored_uv = (floor((uv*texture_details.ba)))/max(texture_details.b, texture_details.a);
-    vec2 uv_scaled_centered = (floored_uv - 0.5) * 2.3 * max(texture_details.b, texture_details.a);
+    vec2 uv_scaled_centered = (floored_uv - 0.5) * 2.8 * max(texture_details.b, texture_details.a);
 
-	vec2 field_part1 = uv_scaled_centered + 50.*vec2(sin(-t / 143.6340), cos(-t / 99.4324));
-	vec2 field_part2 = uv_scaled_centered + 50.*vec2(cos( t / 53.1532),  cos( t / 61.4532));
-	vec2 field_part3 = uv_scaled_centered + 50.*vec2(sin(-t / 87.53218), sin(-t / 49.0000));
+    // Create flame-like movement with multiple noise layers
+	vec2 flame_offset1 = uv_scaled_centered + vec2(sin(-t / 120.0) * 30.0, cos(-t / 80.0) * 15.0);
+	vec2 flame_offset2 = uv_scaled_centered + vec2(cos(t / 90.0) * 25.0, sin(t / 110.0) * 20.0);
+	vec2 flame_offset3 = uv_scaled_centered + vec2(sin(-t / 75.0) * 35.0, cos(-t / 95.0) * 12.0);
 
-    float field = (1.+ (
-        cos(length(field_part1) / 19.483) + sin(length(field_part2) / 33.155) * cos(field_part2.y / 15.73) +
-        cos(length(field_part3) / 27.193) * sin(field_part3.x / 21.92) ))/2.;
-    vec2 borders = vec2(0.2, 0.8);
+    // Generate flame field using noise and time
+    float flame_noise1 = fbm(flame_offset1 * 0.05 + vec2(0.0, t * 0.02));
+    float flame_noise2 = fbm(flame_offset2 * 0.08 + vec2(t * 0.015, 0.0));
+    float flame_noise3 = fbm(flame_offset3 * 0.06 + vec2(0.0, -t * 0.025));
 
-    float res = (.5 + .5* cos( (adjusted_dissolve) / 82.612 + ( field + -.5 ) *3.14))
-    - (floored_uv.x > borders.y ? (floored_uv.x - borders.y)*(5. + 5.*dissolve) : 0.)*(dissolve)
-    - (floored_uv.y > borders.y ? (floored_uv.y - borders.y)*(5. + 5.*dissolve) : 0.)*(dissolve)
-    - (floored_uv.x < borders.x ? (borders.x - floored_uv.x)*(5. + 5.*dissolve) : 0.)*(dissolve)
-    - (floored_uv.y < borders.x ? (borders.x - floored_uv.y)*(5. + 5.*dissolve) : 0.)*(dissolve);
+    float field = (flame_noise1 + flame_noise2 * 0.7 + flame_noise3 * 0.5) / 2.2;
+    
+    // Add upward flame movement
+    float upward_bias = 1.0 - smoothstep(0.0, 1.0, floored_uv.y);
+    field *= upward_bias;
+    
+    vec2 borders = vec2(0.15, 0.85);
 
-    if (tex.a > 0.01 && burn_colour_1.a > 0.01 && !shadow && res < adjusted_dissolve + 0.8*(0.5-abs(adjusted_dissolve-0.5)) && res > adjusted_dissolve) {
-        if (!shadow && res < adjusted_dissolve + 0.5*(0.5-abs(adjusted_dissolve-0.5)) && res > adjusted_dissolve) {
-            tex.rgba = burn_colour_1.rgba;
+    float res = (.5 + .5* cos( (adjusted_dissolve) / 75.0 + ( field + -.3 ) * 4.2))
+    - (floored_uv.x > borders.y ? (floored_uv.x - borders.y)*(6. + 4.*dissolve) : 0.)*(dissolve)
+    - (floored_uv.y > borders.y ? (floored_uv.y - borders.y)*(6. + 4.*dissolve) : 0.)*(dissolve)
+    - (floored_uv.x < borders.x ? (borders.x - floored_uv.x)*(6. + 4.*dissolve) : 0.)*(dissolve)
+    - (floored_uv.y < borders.x ? (borders.x - floored_uv.y)*(6. + 4.*dissolve) : 0.)*(dissolve);
+
+    // Apply flame colors based on intensity
+    if (tex.a > 0.01 && burn_colour_1.a > 0.01 && !shadow && res < adjusted_dissolve + 0.9*(0.5-abs(adjusted_dissolve-0.5)) && res > adjusted_dissolve) {
+        float flame_strength = smoothstep(adjusted_dissolve, adjusted_dissolve + 0.3, res);
+        if (!shadow && res < adjusted_dissolve + 0.4*(0.5-abs(adjusted_dissolve-0.5)) && res > adjusted_dissolve) {
+            tex.rgba = mix(burn_colour_1.rgba, burn_colour_2.rgba, flame_strength);
         } else if (burn_colour_2.a > 0.01) {
             tex.rgba = burn_colour_2.rgba;
         }
@@ -103,33 +130,48 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
     number high = max(tex.r, max(tex.g, tex.b));
 	number delta = high - low;
 
-	number saturation_fac = 1. - max(0., 0.05*(1.1-delta));
+	number saturation_fac = 1. - max(0., 0.03*(1.2-delta));
 
 	vec4 hsl = HSL(vec4(tex.r*saturation_fac, tex.g*saturation_fac, tex.b, tex.a));
 
-	float t = nitro.y*2.221 + mod(time,1.);
+	float t = nitro.y*3.141 + mod(time*1.5, 1.);
 	vec2 floored_uv = (floor((uv*texture_details.ba)))/texture_details.ba;
-    vec2 uv_scaled_centered = (floored_uv - 0.5) * 50.;
+    vec2 uv_scaled_centered = (floored_uv - 0.5) * 45.;
 
-	vec2 field_part1 = uv_scaled_centered + 50.*vec2(sin(-t / 143.6340), cos(-t / 99.4324));
-	vec2 field_part2 = uv_scaled_centered + 50.*vec2(cos( t / 53.1532),  cos( t / 61.4532));
-	vec2 field_part3 = uv_scaled_centered + 50.*vec2(sin(-t / 87.53218), sin(-t / 49.0000));
+    // Create animated flame distortion
+	vec2 flame_field1 = uv_scaled_centered + 40.*vec2(sin(-t / 95.0), cos(-t / 70.0));
+	vec2 flame_field2 = uv_scaled_centered + 40.*vec2(cos(t / 45.0), sin(t / 55.0));
+	vec2 flame_field3 = uv_scaled_centered + 40.*vec2(sin(-t / 65.0), cos(-t / 85.0));
 
+    // Generate flame field with noise
     float field = (1.+ (
-        cos(length(field_part1) / 19.483) + sin(length(field_part2) / 33.155) * cos(field_part2.y / 15.73) +
-        cos(length(field_part3) / 27.193) * sin(field_part3.x / 21.92) ))/2.;
+        cos(length(flame_field1) / 22.0) + sin(length(flame_field2) / 28.0) * cos(flame_field2.y / 18.0) +
+        cos(length(flame_field3) / 25.0) * sin(flame_field3.x / 20.0) +
+        fbm(uv_scaled_centered * 0.08 + vec2(0.0, t * 0.3)) * 0.6
+        ))/2.5;
 
-    float res = (.5 + .5* cos( (nitro.x) * 2.612 + ( field + -.5 ) *3.14));
-	hsl.x = 0.05;  //
-	hsl.y = hsl.y * 0.85; //
-	hsl.z = hsl.z * 0.4 + 0.35 * sin(hsl.z/2.5 - res/4. + sin(nitro.y)/8. + 0.5)/1.2; // Boost lightness
+    // Add flickering effect
+    float flicker = sin(time * 15.0 + uv.y * 10.0) * 0.1 + sin(time * 25.0) * 0.05;
+    field += flicker;
 
+    float res = (.5 + .5* cos( (nitro.x) * 2.8 + ( field + -.4 ) *3.8));
+    
+    // Set orange flame colors
+	hsl.x = 0.08 + sin(res * 6.28 + time * 2.0) * 0.03;  // Orange hue with slight variation
+	hsl.y = hsl.y * 0.95 + 0.4; // High saturation for vivid flames
+	hsl.z = hsl.z * 0.3 + 0.45 * sin(hsl.z/2.2 - res/3.5 + sin(nitro.y * 2.0)/6. + 0.6)/1.1; // Dynamic lightness
 
     tex.rgb = RGB(hsl).rgb;
 
-	if (tex[3] < 0.7)
-		tex[3] = tex[3]/3.;
-	return dissolve_mask(tex*colour, texture_coords, uv);
+    // Add flame transparency effects
+	if (tex[3] < 0.8)
+		tex[3] = tex[3]/2.5;
+		
+    // Enhance flame edges
+    float edge_glow = smoothstep(0.2, 0.8, res);
+    tex.rgb *= (1.0 + edge_glow * 0.3);
+    
+	return flame_mask(tex*colour, texture_coords, uv);
 }
 
 extern MY_HIGHP_OR_MEDIUMP vec2 mouse_screen_pos;

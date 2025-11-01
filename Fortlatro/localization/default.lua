@@ -10,6 +10,96 @@ return {
                 }
             }
         },
+		
+		Edition = {
+			e_fn_Nitro = {
+				name = "Nitro",
+				text = {
+					"{C:attention}+2{} hand size",
+					"Idea: Boi Rowan",
+				},
+			},
+			
+			e_fn_Nitro_playing_card = {
+				name = "Nitro",
+				text = {
+					"{C:attention}+2{} hand size when {c:attention}played",
+					"{C:attention}Resets{} at end of round{}",
+					"Idea: Boi Rowan",
+				},
+			},
+			
+			e_fn_Shockwaved = {
+				name = "Shockwaved",
+				text = {
+					"{C:green}#1# in 3{} chance to retrigger adjacent {C:attention}Jokers{}",
+					"Idea: Boi Rowan",
+				},
+			},
+			
+			e_fn_Shockwaved_playing_card = {
+				name = "Shockwaved",
+				text = {
+					"Retriggers adjacent played cards once",
+					"Idea: Boi Rowan",
+				},
+			},
+			
+			e_fn_Mythic = {
+				name = "Mythic",
+				text = {
+					"{X:mult,C:white}X4{} to all values on this card",
+					"{C:attention}-1{} Joker Slot",
+					"Idea: BoiRowan",
+				},
+			},
+			
+			e_fn_Mythic_consumable = {
+				name = "Mythic",
+				text = {
+					"{X:mult,C:white}X4{} to all values on this card",
+					"{C:attention}-1{} Consumable Slot",
+					"Idea: BoiRowan",
+				},
+			},
+			
+			e_fn_Mythic_playing_card = {
+				name = "Mythic",
+				text = {
+					"{X:mult,C:white}X4{} to all values on this card",
+					"{C:attention}-1{} Handsize",
+					"Idea: BoiRowan",
+				},
+			},
+			
+			e_fn_Overshielded = {
+				name = "Overshielded",
+				text = {
+					"Cannot be {C:mult}debuffed",
+					"Prevent {C:attention}adjacent{} Jokers from being {C:mult}debuffed",
+					"Idea: BoiRowan",
+				},
+			},
+			
+			e_fn_Overshielded_consumable = {
+				name = "Overshielded",
+				text = {
+					"Cannot be {C:mult}debuffed",
+					"Prevent {C:attention}adjacent{} Consumables from being {C:mult}debuffed",
+					"Idea: BoiRowan",
+				},
+			},
+			
+			e_fn_Overshielded_playing_card = {
+				name = "Overshielded",
+				text = {
+					"Cannot be {C:mult}debuffed",
+					"Prevent {C:attention}adjacent{} Cards from being {C:mult}debuffed",
+					"Idea: BoiRowan",
+				},
+			},
+		},
+		
         Other = {
             fn_Luck_Aura = {
                 name = "Luck Aura",
@@ -21,7 +111,7 @@ return {
             fn_Fire_Aura = {
                 name = "Fire Aura",
                 text = {
-                    "{X:spectral,C:white}^2{} Chips",
+                    "{X:spectral,C:white}^#1#{} Chips",
                 }
             },
         }

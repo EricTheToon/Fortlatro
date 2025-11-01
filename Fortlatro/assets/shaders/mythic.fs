@@ -94,6 +94,14 @@ vec4 HSL(vec4 c)
 	return hsl;
 }
 
+// Hash function for pseudo-random sparkles
+float hash(vec2 p)
+{
+	vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+	p3 += dot(p3, p3.yzx + 33.33);
+	return fract((p3.x + p3.y) * p3.z);
+}
+
 vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords )
 {
     vec4 tex = Texel(texture, texture_coords);
@@ -120,10 +128,50 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
         cos(length(field_part3) / 27.193) * sin(field_part3.x / 21.92) ))/2.;
 
     float res = (.5 + .5* cos( (mythic.x) * 2.612 + ( field + -.5 ) *3.14));
-	hsl.x = 0.13;  //
-	hsl.y = hsl.y * 0.85; //
-	hsl.z = hsl.z * 0.4 + 0.35 * sin(hsl.z/2.5 - res/4. + sin(mythic.y)/8. + 0.5)/1.2; // Boost lightness
 
+	// Add radiating light rays
+	vec2 c = (floored_uv - 0.5);
+	float dist = length(c) * 2.0;
+	float ang = atan(c.y, c.x);
+	
+	float ray_time = time * 1.6 + mythic.x * 6.28318;
+	float rays = 0.0;
+	for (int i=0; i<16; i++){
+		float ia = float(i) * 0.39269908;
+		float diff = abs(mod(ang - (ia + ray_time*0.22) + 3.14159265, 6.28318531) - 3.14159265);
+		float w = 0.035 + 0.015*sin(float(i)*1.7 + ray_time*1.3);
+		float core = smoothstep(w, 0.0, diff);
+		float lenf = smoothstep(1.0, 0.1, dist);
+		rays += core * lenf;
+	}
+
+	// Radiating light dots - continuously moving outward from center
+	float light_dots = 0.0;
+	vec2 center = vec2(0.5, 0.5);
+	for (int i=0; i<60; i++){
+		float seed = float(i) * 7.1327;
+		float h = hash(vec2(seed, seed * 1.234));
+		float angle = h * 6.28318;  // Fixed angle per dot
+		float speed = 0.15 + h * 0.25;
+		
+		// Continuous outward movement - time increases distance from center
+		float dot_dist = mod(time * speed + h * 5.0, 1.2);
+		
+		vec2 dot_pos = center + vec2(cos(angle), sin(angle)) * dot_dist;
+		float d = length(floored_uv - dot_pos);
+		
+		float size = 0.01 + hash(vec2(seed * 2.0, seed * 3.0)) * 0.015;
+		// Fade out as they move away from center
+		float fade = 1.0 - smoothstep(0.0, 1.2, dot_dist);
+		fade = pow(fade, 0.5);
+		float brightness = 0.7 + 0.3*sin(time*2.0 + seed);
+		
+		light_dots += smoothstep(size, 0.0, d) * fade * brightness;
+	}
+
+	hsl.x = 0.13;
+	hsl.y = hsl.y * 0.88;
+	hsl.z = hsl.z * 0.5 + 0.45 * sin(hsl.z/2.5 - res/4. + sin(mythic.y)/8. + 0.5)/1.2 + rays * 0.2 + light_dots * 0.3;
 
     tex.rgb = RGB(hsl).rgb;
 

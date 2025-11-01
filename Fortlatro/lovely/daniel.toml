@@ -1,0 +1,20 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -11
+
+# context.starting_shop
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''
+G.CONTROLLER:snap_to({node = G.shop:get_UIE_by_ID('next_round_button')})
+'''
+position = 'before'
+match_indent = true
+payload = '''
+if not nosave_shop then
+	SMODS.calculate_context({starting_shop = true})
+	G.GAME.music_changes = (G.GAME.music_changes or 0) + 1
+end
+'''

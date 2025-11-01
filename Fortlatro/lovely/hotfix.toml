@@ -1,0 +1,28 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -11
+
+# disable context.setting_blind during hotfix blind
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''
+for i = 1, #G.jokers.cards do
+    G.jokers.cards[i]:calculate_joker({setting_blind = true, blind = G.GAME.round_resets.blind})
+end
+'''
+position = 'at'
+match_indent = true
+payload = '''
+if G.GAME and G.GAME.blind and G.GAME.blind.name ~= 'Emergency Hotfix' then
+	SMODS.calculate_context({setting_blind = true, blind = G.GAME.round_resets.blind})
+end
+
+--count the music for daniel while you're here
+if G.GAME and G.GAME.blind and G.GAME.blind.boss and G.GAME.blind.name ~= 'Emergency Hotfix' then
+	G.GAME.music_changes = (G.GAME.music_changes or 0) + 1
+end
+
+-- TARGET: setting_blind effects
+'''
