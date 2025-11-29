@@ -1,3 +1,6 @@
+
+![image](https://github.com/user-attachments/assets/e896c2d1-9beb-4e08-870d-49372c5580c4)
+
 # Requires [Steamodded](https://github.com/Steamodded/smods/wiki/) and [Talisman](https://github.com/MathIsFun0/Talisman/tree/main?tab=readme-ov-file)
 # Fortlatro
 a terrible Fortnite themed Balatro mod
