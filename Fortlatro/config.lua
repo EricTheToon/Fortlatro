@@ -4,8 +4,6 @@ return {
     cracsfx = true, --toggle sound effects for specifically the Crac Joker
     deathcompat = false, --toggle the lefthandeddeath tarot 
     blinds = true, --toggle the blinds added by this mod
-    cryptidcompat = false, --toggle Cryptid compatability ONLY ENABLE IF CRYPTID IS INSTALLED
-    ortalabcompat = false, --toggle Ortalab compatability ONLY ENABLE IF ORTALAB IS INSTALLED
-    oldcalccompat = false, --toggle old calc for enhancements ONLY ENABLE IF ON STEAMODDED OLD CALC
+	splashes = true, --toggle the splash text added by this mod
     newcalccompat = true, --toggle new calc for enhancements ONLY ENABLE IF ON STEAMODDED NEW CALC
 }

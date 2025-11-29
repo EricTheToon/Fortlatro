@@ -17,10 +17,15 @@ match_indent = true
 payload = '''
 if G.GAME and G.GAME.blind and G.GAME.blind.name ~= 'Emergency Hotfix' then
 	SMODS.calculate_context({setting_blind = true, blind = G.GAME.round_resets.blind})
+	G.GAME.videoplaying = 0
+end
+
+if G.GAME and G.GAME.blind and G.GAME.blind.name == 'Emergency Hotfix' then
+	G.GAME.videoplaying = 0
 end
 
 --count the music for daniel while you're here
-if G.GAME and G.GAME.blind and G.GAME.blind.boss and G.GAME.blind.name ~= 'Emergency Hotfix' then
+if G.GAME and G.GAME.blind and G.GAME.blind.boss and G.GAME.blind.name ~= 'Fracture' and G.GAME.blind.name ~= 'Blank' then
 	G.GAME.music_changes = (G.GAME.music_changes or 0) + 1
 end
 

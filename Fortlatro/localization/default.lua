@@ -48,7 +48,7 @@ return {
 			e_fn_Mythic = {
 				name = "Mythic",
 				text = {
-					"{X:mult,C:white}X4{} to all values on this card",
+					"{X:mult,C:white}X4{} to {C:attention}ALL{} values on this card",
 					"{C:attention}-1{} Joker Slot",
 					"Idea: BoiRowan",
 				},
@@ -57,7 +57,7 @@ return {
 			e_fn_Mythic_consumable = {
 				name = "Mythic",
 				text = {
-					"{X:mult,C:white}X4{} to all values on this card",
+					"{X:mult,C:white}X4{} to {C:attention}ALL{} values on this card",
 					"{C:attention}-1{} Consumable Slot",
 					"Idea: BoiRowan",
 				},
@@ -66,7 +66,7 @@ return {
 			e_fn_Mythic_playing_card = {
 				name = "Mythic",
 				text = {
-					"{X:mult,C:white}X4{} to all values on this card",
+					"{X:mult,C:white}X4{} to {C:attention}ALL{} values on this card",
 					"{C:attention}-1{} Handsize",
 					"Idea: BoiRowan",
 				},
@@ -96,6 +96,13 @@ return {
 					"Cannot be {C:mult}debuffed",
 					"Prevent {C:attention}adjacent{} Cards from being {C:mult}debuffed",
 					"Idea: BoiRowan",
+				},
+			},
+			
+			e_fn_Cell = {
+				name = "Cel Shaded",
+				text = {
+					"{C:attention}+1{} to {C:attention}ALL{} values on this card",
 				},
 			},
 		},
@@ -158,6 +165,7 @@ return {
             fn_Shockwaved = 'Shockwaved',
             fn_Mythic = 'Mythic',
             fn_Overshielded = 'Overshielded',
+			fn_Cell = 'Cell Shaded',
             fn_Luck_Aura = 'Luck Aura',
             fn_Fire_Aura = 'Fire Aura',
         }

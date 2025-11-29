@@ -1,0 +1,32 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+position = "before"
+pattern = "if G.debug_splash_size_toggle then "
+payload = '''
+-- Fortlatro Splash Text (Vall-style)
+if G.STAGE ~= G.STAGES.MAIN_MENU and G.fort_splash then
+	G.FORT_LAVA_DRAW_ACTIVE = false
+    G.fort_splash = nil
+end
+
+if G.STAGE == G.STAGES.MAIN_MENU and not G.fort_splash then
+	G.FORT_LAVA_DRAW_ACTIVE = false
+    if Fortlatro and Fortlatro.initialize_splashtext then
+        Fortlatro.initialize_splashtext()
+    end
+end
+
+if G.fort_splash then
+    love.graphics.push()
+    G.fort_splash:translate_container()
+    G.fort_splash:draw()
+    love.graphics.pop()
+end
+'''
+match_indent = true

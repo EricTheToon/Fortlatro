@@ -7,9 +7,11 @@
 --- PREFIX: fn
 --- PRIORITY: -10
 --- DEPENDENCIES: [Steamodded>=1.0.0~BETA-1016c, Talisman>=2.6,]
---- VERSION: 1.2.0 Release
+--- VERSION: 1.2.1
+
 ----------------------------------------------
 ------------MOD CODE -------------------------
+
 SMODS.optional_features.cardareas.unscored = true
 SMODS.current_mod.optional_features = {
 	retrigger_joker = true,
@@ -21,8 +23,7 @@ SMODS.current_mod.optional_features = {
 	},
 }
 
--- if you ever get a good logo remove the --[['s 
---[[
+
 SMODS.Atlas{
 	key = 'balatro',
     path = 'balatro.png',
@@ -30,7 +31,7 @@ SMODS.Atlas{
     py = 216 ,
     prefix_config = {key = false}
 }
---]]
+
 
 local fn = loc_colour
 function loc_colour(_c, _default)
@@ -48,8 +49,6 @@ function loc_colour(_c, _default)
     return fn(_c, _default)
 end
 
-
-
 SMODS.Atlas({
     key = 'modicon',
     path = 'modicon.png',
@@ -64,8 +63,9 @@ SMODS.current_mod.config_tab = function()
             {n = G.UIT.C, config = { minw = G.ROOM.T.w*0.25, padding = 0.05 }, nodes = {
                 create_toggle{ label = "Toggle SFX", info = {"Enable Sound Effects"}, active_colour = Fortlatro.badge_colour, ref_table = Fortlatro.config, ref_value = "sfx" },
                 create_toggle{ label = "Toggle Crac SFX", info = {"Enable Sound Effects for Crac Joker"}, active_colour = Fortlatro.badge_colour, ref_table = Fortlatro.config, ref_value = "cracsfx" },
-				create_toggle{ label = "Toggle LeftHandedDeath", info = {"Enable Left Handed Death"}, active_colour = Fortlatro.badge_colour, ref_table = Fortlatro.config, ref_value = "deathcompat" },
 				create_toggle{ label = "Toggle Blinds", info = {"Enable additional blinds added by this mod"}, active_colour = Fortlatro.badge_colour, ref_table = Fortlatro.config, ref_value = "blinds" },
+				create_toggle{ label = "Toggle Splashes", info = {"Enable Splash Text added by this mod"}, active_colour = Fortlatro.badge_colour, ref_table = Fortlatro.config, ref_value = "splashes" },								
+				create_toggle{ label = "Toggle LeftHandedDeath", info = {"Enable Left Handed Death"}, active_colour = Fortlatro.badge_colour, ref_table = Fortlatro.config, ref_value = "deathcompat" },
             }}
         }}
     }}
@@ -90,6 +90,637 @@ function Game:start_run(args)
 end
 ----------------------------------------------------------------------------------------------------------------
 ------------ALLOW SELECTION OF MULTIPLE JOKERS AND CONSUMABLES SINCE CRYPTID FUCKED THEIRS----------------------
+
+----------------------------------------------------------------------------------------------------------------
+
+------------TITLE SETUP (ADD MORE FUNNY TITLES HERE AT SOME POINT)----------------------
+SMODS.Sound({
+    key = 'music_title',
+    path = 'music_title.ogg',
+    select_music_track = function(self)
+        -- If it's title play music
+        if G.STAGE == G.STAGES.MAIN_MENU then
+            return 1e10
+        end
+    end
+})
+	
+	
+--these are funny right? i'd prefer if they weren't killed but you can ig...
+if config.splashes ~= false then	
+local splashes = {
+    "Battle Royale, But With Cards!",
+    "This Card Costs V-Bucks!",
+    "I got tilted at the towers!",
+    "Flip All the Things!",
+    "Now with 404% more Eric!",
+    "Victory Royale Guaranteed… Maybe", --effect
+    "My shotgun blanked!",
+    "Use code Duality!",
+    "Touch grass!",
+    "Who the fuck is Dan_Ham?",
+    "Don't eat the berries!",
+    "MagmaReef probably doesn't like us!",
+    "Where we dropping?",
+    "Does anyone remember the infinity stones?",
+    "SQUID GAMES!!",
+    "Also try Punchline!",
+    "Nobody is escaping the loop!",
+    "Season X is here, and the world is destabilizing, FAST. But, don't worry! That means there's a ton of new ways to play Fortnite. From the B.R.U.T.E., a new 2 player vehicle that packs some serious firepower, to mysterious rift zones, that alter your favorite POI's in unexpected ways. Huh, that's weird. Season X delivers new experiences for all players to enjoy. There's new places to explore, secrets to uncover, and the world you play today may not be the same world you play tomorrow. In addition to all-new gameplay found in Season X, there's also a brand new battle pass, that will introduce new dimensions to some of your favorite Fortnite characters in ways you've never seen before. And at tier 100, you'll unlock Ultima Knight. Plus, don't forget, there's new emotes, gliders, wraps, and more to earn as you advance through the pass. The battle pass is available right now, for just 950 V-Bucks. We'll see you, in-game.",
+    "Fort Knights!",
+    "Meteor Strike!",
+    "Brace For Impact!",
+    "Worlds Collide!",
+    "Darkness Rises!",
+    "You Better Watch Out!",
+    "X Marks The Spot!",
+    "The Future Is Yours!",
+    "Out Of Time!",
+    "<CARL>",
+    "I know it's a lot to ask, I really can't leave without it. Its somewhere nearby.",--effect
+    "Probably balanced",
+    "Just build, lol.",
+    "OG Balatro moment.",
+    "Queue times may vary.",
+    "Buy the Joker Pass for exclusive cosmetics!",
+    "Fortnite x Balatro when?",
+    "Balatro but make it sweaty.",
+    "The code works. Somehow.",
+    "Not affiliated with Epic (yet).",
+    "Somehow, this made it through testing.",
+    "Now with 0.0001% fewer errors!",
+    "Made with love and mild insanity.",
+    "Your deck’s collabing with Marvel!",
+    "A collab you didn’t ask for.",
+    "Reality collapse speedrun any%!",
+    "I swear it worked on my machine.",
+    "SMODS is screaming internally.",
+    "100% tested on Eric’s machine only.",
+    "Bug-free since never.",
+    "V-Bucks not included.", --effect
+    "Don’t tell Donald Mustard.",
+    "Built different (incorrectly).",
+    "Back to the lobby!",
+    "Fortnite event happening right now!",
+    "OH MY GOD GUYS MY SCREEN IS SHAKING!",
+    "They vaulted your favorite Joker.",
+    "Fortnite event leaked in main.lua!",
+    "Top 10 Jokers who didn’t make it out of the loop.",
+    "Gold Stake Horde Rush when?",
+    "Hey folks in todays video were back with some more Gold Stake Fortlatro in this run...",
+    "Why the fuck can't your GPU run the color purple?!",
+    "[[ Hyperlink Blocked ]]", --effect
+    "Unreal!",
+    "Epic Game!",
+    "Victory Royale not guaranteed.",
+    "It's not just a game!",
+    "Minecraft killer...",
+    "100% Ethically sourced brainrot!",
+    "Gnome-an's land...",
+    "Storms? Sick!",
+    "What's a Fortnight?",
+    "Competitively Casual!",
+    "Fuck Peely.",
+    "Fuck Hope.",
+    "Casually Competitive!",
+    "Rated 13+",
+    "Hey... Can you reboot me...",
+    "Reduced bullet falloff!",
+    "Crank those 90s!",
+    "Bugs? that's just lag!",
+    "Eric is cute!", --this is false bro literally gets zero bitches.
+    "Random Number... Generated!",
+    "Food on plate? Fork and Knife!",
+    "No Chicken Dinners.",
+    "Aura Farming included!",
+    "Built, Brick by Brick!",
+    "Makes you double pump!",
+    "The phrase “it’s just a game” is such a weak mindset. You are ok with what happened, losing, imperfection of a craft. When you stop getting angry after losing, you’ve lost twice. There’s always something to learn, and always room for improvement, never settle.",
+    "Ok CASUALS, how am I supposed to counter THIS??!!!??!",
+    "Will this affect the Fortnite item shop?",
+    "Currently hiding in a toilet",
+    "Each Joker (Probably) Sold Separately!",
+    "Here's why Fortnite pros are playing Fortlatro-",
+    "Trans Rights!", --effect
+    "Gay Rights!", --effect
+    "LTMs are awesome!",--effect
+    "The world needs saving.",
+    "Skibidi Toilet Sigma Rizz!",
+    "Loading... 49% Done...",
+    "Coming Straight from Your Game!",
+    "Hear me out.. Loot Llama...",
+    "Friendly fire (Probably) not included!",
+    "Changed 67 to 49",
+    "Changed 49 to 67",
+	"I really love to Chug Jug with you!",
+	"Spray and pray!",
+	"1v1 Me in Balatro",
+	"Is this the new meta?",
+	"I'm not seeing enough movement!",--effect
+	"FNCS? More like FNC-Zzzzzzz....",
+	"Hold My Shield…",
+	"Meme meta is strong.",
+	"Double XP weekend!", --effect
+	"New Fortnite map... in Balatro!",
+	"Glider redeploy enabled.",
+	"You can’t build here!",
+	"Cannot do that now.",
+	"Can you ready up?",
+	"Jason is so proud of you!",
+	"The low taper fade meme is still MASSIVE",
+	"Please Speed I NEED this",
+	"Speed im watching yo stream why you trying not laugh thats mad disrespectful bro",
+	"SHING SHING SHING",
+	"UR TRASH",
+	"Boxed like a fish",
+	"Friend Inside Me",
+	"Firemonkey where are my fortnite leaks?",
+	"Oh Shiina, im coming for you...",
+	"Play this to escape the loop",
+	"Hey Jimmy, Gimme a Grave Digger with NOTHIN!",--effect
+	"Every copy of Fortlatro is personalized",
+	"LTM stands for Limited Time Modes!",
+	"LTM stands for Limited Time Maps.",
+	"LTM stands for Light Machine Gun?",
+	
+	
+	
+}
+
+
+function Fortlatro.initialize_splashtext()
+    -- pick a random splash
+    local splash_text = splashes[math.random(#splashes)]
+    love.window.setTitle("Fortlatro: " .. splash_text)
+
+    G.fort_splash = {
+        text = splash_text,
+        scale_mod = 1,
+        alpha = 1,
+        t = 0,
+        -- easing logic
+        update = function(self, dt)
+            self.scale_mod = self.scale_mod or 1
+            local target_scale = 1.05 + 0.05 * math.sin(self.t or 0)
+            self.scale_mod = self.scale_mod + (target_scale - self.scale_mod) * dt
+            self.t = (self.t or 0) + dt
+        end,
+        draw = function(self)
+            local lg = love.graphics
+            lg.push("all")
+            local default_font = G.FONT and G.FONT.TITLE or love.graphics.newFont(38)
+            lg.setFont(default_font)
+
+            local w, h = lg.getWidth(), lg.getHeight()
+            local scale = self.scale_mod or 1
+            self.alpha = 0.9 + 0.1 * math.sin(self.t * 2)
+
+            local x, y = w - 500, 150
+            local rotation = -0.35
+            local color = {1, 1, 0, self.alpha} -- bright yellow
+
+            lg.translate(x, y)
+            lg.rotate(rotation)
+            lg.scale(scale)
+
+            -- black outline
+            local outline_offset = 2
+            lg.setColor(0, 0, 0, self.alpha)
+            for dx = -outline_offset, outline_offset, outline_offset do
+                for dy = -outline_offset, outline_offset, outline_offset do
+                    if dx ~= 0 or dy ~= 0 then
+                        lg.printf(self.text, dx, dy, 300, "center")
+                    end
+                end
+            end
+
+            -- main text
+            lg.setColor(color)
+            lg.printf(self.text, 0, 0, 300, "center")
+            lg.pop()
+        end,
+        translate_container = function(self)
+            -- placeholder for any container translation if needed
+        end
+    }
+end
+
+
+--gay rights! easter egg
+local start_run_ref = Game.start_run
+function Game:start_run(args)
+    start_run_ref(self, args)
+	if love.window.getTitle() == "Fortlatro: Gay Rights!" then
+		G.GAME.edition_rate = 3
+	else
+		G.GAME.edition_rate = 1
+	end
+end
+
+
+--LTMs are awesome! easter egg
+local start_run_ref = Game.start_run
+function Game:start_run(args)
+    start_run_ref(self, args)
+	if love.window.getTitle() == "Fortlatro: LTMs are awesome!" then
+		G.GAME.ltmconsumabletype_rate = 10
+	else
+		G.GAME.ltmconsumabletype_rate = 1
+	end
+end
+
+
+--win easter egg
+local start_run_ref = Game.start_run
+function Game:start_run(args)
+    start_run_ref(self, args)
+	if love.window.getTitle() == "Fortlatro: Victory Royale Guaranteed… Maybe" then
+		local chance = math.random(1,100)
+		if chance == 67 then
+			win_game()
+		end
+	end
+end
+
+--Double XP Weekend! easter egg
+local start_run_ref = Game.start_run
+function Game:start_run(args)
+    start_run_ref(self, args)
+	if love.window.getTitle() == "Fortlatro: Double XP weekend!" then
+		G.GAME.weekend = 2
+	else
+		G.GAME.weekend = 0
+	end
+end
+
+
+--ned easter egg
+local start_run_ref = Game.start_run
+function Game:start_run(args)
+    start_run_ref(self, args)
+	if love.window.getTitle() == "Fortlatro: I know it's a lot to ask, I really can't leave without it. Its somewhere nearby." then
+		G.FUNCS.overlay_menu{
+			definition = create_UIBox_fn_custom_video1("ned","Thank you I was getting worried!"),
+            config = {no_esc = true}
+        }
+	end
+end
+
+--grave digger easter egg
+local start_run_ref = Game.start_run
+function Game:start_run(args)
+    start_run_ref(self, args)
+	if love.window.getTitle() == "Fortlatro: Hey Jimmy, Gimme a Grave Digger with NOTHIN!" then
+		G.FUNCS.overlay_menu{
+			definition = create_UIBox_fn_custom_video1("grave","Thank you!"),
+            config = {no_esc = true}
+        }
+	end
+end
+
+--spamtong easter egg
+local start_run_ref = Game.start_run
+function Game:start_run(args)
+    start_run_ref(self, args)
+	if love.window.getTitle() == "Fortlatro: [[ Hyperlink Blocked ]]" then
+		G.FUNCS.overlay_menu{
+			definition = create_UIBox_fn_custom_video("spamton","kromer"),
+            config = {no_esc = true}
+        }
+	end
+end
+
+
+end
+
+G.C.FORTPURPLE = HEX("9662B4")
+G.C.FORTORANGE = HEX("F6CA88")
+G.C.mid_flash = 0
+G.C.vort_time = 7
+G.C.vort_speed = 0.4
+
+------------CHECK FOR UPDATES----------------------
+local oldfunc = Game.main_menu
+Game.main_menu = function(change_context)
+    local ret = oldfunc(change_context)
+	
+	-- colors
+	
+	G.SPLASH_BACK:define_draw_steps({
+			{
+				shader = "splash",
+				send = {
+					{ name = "time", ref_table = G.TIMERS, ref_value = "REAL_SHADER" },
+           			{name = 'vort_speed', val = G.C.vort_speed},
+            		{name = 'colour_1', ref_table = G.C, ref_value = 'FORTPURPLE'},
+            		{name = 'colour_2', ref_table = G.C, ref_value = 'FORTORANGE'},
+            		{name = 'mid_flash', ref_table = G.C, ref_value = 'mid_flash'},
+				},
+			},
+		})
+		
+
+    ----------------------------------------------------------------
+    -- AUTO-UPDATE CHECK
+    ----------------------------------------------------------------
+    local id = "Fortlatro"
+    local modPath = "Mods/Fortlatro"
+
+
+    ----------------------------------------------------------------
+    -- STEP 0 — Ensure the mod is actually loaded
+    ----------------------------------------------------------------
+    if not SMODS.Mods[id] then
+        return ret
+    end
+
+
+    ----------------------------------------------------------------
+    -- STEP 1 —  GitHub repo info 
+    ----------------------------------------------------------------
+    local owner = "EricTheToon"
+    local repo  = "Fortlatro"
+    ----------------------------------------------------------------
+    -- Fetch latest release tag
+    ----------------------------------------------------------------
+    local curl_cmd =
+        ('curl -sL "https://api.github.com/repos/%s/%s/releases/latest"')
+        :format(owner, repo)
+
+
+    local fp = io.popen(curl_cmd, "r")
+    if not fp then
+        return ret
+    end
+
+    local body = fp:read("*a")
+    fp:close()
+
+    if not body or body == "" then
+        return ret
+    end
+
+
+    local latest = body:match('"tag_name"%s*:%s*"([^"]+)"')
+
+    if not latest then
+        return ret
+    end
+
+
+    local git_version =
+        latest:match("^v?(%d+%.%d+%.%d+%a*)$")
+
+    if not git_version then
+        return ret
+    end
+
+
+    ----------------------------------------------------------------
+    -- Compare with installed
+    ----------------------------------------------------------------
+    local current_raw = SMODS.Mods[id].version
+
+    local current_version =
+        current_raw:match("^v?(%d+%.%d+%.%d+%a*)$")
+
+    if not current_version then
+        return ret
+    end
+
+
+    if V(git_version) <= V(current_version) then
+        return ret
+    end
+
+
+    ----------------------------------------------------------------
+    -- Popup UI
+    ----------------------------------------------------------------
+    local msg = {
+		("A new version of %s is available!\n"):format(SMODS.Mods[id].name),
+		("Installed: v%s\n"):format(current_version),
+		("Latest:    v%s\n\n"):format(latest),
+		"Update now? (This will restart Balatro.)"
+	}
+
+
+    local lines = {
+		n = G.UIT.R,
+		config = {
+			padding = 0.2,
+			align = "tm"
+		},
+		nodes = {
+			{
+				n = G.UIT.C,
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = {
+							text = msg[1] .. msg[2] .. msg[3] .. msg[4],
+							scale = 0.5
+						}
+					},
+					--[[
+					{
+						n = G.UIT.T,
+						config = {
+							text = msg[2],
+							scale = 0.5
+						}
+					},
+					{
+						n = G.UIT.T,
+						config = {
+							text = msg[3],
+							scale = 0.5
+						}
+					},
+					{
+						n = G.UIT.T,
+						config = {
+							text = msg[4],
+							scale = 0.5
+						}
+					}
+					]]--
+				}
+			}
+		}
+	}
+	
+	local button_row = {
+		n = G.UIT.R,
+		config = {
+			padding = 0.2,
+			align = "bm"
+		},
+		nodes = {
+			{
+				n = G.UIT.C,
+				config = {
+					padding = 0.1
+				},
+				nodes = {
+					UIBox_button {
+						colour = G.C.GREEN,
+						label = { "Yes" },
+						button = "update_accepted",
+					}
+				}
+			},
+			{
+				n = G.UIT.C,
+				config = {
+					padding = 0.1
+				},
+				nodes = {
+					UIBox_button {
+						colour = G.C.RED,
+						label = { "No" },
+						button = "update_denied",
+					}
+				}
+			}
+		}	
+	}
+	local confirm_ui = {
+		n = G.UIT.ROOT,
+		config = {
+			align = "cm",
+			minw = 4,
+			minh = 5,
+			padding = 0.3,
+			colour = G.C.UI.TEXT_DARK,
+			outline = 5,
+			outline_colour = G.C.BLACK,
+			r = 0.1
+		},
+		nodes = {
+			lines,
+			{
+				n = G.UIT.R,
+				nodes = {
+					{
+						n = G.UIT.B,
+						config = {
+							h = 2,
+							w = 0
+						}
+					}
+				}
+			},
+			button_row
+		}
+	}
+	G.FUNCS.overlay_menu {
+		definition = confirm_ui,
+		config = {
+			align = "cm",
+			bond = "Weak",
+			no_esc = true,
+			major = G.ROOM_ATTACH
+		}
+	}
+
+    ----------------------------------------------------------------
+    -- Button Handlers
+    ----------------------------------------------------------------
+
+    G.FUNCS.update_accepted = function(e)
+
+        local zip_url = string.format(
+            "https://github.com/%s/%s/releases/download/%s/Fortlatro.zip",
+            owner, repo, latest
+        )
+        local zip_path = ("Mods\\%s-%s.zip"):format(repo, latest)
+
+
+        local dl_cmd = ('curl -sL -A "FortlatroUpdater" -o "%s" "%s"')
+            :format(zip_path, zip_url)
+        print("Executing:", dl_cmd)
+
+        os.execute(dl_cmd)
+
+        local target_dir = modPath:gsub("/", "\\")
+        local tmp_dir = target_dir .. ""
+
+
+        os.execute(('if exist "%s" rmdir /S /Q "%s"')
+            :format(tmp_dir, tmp_dir))
+        os.execute(('if exist "%s" rmdir /S /Q "%s"')
+            :format(target_dir, target_dir))
+
+        local unzip_cmd =
+            'powershell -NoProfile -Command "Expand-Archive -LiteralPath '
+            .. ('%q -DestinationPath %q -Force"')
+                :format(zip_path, tmp_dir)
+
+        os.execute(unzip_cmd)
+
+        os.remove(zip_path)
+
+        SMODS.restart_game()
+    end
+
+    G.FUNCS.update_denied = function(e)
+        G.FUNCS.exit_overlay_menu()
+    end
+
+
+    return ret
+end
+
+
+
+
+------------IMPLEMENT STUPID VIDEOS)----------------------
+--thanks yahiamouse this is like directly stolen from yahimod!
+function create_UIBox_fn_custom_video(name, buttonname)
+  -- Init value
+  G.GAME.videoplaying = 1
+
+  -- Path now points to Fortlatro instead of Yahimod
+  local file_path = SMODS.Mods["Fortlatro"].path.."/resources/"..name..".ogv"
+  local file = NFS.read(file_path)
+
+  love.filesystem.write("temp.ogv", file)
+
+  local video_file = love.graphics.newVideo("temp.ogv")
+  local vid_sprite = Sprite(
+    0, 0,
+    11*16/9, 11,
+    G.ASSET_ATLAS["ui_" .. (G.SETTINGS.colourblind_option and 2 or 1)],
+    {x=0, y=0}
+  )
+
+  video_file:getSource():setVolume(
+    G.SETTINGS.SOUND.volume * G.SETTINGS.SOUND.game_sounds_volume / (100 * 10)
+  )
+
+  vid_sprite.video = video_file
+  video_file:play()
+
+  -- Create UIBox
+  local t = create_UIBox_generic_options({
+    back_delay = 2,
+    back_label = buttonname,
+    colour = G.C.BLACK,
+    padding = 0,
+    contents = {
+      { n = G.UIT.O, config = { object = vid_sprite } }
+    }
+  })
+
+  return t
+end
+
+------------IMPLEMENT STUPID VIDEOS)----------------------
+
+
+----------------------------------------------------------------------------------------------------------------
+------------SET TITLE (ADD MORE FUNNY TITLES HERE AT SOME POINT)----------------------
 
 ----------------------------------------------
 ------------ERIC CODE BEGIN----------------------
@@ -1072,6 +1703,9 @@ SMODS.Joker{
 ----------------------------------------------
 ------------DRAV CODE END----------------------
 
+----------------------------------------------
+------------KXTTY CODE BEGIN----------------------
+
 SMODS.Joker({
     key = 'Kxtty',
     loc_txt = {
@@ -1112,7 +1746,8 @@ SMODS.Joker({
     end,
 })
 
-
+----------------------------------------------
+------------KXTTY CODE END----------------------
 
 ----------------------------------------------
 ------------TOILET GANG CODE BEGIN----------------------
@@ -1790,72 +2425,89 @@ SMODS.Joker {
 
 SMODS.Joker
 {
-	key = 'SaveTheWorld',
-	loc_txt = 
-	{
-		name = 'Save The World',
-		text = 
-		{
-			'For every round without buying something at the {C:attention}Shop{}',
-			'gain {X:mult,C:white}X#2#{} Mult',
-			'lose {X:mult,C:white}X#3#{} when buying something',
-			'{C:inactive}Currently {}{X:mult,C:white}X#1#{}{C:inactive} Mult{}'
-		}
-	},
-	atlas = 'Jokers',
-	pos = {x = 3, y = 5},
-	rarity = 3,
-	cost = 7,
-	config = 
-	{ 
-		extra = 
-		{
-			Xmult = 1,
-			xmult_add = 0.5,   -- Increment to add each round
-			xmult_subtract = 0.25  -- Decrement when buying something
-		}
-	},
-	loc_vars = function(self,info_queue,center)
-		return 
-		{
-			vars = 
-			{
-				center.ability.extra.Xmult,
-				center.ability.extra.xmult_add,
-				center.ability.extra.xmult_subtract
-			}
-		}
-	end,
-	calculate = function(self,card,context)
-		if context.joker_main then
-			return
-			{
-				card = card,
-				Xmult_mod = card.ability.extra.Xmult,
-				message = 'X' .. card.ability.extra.Xmult,
-				colour = G.C.MULT
-			}
-		end
+    key = 'SaveTheWorld',
+    loc_txt = 
+    {
+        name = 'Save The World',
+        text = 
+        {
+            'When {C:attention}leaving a shop{} {C:mult}without{} purchasing anything',
+			'Gain {X:mult,C:white}X#2#{} Mult',
+            '{C:inactive}Currently {}{X:mult,C:white}X#1#{}{C:inactive} Mult{}'
+        }
+    },
+    atlas = 'Jokers',
+    pos = {x = 3, y = 5},
+    rarity = 3,
+    cost = 7,
+
+    config = 
+    { 
+        extra =
+        {
+            Xmult = 1,        -- Current X mult
+            xmult_add = 0.5,  -- Additive gain when leaving shop without buying
+            bought_something = false, -- Tracks if a purchase was made this shop
+			in_shop = 0, -- tracks if currently in the shop
+        }
+    },
+
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.extra.Xmult,
+                card.ability.extra.xmult_add
+            }
+        }
+    end,
+
+    calculate = function(self, card, context)
 		
-		if context.buying_card or context.reroll_shop or context.open_booster then
-			card.ability.extra.Xmult = card.ability.extra.Xmult - card.ability.extra.xmult_subtract
-			return
-			{
-				message = 'X' .. card.ability.extra.Xmult,
-				colour = G.C.MULT
-			}
+		if context.starting_shop then
+			card.ability.in_shop = 1
 		end
-		
-		if context.end_of_round and not context.repetition and not context.individual then
-			card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.xmult_add
-			return
-			{
-				message = 'X' .. card.ability.extra.Xmult,
-				colour = G.C.MULT
-			}
-		end
-	end
+        ----------------------------------------------------------------
+        -- Track if player buys ANYTHING from the shop
+        ----------------------------------------------------------------
+        if card.ability.in_shop == 1 then
+			if context.buying_card or context.reroll_shop or context.open_booster then
+				card.ability.extra.bought_something = true
+			end
+        end
+
+        ----------------------------------------------------------------
+        -- When leaving the shop (Tent uses ending_shop)
+        ----------------------------------------------------------------
+        if context.ending_shop then
+            if not card.ability.extra.bought_something then
+                -- Player left shop without buying: gain Xmult
+                card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.xmult_add
+
+                return {
+                    message = localize('k_upgrade_ex'),
+                    colour = G.C.MULT
+                }
+            end
+
+            -- Reset for next shop
+            card.ability.extra.bought_something = false
+			card.ability.in_shop = 0
+        end
+
+        ----------------------------------------------------------------
+        -- Apply Xmult during scoring
+        ----------------------------------------------------------------
+        if context.joker_main then
+            return {
+                card = card,
+                Xmult_mod = card.ability.extra.Xmult,
+                message = 'X' .. card.ability.extra.Xmult,
+                colour = G.C.MULT
+            }
+        end
+    end
 }
+
 
 
 
@@ -2129,7 +2781,6 @@ SMODS.Joker{
 ----------------------------------------------
 ------------VBUCKS CODE BEGIN----------------------
 
-if config.newcalccompat ~= false then
     SMODS.Joker {
         key = 'Vbucks',
         loc_txt = {
@@ -2163,6 +2814,13 @@ if config.newcalccompat ~= false then
                 }
             }
         end,
+		
+		in_pool = function(self)
+            local currentTitle = love.window.getTitle()
+			if currentTitle ~= "Fortlatro: V-Bucks not included." then
+				return true
+			end
+        end,
 
         calculate = function(self, card, context)
             -- Check if the Blind effect is starting and that conditions are met (no blueprint card or slicing)
@@ -2185,7 +2843,6 @@ if config.newcalccompat ~= false then
             end
         end
     }
-end
 
 
 
@@ -3110,7 +3767,6 @@ SMODS.Joker{
 ----------------------------------------------
 ------------MALFUNCTIONING VENDING MACHINE CODE BEGIN----------------------
 
-if config.newcalccompat ~= false then
     SMODS.Joker {
         key = 'MVM',
         loc_txt = {
@@ -3127,6 +3783,7 @@ if config.newcalccompat ~= false then
         config = {
             extra = {
                 dollars = 5,    -- Money granted on purchase
+				in_shop = 0, 	-- are we in the shop
             }
         },
         rarity = 3,           -- Rare joker
@@ -3142,16 +3799,25 @@ if config.newcalccompat ~= false then
         end,
 
         calculate = function(self, card, context)
-            -- Trigger when an item is purchased (card, reroll, or booster)
-            if context.buying_card or context.reroll_shop or context.open_booster then
-                return {
-                    dollars = card.ability.extra.dollars,
-                    colour = G.C.MONEY
-                }
+			if context.starting_shop then
+				card.ability.extra.in_shop = 1
+			end
+			
+			if context.ending_shop then
+				card.ability.extra.in_shop = 0
+			end
+			
+			if card.ability.extra.in_shop == 1 then
+				if context.buying_card or context.reroll_shop or context.open_booster then
+					return {
+						dollars = card.ability.extra.dollars,
+						colour = G.C.MONEY
+					}
+				end
             end
         end
     }
-end
+
 
 ----------------------------------------------
 ------------MALFUNCTIONING VENDING MACHINE CODE END----------------------
@@ -3984,13 +4650,31 @@ end
 ----------------------------------------------
 ------------JANE BALATRO CODE BEGIN----------------------
 
+local card_is_suit_ref = Card.is_suit
+function Card:is_suit(suit, bypass_debuff, flush_calc)
+    local ret = card_is_suit_ref(self, suit, bypass_debuff, flush_calc)
+    if not ret and not SMODS.has_no_suit(self) then
+        if next(SMODS.find_card("j_fn_CassidyQuinn")) then
+            -- If checking for Spades and card is Hearts, return true
+            if suit == "Spades" and self.base.suit == "Hearts" then
+                ret = true
+            end
+            -- If checking for Hearts and card is Spades, return true
+            if suit == "Hearts" and self.base.suit == "Spades" then
+                ret = true
+            end
+        end
+    end
+    return ret
+end
+
+
 SMODS.Joker {
     key = 'CassidyQuinn',
     loc_txt = {
         name = 'Cassidy Quinn',
         text = {
-            "When {C:attention}blind selected{}",
-            "Create {C:attention}#1#{} random cards in hand with {C:hearts}Hearts{} or {C:spades}Spades{}"
+            "{C:hearts}Hearts{} and {C:spades}Spades{} are considered the same suit",
         }
     },
     config = {extra = {cards = 1}},
@@ -4004,40 +4688,6 @@ SMODS.Joker {
     loc_vars = function(self, info_queue, card)
         return {vars = {card.ability.extra.cards}}
     end,
-    calculate = function(self, card, context)
-        if context.first_hand_drawn then
-            G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
-                    local num_cards = card.ability.extra.cards or 1  -- Default to 1 if nil
-                    for _ = 1, num_cards do
-                        -- Pick a random Hearts or Spades card
-                        local valid_cards = {}
-                        for _, v in pairs(G.P_CARDS) do
-                            if v.suit == 'Hearts' or v.suit == 'Spades' then
-                                table.insert(valid_cards, v)
-                            end
-                        end
-
-                        if #valid_cards > 0 then
-                            local chosen_card = pseudorandom_element(valid_cards, pseudoseed('cassidy_quinn'))
-                            local new_card = create_playing_card(
-                                {
-                                    front = chosen_card,
-                                    center = G.P_CENTERS.c_base
-                                },
-                                G.hand
-                            )
-
-                            -- Visual & sound feedback
-                            new_card:juice_up(0.3, 0.3)
-                            play_sound('card1', 1.1)
-                        end
-                    end
-
-                    return true
-                end
-            }))
-        end
-    end
 }
 
 ----------------------------------------------
@@ -4238,11 +4888,11 @@ SMODS.Joker {
                 for _, scoring_card in ipairs(context.scoring_hand) do
                     if scoring_card:is_suit("Hearts") or scoring_card:is_suit("Diamonds") then
                         card.ability.extra.stored_chips = card.ability.extra.stored_chips + card.ability.extra.chips_per_flush
-                        SMODS.eval_this(card, {
-                            message = "Upgrade!",
-                            colour = G.C.CHIPS
-                        })
-                        return
+                        return {
+                            message = localize('k_upgrade_ex'),
+                            colour = G.C.Mult,
+							card = card
+                        }
                     end
                 end
             end
@@ -5022,7 +5672,7 @@ SMODS.Joker{
   perishable_compat = false,
 
   calculate = function(self, card, context)
-    if context.scoring_name == "Flush" and context.cardarea == G.played_cards then
+    if context.scoring_name == "Flush" and context.cardarea == G.jokers and context.before then
       G.E_MANAGER:add_event(Event({
         func = function()
           local face_ranks = {"J", "Q", "K"}
@@ -5110,8 +5760,9 @@ SMODS.Joker {
                 G.FUNCS.draw_from_deck_to_hand(cards_to_draw)
             end
 
-            -- Feedback message and sound
-            SMODS.eval_this(card, {
+            -- Feedback message
+			
+			card_eval_status_text(card, 'extra', nil, nil, nil, {
                 message = "Bot Lobby Activated!",
                 colour = G.C.MULT
             })
@@ -5162,6 +5813,14 @@ if config.newcalccompat ~= false then
 
         loc_vars = function(self, info_queue, card)
             return {vars = {card.ability.extra.mult_add, card.ability.extra.mult}}
+        end,
+		
+		--nickeh30 is transphobic wtf dude
+		in_pool = function(self)
+            local currentTitle = love.window.getTitle()
+			if currentTitle ~= "Fortlatro: Trans Rights!" then
+				return true
+			end
         end,
 
         calculate = function(self, card, context)
@@ -7209,7 +7868,7 @@ SMODS.Joker{
         name = 'Storm Circle',
         text = {
             "{X:mult,C:white}X#1#{} Mult if this is the {C:attention}Middlemost{} Joker",
-			"Idea: {C:inactive}kxttyfrickfish",
+			"Idea: {C:tarot}kxttyfrickfish",
         }
     },
     rarity = 2,
@@ -7263,7 +7922,7 @@ SMODS.Joker{
         text = {
             "{X:mult,C:white}X#1#{} Mult if you have",
 			"{C:attention}#2#{} or more {C:chips}Hands{} left",
-			"Idea: {C:inactive}kxttyfrickfish",
+			"Idea: {C:tarot}kxttyfrickfish",
         }
     },
     rarity = 2,
@@ -7489,6 +8148,10 @@ local fortlatro_jokers = {
 	j_fn_History = true,
 	j_fn_Dan_Ham = true,
 	j_fn_Kxtty = true,
+	j_fn_Peely2 = true,
+	j_fn_YouTube = true,
+	j_fn_Event = true,
+	j_fn_AAA = true,
 	
 }
 
@@ -7554,7 +8217,7 @@ SMODS.Joker{
         text = {
             "{X:mult,C:white}X#1#{} Mult if this is the {C:attention}Rightmost{} Joker",
 			"{C:mult}Self-destruct{} after use",
-			"Idea: {C:inactive}kxttyfrickfish",
+			"Idea: {C:tarot}kxttyfrickfish",
         }
     },
     rarity = 2,
@@ -7654,7 +8317,7 @@ SMODS.Joker({
             "When adding a new {C:attention}Joker{}",
 			"Gain a random {C:attention}Consumable{}",
 			"{C:inactive}(Must have room)",
-			"Idea: {C:inactive}kxttyfrickfish",
+			"Idea: {C:tarot}kxttyfrickfish",
         }
     },
     rarity = 2,
@@ -7693,7 +8356,7 @@ SMODS.Joker {
         text = {
             "Gain {C:chips}+#1#{} Chips per {C:attention}Consumable{} used this Ante",
             "{C:inactive}Currently{} {C:chips}+#2# {C:inactive}Chips",
-			"Idea: {C:inactive}kxttyfrickfish",
+			"Idea: {C:tarot}kxttyfrickfish",
         }
     },
     config = {extra = {stored_chips = 0, chips_per_card = 50}},
@@ -7974,7 +8637,7 @@ SMODS.Joker{
         text = {
             "Each discarded {C:mult}Lego{} card is instead {C:mult}destroyed{}",
 			"Earn {C:money}$#1#{} for each lego card destroyed",
-			"Idea: {C:inactive}kxttyfrickfish",
+			"Idea: {C:tarot}kxttyfrickfish",
         }
     },
     config = {
@@ -8032,10 +8695,7 @@ SMODS.Atlas{
 	}
 
 
---do not load this if cryptid exists Cryptid fucking obliterates the game if you use this 
 
--- Only load Griddy if Cryptid is NOT present
-if not ((SMODS.Mods["Cryptid"] or {}).can_load) then
 
 SMODS.Joker {
     key = 'Griddy',
@@ -8055,36 +8715,47 @@ SMODS.Joker {
 
     config = {
         extra = {
-            _tracked_joker = nil,
-            _tracked_value = nil,
-            _active = nil,
-            animated = true,
-            frame = 0,
-            timer = 0,
-            last_time = 0
+            tracked_joker = nil,
+            active = false
         }
     },
 
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.extra.tracked_joker,
+                card.ability.extra.active,
+            }
+        }
+    end,
+
+    -------------------------------------------------------------------------
+    -- UPDATE (animation, not stored in extra)
+    -------------------------------------------------------------------------
     update = function(self, card)
         self:apply_luck(card)
-        local extra = card.ability.extra
-        if not extra.animated then return end
+
+        card.anim_frame  = card.anim_frame  or 0
+        card.anim_timer  = card.anim_timer  or 0
+        card.last_render = card.last_render or G.TIMERS.REAL
 
         local fps = 9
         local max_frame = 12
 
-        local current_time = G.TIMERS.REAL
-        local delta = current_time - (extra.last_time or 0)
-        extra.last_time = current_time
+        local now   = G.TIMERS.REAL
+        local delta = now - card.last_render
+        card.last_render = now
 
-        extra.timer = (extra.timer or 0) + delta
+        card.anim_timer = card.anim_timer + delta
 
-        if extra.timer >= (1 / fps) then
-            extra.timer = 0
-            extra.frame = ((extra.frame or 0) + 1) % (max_frame + 1)
+        if card.anim_timer >= 1 / fps then
+            card.anim_timer = 0
+            card.anim_frame = (card.anim_frame + 1) % (max_frame + 1)
 
             if card.children and card.children.floating_sprite then
-                card.children.floating_sprite:set_sprite_pos({ x = extra.frame, y = 0 })
+                card.children.floating_sprite:set_sprite_pos({
+                    x = card.anim_frame, y = 0
+                })
             end
         end
     end,
@@ -8093,55 +8764,74 @@ SMODS.Joker {
         self:apply_luck(card)
     end,
 
+    -------------------------------------------------------------------------
+    -- APPLY LUCK (doubles right joker, halves when moved)
+    -------------------------------------------------------------------------
     apply_luck = function(self, card)
-        local tracked = card.ability.extra
-        local right_joker = nil
+        local extra = card.ability.extra
 
+        local right = nil
         if G.jokers then
             for i = 1, #G.jokers.cards do
                 if G.jokers.cards[i] == card then
-                    right_joker = G.jokers.cards[i + 1]
+                    right = G.jokers.cards[i + 1]
                     break
                 end
             end
         end
 
-        if tracked._tracked_joker and tracked._tracked_joker ~= right_joker and tracked._active then
-            local prev_joker = tracked._tracked_joker
-            local prev_values = tracked._tracked_value
+        local stored_key = extra.tracked_joker
+        local active = extra.active
 
-            if prev_joker and prev_values and prev_joker.ability and type(prev_joker.ability.extra) == "table" then
-                for key, value in pairs(prev_values) do
-                    if type(value) == "number" then
-                        prev_joker.ability.extra[key] = value
+        -- Revert previously doubled joker if no longer adjacent
+        if active and stored_key then
+            if (not right) or not (right.config and right.config.center) or right.config.center.key ~= stored_key then
+                local stored_card = nil
+                if G.jokers then
+                    for _, j in ipairs(G.jokers.cards) do
+                        if j.config and j.config.center and j.config.center.key == stored_key then
+                            stored_card = j
+                            break
+                        end
                     end
                 end
-            end
 
-            tracked._tracked_joker = nil
-            tracked._tracked_value = nil
-            tracked._active = nil
-        end
-
-        if right_joker and right_joker.ability and type(right_joker.ability.extra) == "table" and tracked._tracked_joker ~= right_joker then
-            local extra = right_joker.ability.extra
-            local backup = {}
-
-            for key, value in pairs(extra) do
-                if type(value) == "number" then
-                    backup[key] = value
-                    extra[key] = value * 2
+                if stored_card and stored_card.ability and type(stored_card.ability.extra) == "table" then
+                    for k, v in pairs(stored_card.ability.extra) do
+                        if type(v) == "number" then
+                            stored_card.ability.extra[k] = v / 2
+                        end
+                    end
                 end
-            end
 
-            tracked._tracked_joker = right_joker
-            tracked._tracked_value = backup
-            tracked._active = true
+                extra.active = false
+                extra.tracked_joker = nil
+            end
         end
+
+        if not right or not right.ability or type(right.ability.extra) ~= "table" then
+            return
+        end
+
+        local right_key = right.config.center.key
+
+        if active and stored_key == right_key then
+            return
+        end
+
+        -- Double right Joker values
+        for k, v in pairs(right.ability.extra) do
+            if type(v) == "number" then
+                right.ability.extra[k] = v * 2
+            end
+        end
+
+        extra.tracked_joker = right_key
+        extra.active = true
     end
 }
 
-end
+
 
 
 ----------------------------------------------
@@ -9209,6 +9899,7 @@ SMODS.Joker {
             'j_fn_Jam', 'j_fn_Fortnite', 'j_fn_Fortnite', 'j_fn_Smoothie', 'j_fn_Smoothie', 'j_fn_Sprite', 'j_fn_Prebuild', 'j_fn_Prebuild', 'j_fn_Shogun', 'j_fn_Shogun', 'j_fn_Killswitch', 'j_fn_Killswitch', 'j_fn_Hero', 'j_fn_Hero', 'j_fn_NBA', 'j_fn_Tempest', 'j_fn_Tempest', 'j_fn_Tempest', 'j_fn_Tempest',
 			'j_fn_Circle3', 'j_fn_Circle3', 'j_fn_Circle3', 'j_fn_Fortbyte', 'j_fn_Fortbyte', 'j_fn_Fortbyte', 'j_fn_Fortbyte', 'j_fn_FlowberryFizz', 'j_fn_FlowberryFizz', 'j_fn_FlowberryFizz', 'j_fn_EGL', 'j_fn_EGL', 'j_fn_EGL', 'j_fn_Marvel', 'j_fn_Cluster', 'j_fn_Cluster', 'j_fn_Cluster', 'j_fn_Icon', 'j_fn_Gaming', 'j_fn_WRTIS', 'j_fn_WRTIS', 'j_fn_WRTIS', 'j_fn_WRTIS',
 			'j_fn_StarWars', 'j_fn_Crew', 'j_fn_Jules', 'j_fn_Drav', 'j_fn_Snake', 'j_fn_Snake', 'j_fn_Snake', 'j_fn_Doll', 'j_fn_Doll', 'j_fn_DevSword', 'j_fn_DevSword', 'j_fn_DevSword', 'j_fn_DevSword', 'j_fn_ScoobySnacks', 'j_fn_ScoobySnacks', 'j_fn_ScoobySnacks', 'j_fn_ScoobySnacks', 'j_fn_Brainrot', 'j_fn_Brainrot', 'j_fn_Brainrot', 'j_fn_Brainrot', 'j_fn_Brainrot', 'j_fn_History', 'j_fn_History', 'j_fn_History', 'j_fn_Kxtty',
+			'j_fn_Peely2', 'j_fn_Peely2', 'j_fn_Peely2', 'j_fn_Peely2', 'j_fn_YouTube', 'j_fn_YouTube', 'j_fn_YouTube', 'j_fn_Event', 'j_fn_Event', 'j_fn_Event', 'j_fn_AAA', 'j_fn_AAA', 'j_fn_AAA',
 			
 			}
 			
@@ -9859,6 +10550,7 @@ SMODS.Joker{
         extra = {
             xmult_add = 1,
             xmult = 1,
+			pity = 0,
         },
     },
 
@@ -9867,14 +10559,33 @@ SMODS.Joker{
             vars = {
                 card.ability.extra.xmult_add,
                 card.ability.extra.xmult,
+				card.ability.extra.pity,
             }
         }
     end,
 
     calculate = function(self, card, context)
+	
+	if context.reroll_shop or context.starting_shop then
+		card.ability.extra.pity = card.ability.extra.pity + 1
+		if card.ability.extra.pity >= 6 then
+			local chance = math.random(1,4)
+			if chance == 2 then
+				card.ability.extra.pity = 0
+				local new_card = SMODS.create_card{
+					key = "j_fn_Brainrot",
+                    area = G.shop_jokers
+                }
+                G.shop_jokers:emplace(new_card)
+                create_shop_card_ui(new_card)
+			end
+		end
+	end	
+	
+	
 	local count = 0
     for _, j in ipairs(G.jokers.cards) do
-		if j.config.center_key == "j_fn_Brainrot" then
+		if j.config.center_key == "j_fn_Brainrot" or j.config.center_key == "j_fn_Skibidi" then
 			count = count + 1
         end
     end
@@ -9892,24 +10603,6 @@ SMODS.Joker{
 		if config.sfx ~= false then
 			play_sound("fn_brainrot")
 		end
-        if G.GAME and G.GAME.used_jokers then
-            for i = #G.GAME.used_jokers, 1, -1 do
-                if G.GAME.used_jokers[i] == "j_fn_Brainrot" then
-                    table.remove(G.GAME.used_jokers, i)
-                end
-            end
-        end
-    end,
-	
-	update = function(self, card)
-        -- Remove from used_jokers table so it can appear again
-        if G.GAME and G.GAME.used_jokers then
-            for i = #G.GAME.used_jokers, 1, -1 do
-                if G.GAME.used_jokers[i] == "j_fn_Brainrot" then
-                    table.remove(G.GAME.used_jokers, i)
-                end
-            end
-        end
     end,
 }
 
@@ -10085,6 +10778,393 @@ end
 
 ----------------------------------------------
 ------------DAN_HAM CODE END----------------------
+
+----------------------------------------------
+------------PEELY CODE BEGIN----------------------
+
+SMODS.Joker{
+    key = 'Peely2',
+    loc_txt = {
+        ['en-us'] = {
+            name = "Peely",
+            text = {
+                "{C:green}#2# in #1#{} chance turn {C:attention}left{} joker into {C:money}Peely{}",
+                "{C:mult} +#3#{}-{C:mult}#4#{} Mult",
+                "Idea: {C:tarot}kxttyfrickfish{}",
+            }
+        }
+    },
+    atlas = 'Jokers',
+    pos = { x = 2, y = 56 },
+    rarity = 1,
+    cost = 6,
+    blueprint_compat = true,
+    config = { 
+        extra = {
+            odds = 10,  -- Odds for duping
+            mmin = 4,   -- minimum mult
+            mmax = 9,   -- max mult
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return { 
+            vars = { 
+                card.ability.extra.odds,
+                G.GAME.probabilities.normal,
+                card.ability.extra.mmin,
+                card.ability.extra.mmax
+            }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        if context.joker_main then
+            -- find Peely2's position
+            local z_slot
+            for i, j in ipairs(G.jokers.cards) do
+                if j == card then
+                    z_slot = i
+                    break
+                end
+            end
+
+            -- only attempt to replace left Joker if it exists and is not already Peely2
+            if z_slot and G.jokers.cards[z_slot-1] then
+                local target = G.jokers.cards[z_slot-1]
+                if target.config.center.key ~= 'j_fn_Peely2' then
+                    if pseudorandom('the peel') < G.GAME.probabilities.normal / card.ability.extra.odds then
+                        -- destroy that Joker
+                        target:start_dissolve(nil, true)
+
+                        -- create new Peely2
+                        local _card = create_card('Joker', G.consumeables, nil, nil, nil, nil, 'j_fn_Peely2')
+                        _card:add_to_deck()
+                        G.jokers:emplace(_card)
+                    end
+                end
+            end
+
+            -- calculate multiplier
+            local mult = math.random(card.ability.extra.mmin, card.ability.extra.mmax)
+            return { mult = mult }
+        end
+    end
+}
+
+----------------------------------------------
+------------PEELY CODE END----------------------
+
+-- =====================================================
+--  Fortnite YouTube Views Fetcher (Async version)
+-- =====================================================
+
+local succ, https = pcall(require, "SMODS.https")
+if not succ or not https or not https.asyncRequest then
+    print("[Fortlatro] Error: SMODS.https module not available.")
+    return
+end
+
+local last_update_time = 0
+local initial = true
+local update_interval = 60  -- seconds between refreshes
+local channel_id = "UClG8odDC8TS6Zpqk9CGVQiQ"
+
+-- Utility: Parse YouTube view count
+local function parse_view_count(body)
+    if not body then return 0 end
+    local view_count = body:match('"viewCount"%s*:%s*{"simpleText":"([%d,]+) views"}')
+                     or body:match('"viewCount":"(%d+)"')
+    if view_count then
+        view_count = view_count:gsub(",", "")
+        return tonumber(view_count)
+    end
+    return 0
+end
+
+-- Step 2: Get the view count for the latest video (callback)
+local function handle_video_page(code, body, headers)
+    if not body or code ~= 200 then
+        print("[Fortlatro] Failed to fetch YouTube video page:", code or "nil")
+        return
+    end
+
+    local views = parse_view_count(body)
+    if views and views > 0 then
+        G.GAME.FortniteViews = views
+        --print("[Fortlatro] Latest Fortnite video views: " .. views)
+    else
+        print("[Fortlatro] Could not parse view count")
+        G.GAME.FortniteViews = 0
+    end
+end
+
+-- Step 1: Get the latest video ID (callback)
+local function handle_channel_page(code, body, headers)
+    if not body or code ~= 200 then
+        print("[Fortlatro] Failed to fetch YouTube channel:", code or "nil")
+        return
+    end
+
+    local video_id = body:match('"videoId":"([%w%-_]+)"')
+    if video_id then
+        local video_url = "https://www.youtube.com/watch?v=" .. video_id
+        https.asyncRequest(video_url, handle_video_page)
+    else
+        print("[Fortlatro] Could not find latest video ID")
+    end
+end
+
+-- Function to start the async chain
+local function update_fortnite_views()
+    local channel_url = "https://www.youtube.com/channel/" .. channel_id .. "/videos?v=" .. tostring(os.time())
+    https.asyncRequest(channel_url, handle_channel_page)
+end
+
+-- Hook into Game start
+local start_run_ref = Game.start_run
+function Game:start_run(args)
+    start_run_ref(self, args)
+    update_fortnite_views()
+end
+
+update_fortnite_views()
+
+
+----------------------------------------------
+------------YOUTUBE CODE BEGIN----------------------
+
+SMODS.Joker{
+    key = "YouTube",
+    loc_txt = {
+        name = "Search for Survivors",
+        text = {
+            "Gain {X:mult,C:white}X#2#{} per {C:attention}500k{} views",
+            "On the latest {C:purple}Fortnite{} upload",
+            "Currently: {X:mult,C:white}X#1#{}"
+        }
+    },
+    atlas = 'Jokers',
+    pos = { x = 3, y = 56 },
+    config = {
+        extra = {
+			x_mult_add = 1,
+        }
+    },
+    rarity = 2,
+    cost = 5,
+    blueprint_compat = false,
+
+    loc_vars = function(self, info_queue, card)
+        local views = G.GAME.FortniteViews or 0
+        local per_million = views / 500000
+        return {
+            vars = { per_million, card.ability.extra.x_mult_add } -- #2# = per_million, #1# = raw views
+        }
+    end,
+
+    calculate = function(self, card, context)
+	
+		--ensure this is updated regularly
+		if context.setting_blind then
+			update_fortnite_views()
+		end
+		
+        if context.joker_main then
+            local mult = (G.GAME.FortniteViews / 500000)
+            return { xmult = mult }
+        end
+    end,
+}
+
+----------------------------------------------
+------------YOUTUBE CODE END----------------------
+
+-- =====================================================
+--  Fortnite Live Player Count 
+-- =====================================================
+
+local succ, https = pcall(require, "SMODS.https")
+if not succ or not https or not https.asyncRequest then
+    print("[Fortlatro] Error: SMODS.https module not available.")
+    return
+end
+
+
+---------------------------------------------------------
+-- Number Converter
+---------------------------------------------------------
+local function parse_number(str)
+    if not str then
+        return 0
+    end
+    local cleaned = str:gsub(",", "")
+    return tonumber(cleaned) or 0
+end
+
+---------------------------------------------------------
+-- LIVE PLAYER PARSER (Correct)
+---------------------------------------------------------
+local function parse_fortnite_players(body)
+    if not body then 
+        return 0
+    end
+
+
+    -- FIRST occurrence = LIVE players
+    local num_str = body:match('<div class="aalivecounter%-stat%-value">([%d,]+)</div>')
+
+    if not num_str then
+        return 0
+    end
+
+
+    local number = parse_number(num_str)
+    --print("[Fortlatro Debug] Parsed LIVE player count:", number)
+
+    return number
+end
+
+
+local function handle_fortnite_page(code, body, headers)
+
+    if code ~= 200 or not body then
+        return
+    end
+
+
+    local players = parse_fortnite_players(body)
+    G.GAME.FortnitePlayerCount = players
+end
+
+
+local function update_fortnite_player_count()
+    local url = "https://activeplayer.io/fortnite/?t=" .. tostring(os.time())
+    https.asyncRequest(url, handle_fortnite_page)
+end
+
+-- Initial call
+update_fortnite_player_count()
+
+-- Hook into game start
+local start_run_ref = Game.start_run
+function Game:start_run(args)
+    start_run_ref(self, args)
+    update_fortnite_player_count()
+end
+
+----------------------------------------------
+------------PLAYER COUNT CODE BEGIN----------------------
+
+SMODS.Joker{
+    key = "Event",
+    loc_txt = {
+        name = "Epic Event Test 1",
+        text = {
+            "Gain {X:chips,C:white}X#2#{} per",
+            "{C:attention}500k{} live {C:purple}Fortnite{} players",
+            "Currently: {X:chips,C:white}X#1#{}"
+        }
+    },
+    atlas = "Jokers",
+    pos = { x = 1, y = 57 },
+    config = {
+        extra = {
+            x_mult_add = 1
+        }
+    },
+    rarity = 2,
+    cost = 5,
+    blueprint_compat = false,
+
+    loc_vars = function(self, info_queue, card)
+        local players = G.GAME.FortnitePlayerCount or 0
+        local per_half_mil = players / 500000
+
+
+        return {
+            vars = {
+                per_half_mil,
+                card.ability.extra.x_mult_add
+            }
+        }
+    end,
+
+    calculate = function(self, card, context)
+
+        if context.setting_blind then
+            update_fortnite_player_count()
+        end
+
+        if context.joker_main then
+            local players = G.GAME.FortnitePlayerCount or 0
+            local mult = players / 500000
+
+
+            return { xchips = mult }
+        end
+    end
+}
+
+----------------------------------------------
+------------PLAYER COUNT CODE END----------------------
+
+----------------------------------------------
+------------AAA GAME CODE BEGIN----------------------
+
+SMODS.Joker {
+    key = 'AAA',
+    loc_txt = {
+        name = 'AAA Game',
+        text = {
+            "{X:mult,C:white}X#1#{} Mult if played hand contains {C:attention}#2#{} or more {C:attention}Aces{}",
+            "Idea: {C:tarot}kxttyfrickfish{}",
+        }
+    },
+    rarity = 2,
+    atlas = "Jokers",
+    pos = {x = 4, y = 56},
+    cost = 5,
+    unlocked = true,
+    discovered = false,
+    eternal_compat = true,
+    blueprint_compat = true,
+    perishable_compat = false,
+    config = {
+        extra = {
+			xmult = 2,
+			aces = 3,
+        }
+    },
+
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.extra.xmult,
+				card.ability.extra.aces,
+            }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        -- Calculate Ace count
+        local ace_count = 0
+        if context.joker_main then
+            for _, scoring_card in ipairs(context.scoring_hand) do
+                if scoring_card:get_id() == 14 then -- Ace card ID
+                    ace_count = ace_count + 1
+					if ace_count >= card.ability.extra.aces then
+						return {
+							x_mult = card.ability.extra.xmult
+						}
+					end
+                end
+            end
+        end
+    end,
+}
+
+----------------------------------------------
+------------AAA GAME CODE END----------------------
 
 ----------------------------------------------
 ------------GLASSES CODE BEGIN----------------------
@@ -11844,7 +12924,16 @@ SMODS.Sound({
 	path = "xp.ogg",
 })
 
-if config.newcalccompat ~= false then
+-- Ensure G.GAME.ammo_extra exist at 0 on game start/load
+local igo = Game.init_game_object
+function Game:init_game_object(...)
+    local ret = igo(self, ...)
+    -- preserve values if loading a save; otherwise seed to 0
+    ret.weekend    = tonumber(ret.weekend)     or 0
+    return ret
+end
+
+
     SMODS.Enhancement({
         loc_txt = {
             name = 'Xp Boost',
@@ -11872,7 +12961,7 @@ if config.newcalccompat ~= false then
         loc_vars = function(self, info_queue, card)
             return {
                 vars = {
-                    card.ability.extra.level_up,
+                    card.ability.extra.level_up + G.GAME.weekend,
                 }
             }
         end,
@@ -11880,8 +12969,8 @@ if config.newcalccompat ~= false then
         calculate = function(self, card, context)
             if context.before and card.area == G.hand and not context.individual then
 				card.ability.extra.scored = 1
-                G.GAME.hands[context.scoring_name].mult = G.GAME.hands[context.scoring_name].mult * card.ability.extra.level_up
-				G.GAME.hands[context.scoring_name].chips = G.GAME.hands[context.scoring_name].chips * card.ability.extra.level_up
+                G.GAME.hands[context.scoring_name].mult = G.GAME.hands[context.scoring_name].mult * (card.ability.extra.level_up+G.GAME.weekend)
+				G.GAME.hands[context.scoring_name].chips = G.GAME.hands[context.scoring_name].chips * (card.ability.extra.level_up+G.GAME.weekend)
 				if config.sfx ~= false then
 					return {
 						message = "XP BOOSTED!",
@@ -11905,7 +12994,6 @@ if config.newcalccompat ~= false then
             end
         end,
     })
-end
 
 ----------------------------------------------
 ------------XP BOOST CODE END----------------------
@@ -12070,7 +13158,7 @@ SMODS.Shader({key = 'mythic', path = "mythic.fs"})
 
 
 -- Utility to safely ensure card.ability.extra works
-local function ensure_extra(card)
+function ensure_extra(card)
     card.ability = card.ability or {}
     -- Only create a table if extra is nil
     if card.ability.extra == nil then
@@ -12160,6 +13248,9 @@ SMODS.Edition({
 
 ----------------------------------------------
 ------------MYTHIC CODE END----------------------
+
+----------------------------------------------
+------------OVERSHIELDED CODE BEGIN----------------------
 
 SMODS.Shader({key = 'overshielded', path = "overshielded.fs"})
 
@@ -12293,6 +13384,85 @@ SMODS.Edition({
 })
 
 end
+
+----------------------------------------------
+------------OVERSHIELDED CODE END----------------------
+
+SMODS.Shader({key = 'cell', path = "cell.fs"})
+
+
+
+SMODS.Edition({
+    key = "Cell",
+    discovered = false,
+    unlocked = true,
+    shader = 'cell',
+    config = { card_limit = 0 },
+    in_shop = true,
+    weight = 5,
+    extra_cost = 1,
+    badge_colour = HEX("0C252E"),
+    apply_to_float = true,
+
+    on_apply = function(card)
+        ensure_extra(card)
+
+        -- Adjust slot limits
+        if card.ability.set == 'Joker' then
+            --this is handled by card_limit now
+        elseif card.ability.consumeable then
+            --this is handled by card_limit now
+        else
+            -- Non-Joker, non-Consumable: apply permanent chip bonus
+            if card.base and card.base.value then
+                card.ability.perma_bonus = (card.ability.perma_bonus or 0) + 1
+                card:juice_up()
+            end
+        end
+
+        -- Apply multiplier to any numeric values in `extra`
+        if type(card.ability.extra) == "table" then
+            for k, v in pairs(card.ability.extra) do
+                if type(v) == "number" then
+                    card.ability.extra[k] = v + 1
+                end
+            end
+        elseif type(card.ability.extra) == "number" then
+            card.ability.extra = card.ability.extra + 1
+        end
+    end,
+
+    on_remove = function(card)
+        ensure_extra(card)
+
+        -- Revert multiplier
+        if type(card.ability.extra) == "table" then
+            for k, v in pairs(card.ability.extra) do
+                if type(v) == "number" then
+                    card.ability.extra[k] = v - 1
+                end
+            end
+        elseif type(card.ability.extra) == "number" then
+            card.ability.extra = card.ability.extra - 1
+        end
+
+        -- Restore slot limits and chip bonus
+        if card.ability.set == 'Joker' then
+            --this is handled by card_limit now
+        elseif card.ability.consumeable then
+            --this is handled by card_limit now
+        else
+            if card.base and card.base.value then
+                card.ability.perma_bonus = (card.ability.perma_bonus or 0) - 1
+                card:juice_up()
+            end
+        end
+    end,
+
+    update = function(self, card)
+        ensure_extra(card)
+    end,
+})
 
 
 ----------------------------------------------
@@ -13402,7 +14572,7 @@ SMODS.Consumable{
         }
     },
     config = {
-        extra = { cards = 5, tags = 1 },
+        extra = { cards = 4, tags = 1 },
     },
     loc_vars = function(self, info_queue, center)
         if center and center.ability and center.ability.extra then
@@ -15174,7 +16344,7 @@ SMODS.Consumable{
         text = {
             'Select up to {C:attention}#1#{} cards',
             'Earn {C:money}money{} equal to {C:attention}a third{} of their {C:chips}Chip{} value',
-			'Idea: {C:inactive}kxttyfrickfish',
+			'Idea: {C:tarot}kxttyfrickfish',
         }
     },
     config = {
@@ -15503,7 +16673,7 @@ SMODS.Consumable{
         text = {
             'Select up to {C:attention}#1#{} cards',
             'Give them {C:mult}Red Seal{} and {C:fn_perishable}Perishable',
-			'Idea: {C:inactive}kxttyfrickfish',
+			'Idea: {C:tarot}kxttyfrickfish',
         }
     },
     config = {
@@ -15553,7 +16723,7 @@ SMODS.Consumable{
         text = {
             'Select up to {C:attention}#1#{} cards',
             'Turn them into {C:attention}Face Cards',
-            'Idea: {C:inactive}kxttyfrickfish',
+            'Idea: {C:tarot}kxttyfrickfish',
         }
     },
     config = {
@@ -15634,7 +16804,7 @@ SMODS.Consumable{
             'Select up to {C:attention}#1#{} cards',
             'If they have an {C:enhanced}Enhancement{}',
 			'Replace it with {C:inactive}Steel',
-            'Idea: {C:inactive}kxttyfrickfish',
+            'Idea: {C:tarot}kxttyfrickfish',
         }
     },
     config = {
@@ -15742,6 +16912,7 @@ SMODS.Consumable {
             'j_fn_Jam', 'j_fn_Fortnite', 'j_fn_Fortnite', 'j_fn_Smoothie', 'j_fn_Smoothie', 'j_fn_Sprite', 'j_fn_Prebuild', 'j_fn_Prebuild', 'j_fn_Shogun', 'j_fn_Shogun', 'j_fn_Killswitch', 'j_fn_Killswitch', 'j_fn_Hero', 'j_fn_Hero', 'j_fn_NBA', 'j_fn_Tempest', 'j_fn_Tempest', 'j_fn_Tempest', 'j_fn_Tempest',
 			'j_fn_Circle3', 'j_fn_Circle3', 'j_fn_Circle3', 'j_fn_Fortbyte', 'j_fn_Fortbyte', 'j_fn_Fortbyte', 'j_fn_Fortbyte', 'j_fn_FlowberryFizz', 'j_fn_FlowberryFizz', 'j_fn_FlowberryFizz', 'j_fn_EGL', 'j_fn_EGL', 'j_fn_EGL', 'j_fn_Marvel', 'j_fn_Cluster', 'j_fn_Cluster', 'j_fn_Cluster', 'j_fn_Icon', 'j_fn_Gaming', 'j_fn_WRTIS', 'j_fn_WRTIS', 'j_fn_WRTIS', 'j_fn_WRTIS',
 			'j_fn_StarWars', 'j_fn_Crew', 'j_fn_Jules', 'j_fn_Drav', 'j_fn_Snake', 'j_fn_Snake', 'j_fn_Snake', 'j_fn_Doll', 'j_fn_Doll', 'j_fn_DevSword', 'j_fn_DevSword', 'j_fn_DevSword', 'j_fn_DevSword', 'j_fn_ScoobySnacks', 'j_fn_ScoobySnacks', 'j_fn_ScoobySnacks', 'j_fn_ScoobySnacks', 'j_fn_Brainrot', 'j_fn_Brainrot', 'j_fn_Brainrot', 'j_fn_Brainrot', 'j_fn_Brainrot', 'j_fn_History', 'j_fn_History', 'j_fn_History', 'j_fn_Kxtty',
+			'j_fn_Peely2', 'j_fn_Peely2', 'j_fn_Peely2', 'j_fn_Peely2', 'j_fn_YouTube', 'j_fn_YouTube', 'j_fn_YouTube', 'j_fn_Event', 'j_fn_Event', 'j_fn_Event', 'j_fn_AAA', 'j_fn_AAA', 'j_fn_AAA',
 			
         }
 
@@ -16418,7 +17589,6 @@ SMODS.Consumable{
 ----------------------------------------------
 ------------BATTLE PASS BOOST CODE BEGIN----------------------
 
-if config.newcalccompat ~= false then
 SMODS.Consumable{
     key = 'LTMBoost',
     set = 'LTMConsumableType',
@@ -16436,6 +17606,19 @@ SMODS.Consumable{
         info_queue[#info_queue + 1] = G.P_CENTERS.m_fn_Xp
         return {vars = {}}
     end,
+	
+	in_pool = function(self)
+        if not G.playing_cards then return false end
+            
+		for _, card in ipairs(G.playing_cards) do
+			if card and card.config and card.config.center then
+                if card.config.center ~= G.P_CENTERS.c_base	then
+					return true
+                end
+			end
+		end
+        return false
+	end,
 
     can_use = function(self, card)
         return G and G.hand and #G.hand.cards > 0
@@ -16469,7 +17652,6 @@ SMODS.Consumable{
         }))
     end,
 }
-end
 
 ----------------------------------------------
 ------------BATTLE PASS BOOST CODE END----------------------
@@ -16712,7 +17894,14 @@ SMODS.Consumable{
             'Add a {C:attention}random voucher{} to this {C:green}shop{}',
         }
     },
-
+	
+	--dont show up on og deck cause its useless there
+	in_pool = function(self)
+		if G.GAME.selected_back.effect.center.key ~= 'b_fn_OGDeck' then
+			return true
+		end
+    end,
+	
     can_use = function(self, card)
         return G.STATE == G.STATES.SHOP
     end,
@@ -17244,6 +18433,9 @@ SMODS.Consumable {
 ----------------------------------------------
 ------------RIDE THE LIGHTNING CODE END----------------------
 
+----------------------------------------------
+------------SUB WAFER CODE BEGIN----------------------
+
 SMODS.Consumable {
   key = "LTMWafer",
   set = 'LTMConsumableType',
@@ -17324,6 +18516,12 @@ SMODS.Consumable {
   end,
 }
 
+----------------------------------------------
+------------SUB WAFER CODE END----------------------
+
+----------------------------------------------
+------------SMOKE BOMB CODE BEGIN----------------------
+
 SMODS.Consumable {
   key = "LTMSmoke",
   set = 'LTMConsumableType',
@@ -17384,7 +18582,53 @@ SMODS.Consumable {
   end,
 }
 
+----------------------------------------------
+------------SMOKE BOMB CODE END----------------------
 
+SMODS.Consumable{
+        key = 'LTMInk', -- key
+        set = 'LTMConsumableType', -- the set of the card: corresponds to a consumable type
+        atlas = 'Jokers', -- atlas
+        pos = {x = 0, y = 57}, -- position in atlas
+        loc_txt = {
+            name = 'Rainbow Ink', -- name of card
+            text = { -- text of card
+                'Apply {C:fn_boogie}Cel Shaded{} to up to {C:attention}#1#{} selected cards',
+            }
+        },
+        config = {
+            extra = {
+                cards = 3, -- configurable value
+            }
+        },
+        loc_vars = function(self, info_queue, center)
+            info_queue[#info_queue + 1] = G.P_CENTERS.e_fn_Cell
+            if center and center.ability and center.ability.extra then
+                return {vars = {center.ability.extra.cards}} 
+            end
+            return {vars = {}}
+        end,
+		
+		draw = function(self, card, layer)
+			card.children.center:draw_shader('fn_cell', nil, card.ARGS.send_to_shader)
+		end,
+		
+        can_use = function(self, card)
+            if G and G.hand and G.hand.highlighted and card.ability and card.ability.extra and card.ability.extra.cards then
+                if #G.hand.highlighted > 0 and #G.hand.highlighted <= card.ability.extra.cards then
+                    return true
+                end
+            end
+            return false
+        end,
+        use = function(self, card, area, copier)
+            if G and G.hand and G.hand.highlighted then
+                for i = 1, #G.hand.highlighted do
+                    G.hand.highlighted[i]:set_edition({fn_Cell = true},true)
+                end
+            end
+        end,
+    }
 
 ----------------------------------------------
 ------------DUMPSTER DIVER CODE BEGIN----------------------
@@ -18644,6 +19888,39 @@ SMODS.Voucher{
 
 ----------------------------------------------
 ------------BOOSTER CODE BEGIN----------------------
+
+-- Register music for ltm boosters
+SMODS.Sound({
+    key = 'music_pack',
+    path = 'music_pack.ogg',
+    select_music_track = function(self)
+        -- We only check the booster once there are cards in the pack_cards area
+        local booster = G.pack_cards and G.pack_cards.cards and SMODS.OPENED_BOOSTER
+
+        -- If it's a ltm pack, we return the priority of this music
+        if booster and booster.config.center_key:find('p_fn_LTMBooster') then
+            return 1e10
+        end
+    end
+})
+
+-- Register music for augment boosters
+SMODS.Sound({
+    key = 'music_pack2',
+    path = 'music_pack2.ogg',
+    select_music_track = function(self)
+        -- We only check the booster once there are cards in the pack_cards area
+        local booster = G.pack_cards and G.pack_cards.cards and SMODS.OPENED_BOOSTER
+
+        -- If it's a ltm pack, we return the priority of this music
+        if booster and booster.config.center_key:find('p_fn_AugmentBooster') then
+            return 1e10
+        end
+    end
+})
+
+
+
 SMODS.Sound({
 	key = "pack",
 	path = "pack.ogg",
@@ -18665,6 +19942,7 @@ local disabled = {
     c_fn_LTMSuperLaunchPad = true,
 	c_fn_LTMCache = true,
 	c_fn_LTMApple = true,
+	c_fn_LTMSmoke = true,
 }
 
 SMODS.Booster({
@@ -18790,6 +20068,7 @@ local disabled = {
 	c_fn_LTMSuperLaunchPad = true,
 	c_fn_LTMCache = true,
 	c_fn_LTMApple = true,
+	c_fn_LTMSmoke = true,
 }
 
 SMODS.Booster({
@@ -19039,8 +20318,6 @@ SMODS.Booster({
 ----------------------------------------------
 ------------LTM TAG CODE END----------------------
 
-
-
 SMODS.Tag{
     key = 'LTMTag1',
     atlas = 'Jokers',
@@ -19241,6 +20518,9 @@ SMODS.Tag{
 ----------------------------------------------
 ------------AUGMENT TAG CODE END----------------------
 
+----------------------------------------------
+------------AUGMENT TAG 2 CODE BEGIN----------------------
+
 SMODS.Tag{
     key = 'AugmentTag2',
     atlas = 'Jokers',
@@ -19304,9 +20584,88 @@ SMODS.Tag{
 }
 
 ----------------------------------------------
+------------AUGMENT TAG 2 CODE END----------------------
+
+function create_UIBox_fn_custom_video1(name, buttonname)
+  -- Init value
+  G.GAME.videoplaying = 1
+
+  -- Path now points to Fortlatro instead of Yahimod
+  local file_path = SMODS.Mods["Fortlatro"].path.."/resources/"..name..".ogv"
+  local file = NFS.read(file_path)
+
+  love.filesystem.write("temp.ogv", file)
+
+  local video_file = love.graphics.newVideo("temp.ogv")
+  local vid_sprite = Sprite(
+    0, 0,
+    11*16/9, 11,
+    G.ASSET_ATLAS["ui_" .. (G.SETTINGS.colourblind_option and 2 or 1)],
+    {x=0, y=0}
+  )
+
+  video_file:getSource():setVolume(
+    G.SETTINGS.SOUND.volume * G.SETTINGS.SOUND.game_sounds_volume / (100 * 10)
+  )
+
+  vid_sprite.video = video_file
+  video_file:play()
+
+  -- Create UIBox
+  local t = create_UIBox_generic_options({
+    back_delay = 12,
+    back_label = buttonname,
+    colour = G.C.BLACK,
+    padding = 0,
+    contents = {
+      { n = G.UIT.O, config = { object = vid_sprite } }
+    }
+  })
+
+  return t
+end
+
+--[[
+SMODS.Tag{
+    key = 'Ned',
+    loc_txt= {
+        name = 'Medkit Tag',
+        text = { "Retrieve Ned's {C:mult}Medkit{}", }},
+    atlas = 'Jokers',
+    pos = { x = 1, y = 0 },
+
+
+    apply = function(self, tag, context)
+        tag:yep('+', G.C.DARK_EDITION )
+
+           G.FUNCS.overlay_menu{
+                definition = create_UIBox_fn_custom_video1("ned","Thank you I was getting worried!"),
+                config = {no_esc = true}
+            }
+
+        tag.triggered = true
+        return true
+    end,
+}
+--]]
+----------------------------------------------
 ------------FRACTURE CODE BEGIN----------------------
 
 SMODS.Atlas({ key = "Blinds", atlas_table = "ANIMATION_ATLAS", path = "Blinds.png", px = 34, py = 34, frames = 21 })
+
+-- Register music for fracture
+SMODS.Sound({
+    key = 'music_fracture',
+    path = 'music_fracture.ogg',
+    select_music_track = function(self)
+
+        -- If it's a fracture boss play music
+        if G.GAME and G.GAME.blind and G.GAME.blind.name == 'Fracture' then
+            return 1e10
+        end
+    end
+})
+
 
 if config.blinds ~= false then
     SMODS.Blind {
@@ -19413,7 +20772,7 @@ function Game:update(dt)
     original_game_update(self, dt)
 
     -- Only run if the current blind is Tornado
-    if G.GAME.blind and G.GAME.blind.name == 'Tornado' and not G.GAME.blind.disabled then
+    if G.GAME.blind and G.GAME.blind.name == 'Tornado' and not G.GAME.blind.disabled or G.STAGE ~= G.STAGES.MAIN_MENU and love.window.getTitle() == "Fortlatro: I'm not seeing enough movement!" then
         tornado_shuffle_timer = tornado_shuffle_timer + dt
         if tornado_shuffle_timer > 1 then -- shuffle every 2 seconds
             tornado_shuffle_timer = 0
@@ -19459,10 +20818,6 @@ end
 ----------------------------------------------
 ------------MRBLOCKU CODE BEGIN----------------------
 
-SMODS.Sound({
-	key = "block",
-	path = "block.ogg",
-})
 
 if config.blinds ~= false then
     SMODS.Blind {
@@ -19481,9 +20836,10 @@ if config.blinds ~= false then
 		
         calculate = function(self, card, context)
             if context.setting_blind then
-                if config.sfx ~= false then
-                    play_sound("fn_block") 
-                end
+                G.FUNCS.overlay_menu{
+					definition = create_UIBox_fn_custom_video("block","No more Fortnite :("),
+					config = {no_esc = true}
+				}
             end
         end,
 		
@@ -19648,7 +21004,7 @@ if config.blinds ~= false then
         end,
         
         calculate = function(self, card, context)
-            if context.setting_blind then
+            if context.first_hand_drawn and not G.GAME.blind.disabled then
                 if config.sfx ~= false then
                     play_sound("fn_party")
                 end
@@ -19744,6 +21100,20 @@ end
 ----------------------------------------------
 ------------BLANK CODE BEGIN----------------------
 
+-- Register music for fracture
+SMODS.Sound({
+    key = 'music_blank',
+    path = 'music_blank.ogg',
+    select_music_track = function(self)
+
+        -- If it's blank boss play music
+        if G.GAME and G.GAME.blind and G.GAME.blind.name == 'Blank' or G.GAME.videoplaying and G.GAME.videoplaying == 1 then
+            return 1e10
+        end
+    end
+})
+
+
 if config.blinds ~= false then
     SMODS.Blind {
         loc_txt = {
@@ -19821,6 +21191,7 @@ end
 local old_update_game_over = Game.update_game_over
 
 function Game:update_game_over(dt)
+	G.FORT_LAVA_DRAW_ACTIVE = false
     if G.GAME.BlankFailed and G.GAME.current_round.hands_left > 0 then
 		-- Draw new cards
         if G.deck and #G.deck.cards > 0 then
@@ -19838,6 +21209,8 @@ end
 ----------------------------------------------
 ------------BLANK CODE END----------------------
 
+----------------------------------------------
+------------COMP PLAYER CODE BEGIN----------------------
 
 if config.blinds ~= false then
     SMODS.Blind {
@@ -19917,7 +21290,255 @@ if config.blinds ~= false then
     }
 end
 
+----------------------------------------------
+------------COMP PLAYER CODE END----------------------
 
+----------------------------------------------
+------------HEAVY WEAPONS CODE BEGIN----------------------
+
+if config.blinds ~= false then
+    SMODS.Blind {
+        loc_txt = {
+            name = 'Heavy Weapons',
+            text = {
+                'Discarded cards gain Heavy Seal', 'Idea: Kxttyfrickfish',
+            }
+        },
+        key = 'Heavy',
+        name = 'Heavy Weapons',
+        config = {},
+        boss = { min = 3, max = 10, hardcore = true },
+        boss_colour = HEX("1e2b2d"),
+        atlas = "Blinds",
+        pos = { x = 0, y = 8 },
+        dollars = 10,
+		
+		calculate = function(self, card, context)
+            if context.discard and context.other_card and not G.GAME.blind.disabled then
+                local discardedCard = context.other_card
+                discardedCard:set_seal('fn_HeavySeal', true)
+                discardedCard:juice_up()
+            end
+        end,
+
+    }
+end
+
+----------------------------------------------
+------------HEAVY WEAPONS CODE END----------------------
+
+----------------------------------------------
+------------EDGING CODE BEGIN----------------------
+
+if config.blinds ~= false then
+    SMODS.Blind {
+        loc_txt = {
+            name = 'Edging',
+            text = {
+                'Odd hands score negative', 'Idea: Kxttyfrickfish',
+            }
+        },
+        key = 'Edging',
+        name = 'Edging',
+        config = {},
+        boss = { min = 1, max = 10, hardcore = true },
+        boss_colour = HEX("184f72"),
+        atlas = "Blinds",
+        pos = { x = 0, y = 9 },
+        dollars = 10,
+		
+		defeat = function(self)
+			G.GAME.EdgingHands = 0
+		end,
+		
+		calculate = function(self, card, context)
+            if context.final_scoring_step and not G.GAME.blind.disabled then
+				G.GAME.EdgingHands = (G.GAME.EdgingHands or 0) + 1
+				if G.GAME.EdgingHands % 2 == 1 then
+					return { xchips = -1 }
+				end
+            end
+        end,
+
+    }
+end
+
+----------------------------------------------
+------------EDGING CODE END----------------------
+
+----------------------------------------------
+------------HIGH PING CODE BEGIN----------------------
+
+local old_insert = SMODS.insert_repetitions
+
+SMODS.insert_repetitions = function(repeat_table, value, source, tag)
+    if G.GAME and G.GAME.blind and G.GAME.blind.name == 'High Ping' and not G.GAME.blind.disabled then
+        -- Block ALL retriggers
+        return
+    end
+
+    -- Otherwise do normal retrigger behavior
+    return old_insert(repeat_table, value, source, tag)
+end
+
+
+
+if config.blinds ~= false then
+    SMODS.Blind {
+        loc_txt = {
+            name = 'High Ping',
+            text = {
+                'Retriggers are disabled',
+            }
+        },
+        key = 'Ping',
+        name = 'High Ping',
+        config = {},
+        boss = { min = 4, max = 10, hardcore = true },
+        boss_colour = HEX("033bf9"),
+        atlas = "Blinds",
+        pos = { x = 0, y = 10 },
+        dollars = 5,
+    }
+end
+
+----------------------------------------------
+------------HIGH PING CODE END----------------------
+
+
+----------------------------------------------
+------------FLOOR IS LAVA CODE BEGIN----------------------
+
+G.FORT_LAVA_IMAGE = nil
+G.FORT_LAVA_DRAW_ACTIVE = false  -- only draw when blind active
+
+if config.blinds ~= false then
+    SMODS.Blind {
+        loc_txt = {
+            name = 'Floor is Lava',
+            text = { '25% of Held cards are destroyed' }
+        },
+        key = 'Lava',
+        name = 'Floor is Lava',
+        config = {},
+        boss = { min = 1, max = 10, hardcore = true },
+        boss_colour = HEX("b83b05"),
+        atlas = "Blinds",
+        pos = { x = 0, y = 11 },
+        dollars = 5,
+
+        in_pool = function(self)
+            return not G.GAME.blinds_fought_lava
+        end,
+
+        press_play = function(self)
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    local hand = G.hand.cards
+                    local count = #hand
+
+                    if count > 0 then
+                        -- destroy_count = ceil(25% of held cards)
+                        local destroy_count = math.ceil(count * 0.25)
+
+                        if destroy_count > 0 then
+                            -- copy hand to a temporary table
+                            local temp = {}
+                            for i, c in ipairs(hand) do temp[i] = c end
+
+                            -- shuffle table
+                            for i = #temp, 2, -1 do
+                                local j = math.random(i)
+                                temp[i], temp[j] = temp[j], temp[i]
+                            end
+
+                            -- destroy N random cards
+                            for i = 1, destroy_count do
+                                local selected_card = temp[i]
+                                if selected_card then
+                                    selected_card:start_dissolve()
+
+                                    -- trigger joker callbacks if applicable
+                                    if selected_card.playing_card then
+                                        for j = 1, #G.jokers.cards do
+                                            eval_card(G.jokers.cards[j], {
+                                                cardarea = G.jokers,
+                                                remove_playing_cards = true,
+                                                removed = { selected_card }
+                                            })
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    -- Enable lava rendering
+                    G.FORT_LAVA_DRAW_ACTIVE = true
+
+                    -- Lazy-load lava image
+                    if G.FORT_LAVA_IMAGE == nil then
+                        local full_path = (SMODS.Mods["Fortlatro"].path .. "/customimages/lava.png")
+                        local file_data = assert(NFS.newFileData(full_path), "Epic fail: Cannot load lava.png")
+                        local tempimagedata = assert(love.image.newImageData(file_data), "Epic fail 2: Cannot decode lava.png")
+                        G.FORT_LAVA_IMAGE = assert(love.graphics.newImage(tempimagedata), "Epic fail 3: Cannot create lava image")
+                    end
+
+                    return true
+                end
+            }))
+        end,
+
+        calculate = function(self, card, context)
+            if G.STATE == G.STATES.SELECTING_HAND or context.hand_drawn then
+                -- stop drawing lava
+                G.FORT_LAVA_DRAW_ACTIVE = false
+            end
+        end,
+
+        defeat = function(self)
+            G.GAME.blinds_fought_lava = true
+            -- stop drawing lava
+            G.FORT_LAVA_DRAW_ACTIVE = false
+        end
+    }
+end
+
+
+--draw hook
+local old_draw = love.draw
+love.draw = function()
+    if old_draw then old_draw() end
+
+    if G.FORT_LAVA_DRAW_ACTIVE and G.FORT_LAVA_IMAGE then
+        local screen_w = love.graphics.getWidth()
+        local screen_h = love.graphics.getHeight()
+
+        -- scaling relative to 1920x1080
+        local _xscale = screen_w / 1920
+        local _yscale = screen_h / 1080
+
+        -- shrink factor
+        local scale_factor = 1
+
+        -- compute center position
+        local draw_x = 0
+        local draw_y = 400
+
+        love.graphics.setColor(1,1,1,1)
+        love.graphics.draw(
+            G.FORT_LAVA_IMAGE,
+            draw_x,
+            draw_y,
+            0,
+            _xscale * scale_factor,
+            _yscale * scale_factor
+        )
+    end
+end
+
+----------------------------------------------
+------------FLOOR IS LAVA CODE END----------------------
 
 ----------------------------------------------
 ------------STORM SEAL CODE BEGIN----------------------
@@ -20190,46 +21811,34 @@ end
 SMODS.Seal {
     name = "Zero Point Seal",
     key = "ZeroSeal",
-    config = {
-        extra = { cards = 2, drawn = 0 },
-    },
     badge_colour = HEX("38faff"),
+
     loc_txt = {
         label = 'Zero Point Seal',
-        name = 'Zero Point Seal',
+        name  = 'Zero Point Seal',
         text = {
-            "When {C:attention}drawn{} draw {C:attention}#1#{} additional cards",
+            "When {C:attention}drawn{} draw {C:attention}2{} additional cards",
             "Idea: BoiRowan"
         }
     },
+
     atlas = "Jokers",
     pos = {x=1, y=29},
 
-    loc_vars = function(self, info_queue, card)
-        return { vars = { self.config.extra.cards, self.config.extra.drawn } }
-    end,
-	
-	update = function(self, card)
-        if card.seal == 'fn_ZeroSeal' and not card.ability.extra then
-			card.ability.extra = {cards = 2, drawn = 0}
-		end
-    end,
-	
     calculate = function(self, card, context)
-		if not card.ability.extra then
-			card.ability.extra = {cards = 2, drawn = 0}
-		end
-        if context.hand_drawn and card.area == G.hand then  -- Check if a hand is drawn
-            if card.ability.extra.drawn == 0 then
-                G.FUNCS.draw_from_deck_to_hand(card.ability.extra.cards)
-                card.ability.extra.drawn = 1
+
+        if not context.hand_drawn then return end
+
+        -- Loop through drawn cards properly
+        for i, drawn_card in ipairs(context.hand_drawn) do
+            if drawn_card == card then
+                G.FUNCS.draw_from_deck_to_hand(2)
+                return
             end
-        end
-        if context.end_of_round then
-            card.ability.extra.drawn = 0
         end
     end
 }
+
 
 ----------------------------------------------
 ------------ZERO POINT SEAL CODE END----------------------
@@ -20246,7 +21855,7 @@ SMODS.Seal {
         name = 'Heavy Seal',
         text = {
             "This card is always {C:attention}Flipped{}",
-            "Idea: {C:inactive}kxttyfrickfish"
+            "Idea: {C:tarot}kxttyfrickfish"
         }
     },
     atlas = "Jokers",
