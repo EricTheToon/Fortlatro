@@ -5,7 +5,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 128 Jokers
+# 132 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see) (can turn into GOOD or EVIL Crac)
@@ -262,6 +262,14 @@ Purchase History - Uncommon - Based on the rarity of the last obtained Joker gra
 
 Dan_Ham - Uncommon - Whenever the music changes 1/3 chance to gain a random consumable
 
+Peely - Common - 1-10 chance to turn left joker into Peely 4-9 Mult
+
+Search for Survivors - Uncommon - X1 Mult per 500k views on the latest Fortnite upload
+
+Epic Event Test 1 - Uncommon - X1 Chips per 500k players currently playing Fortnite
+
+AAA Game - Uncommon - X2 Mult if played hand contains 3 or more Aces
+
 # 6 Decks
 Eric Deck - Start with Eric
 
@@ -396,7 +404,7 @@ Breakthrough - Apply Mythic to up to 5 Cards  -1 Discard
 
 The Great Turtle - Create a copy of 1 random destroyed Joker (must have room)
 
-# 54 LTM Cards
+# 55 LTM Cards
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -505,6 +513,8 @@ Sub Wafer - Next hand is worth 50% more
 
 Smoke Bomb - Disable blind for 2 turns
 
+Rainbow Ink - Apply Cel Shaded to 3 selected cards
+
 # 15 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
 
@@ -553,7 +563,7 @@ Sponsorship Seal - While held each scored card gives $1 increase this by 0.1 for
 
 Bush Seal - +30 chips while held in deck
 
-# 4 Editions
+# 5 Editions
 Nitro - +2 handsize resets at end of round
 
 Shockwaved - 1/3 chance to to retrigger adjacent jokers retrigger adjacent playing cards
@@ -561,6 +571,8 @@ Shockwaved - 1/3 chance to to retrigger adjacent jokers retrigger adjacent playi
 Mythic - X4 to all values on this card - 1 slot 
 
 Overshielded - Cannot be debuffed prevent adjacent cards from being debuffed
+
+Cel Shaded - +1 to all values on this card
 
 # 2 Auras
 
@@ -577,7 +589,7 @@ Reality Augmentation Device - Gives a free Augment Pack
 
 Dual Reality Augmentation Device - Gives a free MEGA Augment Pack
 
-# 8 Blinds
+# 12 Blinds
 Fracture - All played cards are destroyed
 
 Zero Build - Wood, Brick and Metal are debuffed
@@ -593,6 +605,14 @@ Hotfix - All blind selected effects disabled
 Blank - All Jokers must trigger
 
 Comp Player - All Joker values are halved
+
+Heavy Weapons - Discarded cards gain the Heavy seal
+
+Edging - Odd hands score negative
+
+High Ping - Retriggers are disabled
+
+Floor is Lava - 25% of held cards are destroyed
 
 # Be sure to check the config tab you can enable and disable sounds and blinds
 additional content with:
