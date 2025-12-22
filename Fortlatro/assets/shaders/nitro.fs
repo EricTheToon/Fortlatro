@@ -134,7 +134,7 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
 
 	vec4 hsl = HSL(vec4(tex.r*saturation_fac, tex.g*saturation_fac, tex.b, tex.a));
 
-	float t = nitro.y*3.141 + mod(time*1.5, 1.);
+	float t = mod(time*1.5, 1.);
 	vec2 floored_uv = (floor((uv*texture_details.ba)))/texture_details.ba;
     vec2 uv_scaled_centered = (floored_uv - 0.5) * 45.;
 
@@ -154,12 +154,12 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
     float flicker = sin(time * 15.0 + uv.y * 10.0) * 0.1 + sin(time * 25.0) * 0.05;
     field += flicker;
 
-    float res = (.5 + .5* cos( (nitro.x) * 2.8 + ( field + -.4 ) *3.8));
+    float res = (.5 + .5* cos( (time * 0.5) * 2.8 + ( field + -.4 ) *3.8));
     
     // Set orange flame colors
-	hsl.x = 0.08 + sin(res * 6.28 + time * 2.0) * 0.03;  // Orange hue with slight variation
+	hsl.x = 0.08 + sin(res * 6.28 + time * 2.0) * 0.03 + nitro.x * 0.00001;  // Orange hue with slight variation
 	hsl.y = hsl.y * 0.95 + 0.4; // High saturation for vivid flames
-	hsl.z = hsl.z * 0.3 + 0.45 * sin(hsl.z/2.2 - res/3.5 + sin(nitro.y * 2.0)/6. + 0.6)/1.1; // Dynamic lightness
+	hsl.z = hsl.z * 0.3 + 0.45 * sin(hsl.z/2.2 - res/3.5 + sin(time * 2.0)/6. + 0.6)/1.1; // Dynamic lightness
 
     tex.rgb = RGB(hsl).rgb;
 

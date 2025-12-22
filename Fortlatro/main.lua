@@ -10199,11 +10199,7 @@ SMODS.Joker({
         return {
             vars = {card.ability.extra.Xmult}
         }
-    end,
-	
-	draw = function(self, card, layer)
-		card.children.center:draw_shader('booster', nil, card.ARGS.send_to_shader)
-	end
+    end
 })
 
 ----------------------------------------------
@@ -13069,7 +13065,7 @@ SMODS.Edition({
     },
     discovered = false,
     unlocked = true,
-    shader = 'shockwaved',
+    shader = 'fn_shockwaved',
 	config = { card_limit = 0 },
     in_shop = true,
     weight = 0.5,
@@ -13174,7 +13170,7 @@ SMODS.Edition({
     key = "Mythic",
     discovered = false,
     unlocked = true,
-    shader = 'mythic',
+    shader = 'fn_mythic',
     config = { card_limit = -1 },
     in_shop = true,
     weight = 0.2,
@@ -13277,7 +13273,7 @@ SMODS.Edition({
     },
     discovered = false,
     unlocked = true,
-    shader = 'overshielded',
+    shader = 'fn_overshielded',
 	config = { card_limit = 0 },
     in_shop = true,
     weight = 5,
@@ -13396,7 +13392,7 @@ SMODS.Edition({
     key = "Cell",
     discovered = false,
     unlocked = true,
-    shader = 'cell',
+    shader = 'fn_cell',
     config = { card_limit = 0 },
     in_shop = true,
     weight = 5,
@@ -18604,15 +18600,11 @@ SMODS.Consumable{
         loc_vars = function(self, info_queue, center)
             info_queue[#info_queue + 1] = G.P_CENTERS.e_fn_Cell
             if center and center.ability and center.ability.extra then
-                return {vars = {center.ability.extra.cards}} 
+                return {vars = {center.ability.extra.cards}}
             end
             return {vars = {}}
         end,
-		
-		draw = function(self, card, layer)
-			card.children.center:draw_shader('fn_cell', nil, card.ARGS.send_to_shader)
-		end,
-		
+
         can_use = function(self, card)
             if G and G.hand and G.hand.highlighted and card.ability and card.ability.extra and card.ability.extra.cards then
                 if #G.hand.highlighted > 0 and #G.hand.highlighted <= card.ability.extra.cards then
