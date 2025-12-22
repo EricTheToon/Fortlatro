@@ -128,7 +128,7 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
 
 	vec4 hsl = HSL(vec4(tex.r*saturation_fac, tex.g*saturation_fac, tex.b, tex.a));
 
-	float t = shockwaved.y * 2.5 + mod(time, 1.);
+	float t = mod(time, 1.);
 	vec2 floored_uv = (floor((uv*texture_details.ba)))/texture_details.ba;
     vec2 uv_scaled_centered = (floored_uv - 0.5) * 50.;
 
@@ -141,7 +141,7 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
         cos(length(field_part1) / 19.483) + sin(length(field_part2) / 33.155) * cos(field_part2.y / 15.73) +
         cos(length(field_part3) / 27.193) * sin(field_part3.x / 21.92) ))/2.;
 
-    float base_wave = (.5 + .5* cos( (shockwaved.x) * 2.612 + ( field + -.5 ) *3.14));
+    float base_wave = (.5 + .5* cos( (time * 0.5) * 2.612 + ( field + -.5 ) *3.14));
 	
 	// GPU-optimized lightning using analytical functions instead of loops
 	vec2 lightning_uv = floored_uv * vec2(15., 12.);
@@ -156,26 +156,26 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
 	vec2 rot1 = vec2(lightning_uv.x * cos(angle1) - lightning_uv.y * sin(angle1),
 	                  lightning_uv.x * sin(angle1) + lightning_uv.y * cos(angle1));
 	float noise1 = sin(rot1.x * 2.3 + time * 3.0) * 0.8 + sin(rot1.x * 4.7 - time * 2.0) * 0.4;
-	float dist1 = abs(rot1.y - noise1 + shockwaved.x * 2.5);
+	float dist1 = abs(rot1.y - noise1 + time * 0.5 * 2.5);
 	lightning += smoothstep(0.15, 0.0, dist1) + smoothstep(0.5, 0.0, dist1) * 0.6;
 	
 	// Bolt 2
 	vec2 rot2 = vec2(lightning_uv.x * cos(angle2) - lightning_uv.y * sin(angle2),
 	                  lightning_uv.x * sin(angle2) + lightning_uv.y * cos(angle2));
 	float noise2 = sin(rot2.x * 2.3 + time * 3.0 + 1.0) * 0.8 + sin(rot2.x * 4.7 - time * 2.0 + 1.3) * 0.4;
-	float dist2 = abs(rot2.y - noise2 + 0.7 + shockwaved.x * 2.5);
+	float dist2 = abs(rot2.y - noise2 + 0.7 + time * 0.5 * 2.5);
 	lightning += (smoothstep(0.15, 0.0, dist2) + smoothstep(0.5, 0.0, dist2) * 0.6) * 0.88;
 	
 	// Bolt 3
 	vec2 rot3 = vec2(lightning_uv.x * cos(angle3) - lightning_uv.y * sin(angle3),
 	                  lightning_uv.x * sin(angle3) + lightning_uv.y * cos(angle3));
 	float noise3 = sin(rot3.x * 2.3 + time * 3.0 + 2.0) * 0.8 + sin(rot3.x * 4.7 - time * 2.0 + 2.6) * 0.4;
-	float dist3 = abs(rot3.y - noise3 + 1.4 + shockwaved.x * 2.5);
+	float dist3 = abs(rot3.y - noise3 + 1.4 + time * 0.5 * 2.5);
 	lightning += (smoothstep(0.15, 0.0, dist3) + smoothstep(0.5, 0.0, dist3) * 0.6) * 0.76;
 	
 	// GPU-optimized electrical crackles using noise
 	vec2 crackle_uv = floored_uv * 25.;
-	float crackle_t = time * 4.0 + shockwaved.x * 3.0;
+	float crackle_t = time * 4.0 + time * 0.5 * 3.0;
 	
 	// Multi-frequency crackle pattern
 	vec2 crackle_pos = crackle_uv + vec2(sin(crackle_t * 0.7), cos(crackle_t * 0.9)) * 3.;
@@ -192,10 +192,10 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
 	
 	// Edge glow
 	float edge_dist = min(min(floored_uv.x, 1. - floored_uv.x), min(floored_uv.y, 1. - floored_uv.y));
-	float edge_glow = smoothstep(0.15, 0.0, edge_dist) * (0.5 + sin(time * 2.0 + shockwaved.x * 4.0) * 0.3);
+	float edge_glow = smoothstep(0.15, 0.0, edge_dist) * (0.5 + sin(time * 2.0 + time * 0.5 * 4.0) * 0.3);
 	
 	// Purple base with white lightning
-	hsl.x = 0.78 + sin(time * 1.5) * 0.03;
+	hsl.x = 0.78 + sin(time * 1.5) * 0.03 + shockwaved.x * 0.00001;
 	hsl.y = 0.95;
 	hsl.z = hsl.z * 0.25 + 0.45 + base_wave * 0.1 + edge_glow * 0.25;
 	

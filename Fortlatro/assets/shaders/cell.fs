@@ -107,7 +107,7 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
 
 	vec4 hsl = HSL(vec4(tex.r*saturation_fac, tex.g*saturation_fac, tex.b, tex.a));
 
-	float t = cell.y*3.141 + mod(time*1.5, 1.);
+	float t = mod(time*1.5, 1.);
 	vec2 floored_uv = (floor((uv*texture_details.ba)))/texture_details.ba;
     vec2 uv_scaled_centered = (floored_uv - 0.5) * 45.;
 
@@ -122,14 +122,14 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
         cos(length(cell_field3) / 25.0) * sin(cell_field3.x / 20.0)
         ))/2.5;
 
-    float res = (.5 + .5* cos( (cell.x) * 2.8 + ( field + -.4 ) *3.8));
+    float res = (.5 + .5* cos( (time * 0.5) * 2.8 + ( field + -.4 ) *3.8));
     
     // Cell shading - posterize the lightness for distinct color bands
     float shade_levels = -7.0;
     hsl.z = floor(hsl.z * shade_levels + 0.5) / shade_levels;
     
     // Boost saturation and brightness for vibrant colors
-	hsl.y = clamp(hsl.y * 1.4 + 0.15, 0., 1.); 
+	hsl.y = clamp(hsl.y * 1.4 + 0.15 + cell.x * 0.00001, 0., 1.); 
     hsl.z = clamp(hsl.z * 1.1 + 0.05, 0., 1.);
 
     tex.rgb = RGB(hsl).rgb;

@@ -107,7 +107,7 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
 
 	vec4 hsl = HSL(vec4(tex.r*saturation_fac, tex.g*saturation_fac, tex.b, tex.a));
 
-	float t = holographic.y*3.141 + mod(time*0.8, 1.);
+	float t = mod(time*0.8, 1.);
 	vec2 floored_uv = (floor((uv*texture_details.ba)))/texture_details.ba;
     vec2 uv_scaled_centered = (floored_uv - 0.5) * 60.;
 
@@ -125,13 +125,13 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
     float scan = sin(scan_angle + t * 8.0) * 0.5 + 0.5;
 
     // Combine wave and scan for holographic effect
-    float holo_intensity = (.5 + .5* sin( (holographic.x) * 4.0 + ( wave_field + scan - 1.0 ) * 6.28));
+    float holo_intensity = (.5 + .5* sin( (time * 0.5) * 4.0 + ( wave_field + scan - 1.0 ) * 6.28));
 
     // Rainbow hue shift based on position and time
     float hue_shift = mod(floored_uv.y * 2.5 + floored_uv.x * 1.5 + t * 0.3, 1.0);
     
     // Apply holographic rainbow effect
-	hsl.x = mod(hsl.x + hue_shift * 0.6 * holo_intensity, 1.0);
+	hsl.x = mod(hsl.x + hue_shift * 0.6 * holo_intensity + holographic.x * 0.00001, 1.0);
 	hsl.y = min(1.0, hsl.y * 1.2 + 0.3 * holo_intensity); 
 	hsl.z = hsl.z * 0.5 + 0.45 * sin(hsl.z * 1.8 + wave_field * 2.0 + t * 2.0) + 0.3 * holo_intensity;
 
