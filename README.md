@@ -5,7 +5,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 132 Jokers
+# 141 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see) (can turn into GOOD or EVIL Crac)
@@ -262,13 +262,31 @@ Purchase History - Uncommon - Based on the rarity of the last obtained Joker gra
 
 Dan_Ham - Uncommon - Whenever the music changes 1/3 chance to gain a random consumable
 
-Peely - Common - 1-10 chance to turn left joker into Peely 4-9 Mult
+Peely - Common - 1/10 chance to turn left joker into Peely 4-9 Mult
 
 Search for Survivors - Uncommon - X1 Mult per 500k views on the latest Fortnite upload
 
 Epic Event Test 1 - Uncommon - X1 Chips per 500k players currently playing Fortnite
 
 AAA Game - Uncommon - X2 Mult if played hand contains 3 or more Aces
+
+Five Gun - Common - When playing a hand with 5 scoring cards retrigger a random card
+
+Rift Device - Uncommon - When starting a round draw 3 additional cards
+
+OXR - Common - Scored cards with enhancements or seals lose them and gain +3 chips
+
+Six Seven - Uncommon - If played hand contains an adjacdent 6 and 7 set mult to 67 before scoring
+
+Pot Hotspot - Uncommon - X1.5 Mult while connected to the internet
+
+Party Hips - Rare - 1/4 chance playing a hand does not consume a hand
+
+Brat - Common - 1/2 chance to create a food consumable when blind ends
+
+Hired NPC - Uncommon - Copy the last obtained Joker
+
+Spongebob - Rare - Sponge up 25% of the score and it to scoring after scoring
 
 # 6 Decks
 Eric Deck - Start with Eric
@@ -391,6 +409,10 @@ Education - Convert 1 card into an Xp Boost card
 
 Comet - Select 1 card to turn into a King
 
+# 1 Planet
+
+Earth? - Level up Squad by +2 Mult and +15 Chips
+
 # 6 Spectrals
 Double or Nothing - 1/2 chance to get 2 Spectral packs else give nothing
 
@@ -404,7 +426,7 @@ Breakthrough - Apply Mythic to up to 5 Cards  -1 Discard
 
 The Great Turtle - Create a copy of 1 random destroyed Joker (must have room)
 
-# 55 LTM Cards
+# 56 LTM Cards
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -515,6 +537,10 @@ Smoke Bomb - Disable blind for 2 turns
 
 Rainbow Ink - Apply Cel Shaded to 3 selected cards
 
+Steak - +1 to all offers in the next shop
+
+B.A.S.E - Apply the Based aura to up to 3 selected cards
+
 # 15 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
 
@@ -574,11 +600,13 @@ Overshielded - Cannot be debuffed prevent adjacent cards from being debuffed
 
 Cel Shaded - +1 to all values on this card
 
-# 2 Auras
+# 3 Auras
 
 Luck Aura - All probabilities are guarenteed
 
 Fire Aura - ^2 Chips
+
+Based Aura - This and adjacent cards permanantely gain +5 Chips and +1 Mult
 
 # 4 Tags
 Ship It! - Gives a free LTM Pack
