@@ -1,0 +1,24 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -11
+
+# context.ending_shop
+[[patches]]
+[patches.pattern]
+target = 'functions/button_callbacks.lua'
+pattern = '''
+      for i = 1, #G.jokers.cards do
+        G.jokers.cards[i]:calculate_joker({ending_shop = true})
+      end
+'''
+position = 'at'
+match_indent = true
+payload = '''
+SMODS.calculate_context({ending_shop = true})
+if #G.shop_jokers.cards == 0 and #G.shop_vouchers.cards == 0 and #G.shop_booster.cards == 0 then
+	check_for_unlock({ type = "ach_italk" })	  
+	G.GAME.Shops_Fully_Bought = G.GAME.Shops_Fully_Bought + 1
+	G.GAME.Shop_Loaded = 0
+end
+'''

@@ -17,5 +17,6 @@ if not nosave_shop then
 	SMODS.calculate_context({starting_shop = true})
 	G.GAME.music_changes = (G.GAME.music_changes or 0) + 1
 	G.GAME.videoplaying = 0
+	G.GAME.Shop_Loaded = 1
 end
 '''

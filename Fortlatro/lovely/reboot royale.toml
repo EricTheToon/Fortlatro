@@ -1,0 +1,39 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -11
+
+# context.end_of_round
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''
+for i = 1, #G.jokers.cards do
+    local eval = nil
+    eval = G.jokers.cards[i]:calculate_joker({end_of_round = true, game_over = game_over})
+    if eval then
+        if eval.saved then
+            game_over = false
+        end
+        card_eval_status_text(G.jokers.cards[i], 'jokers', nil, nil, nil, eval)
+    end
+    G.jokers.cards[i]:calculate_rental()
+    G.jokers.cards[i]:calculate_perishable()
+end
+'''
+position = 'at'
+match_indent = true
+payload = '''
+-- context.end_of_round calculations
+SMODS.saved = false
+G.GAME.saved_text = nil
+SMODS.calculate_context({end_of_round = true, game_over = game_over, beat_boss = G.GAME.blind.boss })
+if SMODS.saved then
+	game_over = false
+	G.GAME.reboots = G.GAME.reboots + 1
+	if G.GAME.reboots >= 3 then
+		check_for_unlock({ type = "ach_reboot" })
+	end
+end
+-- TARGET: main end_of_round evaluation
+'''

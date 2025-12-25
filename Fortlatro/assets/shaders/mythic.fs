@@ -115,7 +115,7 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
 
 	vec4 hsl = HSL(vec4(tex.r*saturation_fac, tex.g*saturation_fac, tex.b, tex.a));
 
-	float t = mod(time,1.);
+	float t = mythic.y*2.221 + mod(time,1.);
 	vec2 floored_uv = (floor((uv*texture_details.ba)))/texture_details.ba;
     vec2 uv_scaled_centered = (floored_uv - 0.5) * 50.;
 
@@ -127,14 +127,14 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
         cos(length(field_part1) / 19.483) + sin(length(field_part2) / 33.155) * cos(field_part2.y / 15.73) +
         cos(length(field_part3) / 27.193) * sin(field_part3.x / 21.92) ))/2.;
 
-    float res = (.5 + .5* cos( (time * 0.5) * 2.612 + ( field + -.5 ) *3.14));
+    float res = (.5 + .5* cos( (mythic.x) * 2.612 + ( field + -.5 ) *3.14));
 
 	// Add radiating light rays
 	vec2 c = (floored_uv - 0.5);
 	float dist = length(c) * 2.0;
 	float ang = atan(c.y, c.x);
 	
-	float ray_time = time * 1.6 + time * 0.5 * 6.28318;
+	float ray_time = time * 1.6 + mythic.x * 6.28318;
 	float rays = 0.0;
 	for (int i=0; i<16; i++){
 		float ia = float(i) * 0.39269908;
@@ -169,9 +169,9 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
 		light_dots += smoothstep(size, 0.0, d) * fade * brightness;
 	}
 
-	hsl.x = 0.13 + mythic.x * 0.00001;
+	hsl.x = 0.13;
 	hsl.y = hsl.y * 0.88;
-	hsl.z = hsl.z * 0.5 + 0.45 * sin(hsl.z/2.5 - res/4. + sin(time)/8. + 0.5)/1.2 + rays * 0.2 + light_dots * 0.3;
+	hsl.z = hsl.z * 0.5 + 0.45 * sin(hsl.z/2.5 - res/4. + sin(mythic.y)/8. + 0.5)/1.2 + rays * 0.2 + light_dots * 0.3;
 
     tex.rgb = RGB(hsl).rgb;
 

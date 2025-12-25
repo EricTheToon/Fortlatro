@@ -5,5 +5,6 @@ return {
     deathcompat = false, --toggle the lefthandeddeath tarot 
     blinds = true, --toggle the blinds added by this mod
 	splashes = true, --toggle the splash text added by this mod
+	speedrun = false,
     newcalccompat = true, --toggle new calc for enhancements ONLY ENABLE IF ON STEAMODDED NEW CALC
 }

@@ -123,7 +123,7 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
 	float electric_crackle = sin(t * 3.5 + field * 8.0) * 0.12 + 0.85;
 
 	// Energy shimmer calculation
-	float shimmer = (.5 + .5* cos( (time * 0.5) * 3.14 + ( field + -.5 ) * 3.14));
+	float shimmer = (.5 + .5* cos( (overshielded.x) * 3.14 + ( field + -.5 ) * 3.14));
 
 	// Uniform cube pattern overlay across entire surface
 	vec2 cube_uv = uv * 8.0;
@@ -142,7 +142,7 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
 	vec4 hsl = HSL(vec4(tex.rgb, tex.a));
 	
 	// Bright cyan-blue hue (190-200° range) like the joker card
-	hsl.x = 0.53 + shimmer * 0.03 + overshielded.x * 0.00001;
+	hsl.x = 0.53 + shimmer * 0.03;
 	
 	// High saturation for vibrant cyan-blue
 	hsl.y = hsl.y * 0.3 + 0.85;

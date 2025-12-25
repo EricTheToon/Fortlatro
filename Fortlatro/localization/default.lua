@@ -118,7 +118,14 @@ return {
             fn_Fire_Aura = {
                 name = "Fire Aura",
                 text = {
-                    "{X:spectral,C:white}^#1#{} Chips",
+                    "{X:spectral,C:white}^2{} Chips",
+                }
+            },
+			
+			fn_Based_Aura = {
+                name = "Based Aura",
+                text = {
+                    "This and {C:attention}Adjacent{} cards permanently gain {C:chips}+5{} Chips and {C:mult}+1{} Mult",
                 }
             },
         }
@@ -165,9 +172,10 @@ return {
             fn_Shockwaved = 'Shockwaved',
             fn_Mythic = 'Mythic',
             fn_Overshielded = 'Overshielded',
-			fn_Cell = 'Cell Shaded',
+			fn_Cell = 'Cel Shaded',
             fn_Luck_Aura = 'Luck Aura',
             fn_Fire_Aura = 'Fire Aura',
+			fn_Based_Aura = 'Based Aura',
         }
     }
 }
