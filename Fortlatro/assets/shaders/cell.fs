@@ -1,3 +1,4 @@
+
 #if defined(VERTEX) || __VERSION__ > 100 || defined(GL_FRAGMENT_PRECISION_HIGH)
 	#define MY_HIGHP_OR_MEDIUMP highp
 #else
@@ -103,11 +104,11 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
     number high = max(tex.r, max(tex.g, tex.b));
 	number delta = high - low;
 
-	number saturation_fac = 1. - max(0., 0.03*(1.2-delta));
+	number saturation_fac = 1. - max(0., 0.02*(1.1-delta));
 
 	vec4 hsl = HSL(vec4(tex.r*saturation_fac, tex.g*saturation_fac, tex.b, tex.a));
 
-	float t = cell.y*3.141 + mod(time*1.5, 1.);
+	float t = mod(time*1.5, 1.);
 	vec2 floored_uv = (floor((uv*texture_details.ba)))/texture_details.ba;
     vec2 uv_scaled_centered = (floored_uv - 0.5) * 45.;
 
@@ -122,34 +123,34 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
         cos(length(cell_field3) / 25.0) * sin(cell_field3.x / 20.0)
         ))/2.5;
 
-    float res = (.5 + .5* cos( (cell.x) * 2.8 + ( field + -.4 ) *3.8));
+    float res = (.5 + .5* cos( (time * 0.5) * 2.8 + ( field + -.4 ) *3.8));
     
-    // Cel shading - discretize lightness like classic toon shading
-    // Using same cutoff points as reference shader: >0.95, >0.5, >0.05
-    float intensity = hsl.z;
-    if (intensity > 0.95)
-        hsl.z = 1.0;
-    else if (intensity > 0.5)
-        hsl.z = 0.7;
-    else if (intensity > 0.05)
-        hsl.z = 0.35;
-    else
-        hsl.z = 0.1;
+    // Cell shading - posterize the lightness for distinct color bands
+    float shade_levels = -7.0;
+    hsl.z = floor(hsl.z * shade_levels + 0.5) / shade_levels;
     
-    // Keep original hue
-	// hsl.x = hsl.x;
-	hsl.y = hsl.y * 1.2 + 0.1; // Boost saturation
-	// Lightness already discretized above
+    // Boost saturation and brightness for vibrant colors
+	hsl.y = clamp(hsl.y * 1.4 + 0.15 + cell.x * 0.00001, 0., 1.); 
+    hsl.z = clamp(hsl.z * 1.1 + 0.05, 0., 1.);
 
     tex.rgb = RGB(hsl).rgb;
 
-    // Add cel shading transparency effects
+    // Strong dark edges for cel-shaded outlines
+    float edge_dist_x = min(floored_uv.x, 1.0 - floored_uv.x);
+    float edge_dist_y = min(floored_uv.y, 1.0 - floored_uv.y);
+    float edge_dist = min(edge_dist_x, edge_dist_y);
+    
+    // Create thick dark borders - only darken the actual edges
+    float border_outline = smoothstep(0.05, 0.08, edge_dist);
+    
+    // Apply darkening only to edges, keep center bright
+    float brightness = mix(0.15, 1.0, border_outline);
+    
+    tex.rgb *= brightness;
+    
+    // Preserve transparency
 	if (tex[3] < 0.8)
-		tex[3] = tex[3]/2.5;
-		
-    // Edge darkening for toon outline effect
-    float edge_darken = smoothstep(0.2, 0.8, res);
-    tex.rgb *= (0.85 + edge_darken * 0.15);
+		tex[3] = tex[3]/2.0;
     
 	return dissolve_mask(tex*colour, texture_coords, uv);
 }
