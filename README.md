@@ -5,7 +5,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 141 Jokers
+# 148 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see) (can turn into GOOD or EVIL Crac)
@@ -288,7 +288,21 @@ Hired NPC - Uncommon - Copy the last obtained Joker
 
 Spongebob - Rare - Sponge up 25% of the score and it to scoring after scoring
 
-# 6 Decks
+Ninja - Rare - If Ninja is currently live on Twitch X3 Mult
+
+Reboot Man - Rare - Gain X1.5 Mult for every life lost
+
+Market Crash - Uncommon - X3 Mult if you are in debt
+
+Vbucks Revoke - Common - +1 Mult for every $2 of debt
+
+Cannelloni Dragoni - Common - +8 Mult for every owned Brainrot
+
+Tung Tung Tung Sahur - Legendary - You can buy Brainrots past joker limit
+
+Jonesy The First - Uncommon - First played card of First Hand gives X4 Mult first hand discarded gives X-1 Mult
+
+# 9 Decks
 Eric Deck - Start with Eric
 
 Crac Deck - 13 handsize - Start with Crac and Reality Augment
@@ -301,11 +315,16 @@ OG Deck - +2 Joker slots Vouchers CANNOT spawn in the shop
 
 Zero Build Deck - Vouchers restock after every round and are half price -2 Joker slots
 
+Fortnite Deck - Only Fortlatro content
+
+Shop Deck - Shop never changes Rerolls change the entire shop
+
+Siphon Deck - Start with 10 hands. Hands save between rounds. Selling Jokers gives hands
 
 # 1 [Card Sleeve](https://github.com/larswijn/CardSleeves)
 Crac Sleeve - Start with a Crac that always triggers
 
-# 25 Vouchers
+# 26 Vouchers
 Dumpster Diving - 1/3 Chance to spawn a random consumable at the end of the round (no need to have room)
 
 Trash Tycoon - Spawn a random consumable at the end of the round (no need to have room)
@@ -356,7 +375,9 @@ Monster Part Availability - ALL blinds payout $10 earn no interest
 
 Resourceful Respite - ALL blinds payout $15 earn no interest remaining hands and discards no longer give money
 
-# 26 Tarots
+Favorites - LTMs from LTM packs can be dragged to your consumable slot to be used later
+
+# 27 Tarots
 Left Handed Death - its just death but backwards i made it specifically to fuck with Crac since he keeps messing it up and then he installed a persona tarot card mod so now its a persona death tarot
 
 Glitched - Create 0-4 random LTM cards (no need to have room)
@@ -409,11 +430,14 @@ Education - Convert 1 card into an Xp Boost card
 
 Comet - Select 1 card to turn into a King
 
+Mod Bench - Convert up to 2 selected cards to the last obtained enhancement
+
+
 # 1 Planet
 
 Earth? - Level up Squad by +2 Mult and +15 Chips
 
-# 6 Spectrals
+# 8 Spectrals
 Double or Nothing - 1/2 chance to get 2 Spectral packs else give nothing
 
 Queue - Randomize the seals of all sealed cards in the deck
@@ -426,7 +450,11 @@ Breakthrough - Apply Mythic to up to 5 Cards  -1 Discard
 
 The Great Turtle - Create a copy of 1 random destroyed Joker (must have room)
 
-# 56 LTM Cards
+Stick Of Truth - Pick the next boss blind. Next shop contains no packs
+
+Thorne Ring - Make all Jokers Polychrome and Eternal
+
+# 59 LTM Cards
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -541,6 +569,12 @@ Steak - +1 to all offers in the next shop
 
 B.A.S.E - Apply the Based aura to up to 3 selected cards
 
+Replace Quest - Reroll the Boss Blind
+
+Refund Ticket - Refund half the money spent on LTMS
+
+Cheap Vbucks - Double money 1/4 chance to chargeback instead
+
 # 15 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
 
@@ -608,7 +642,7 @@ Fire Aura - ^2 Chips
 
 Based Aura - This and adjacent cards permanantely gain +5 Chips and +1 Mult
 
-# 4 Tags
+# 9 Tags
 Ship It! - Gives a free LTM Pack
 
 Ship It Express! - Gives a free MEGA LTM Pack
@@ -617,7 +651,17 @@ Reality Augmentation Device - Gives a free Augment Pack
 
 Dual Reality Augmentation Device - Gives a free MEGA Augment Pack
 
-# 12 Blinds
+Nitro Tag - Next base edition shop Joker is free and becomes Nitro
+
+Shockwave Tag - Next base edition shop Joker is free and becomes Shockwaved
+
+Mythic Tag - Next base edition shop Joker is free and becomes Mythic
+
+Overshield Tag - Next base edition shop Joker is free and becomes Overshielded
+
+Cel Tag - Next base edition shop Joker is free and becomes Cel Shaded
+
+# 14 Blinds
 Fracture - All played cards are destroyed
 
 Zero Build - Wood, Brick and Metal are debuffed
@@ -642,7 +686,16 @@ High Ping - Retriggers are disabled
 
 Floor is Lava - 25% of held cards are destroyed
 
+No Sweat insurance - Mult cannot exceed $
+
+<details> 
+  <summary>Nothing Burger - Does nothing?</summary>
+   You immediately skip the shop after beating this blind
+</details>
+
+
 # Be sure to check the config tab you can enable and disable sounds and blinds
 additional content with:
 [ortalab](https://github.com/EremelMods/Ortalab/tree/498cbebaa0226853b76a8d2475717ad393fa5682)
 [cryptid](https://github.com/MathIsFun0/Cryptid)
+[multiplayer](https://github.com/Balatro-Multiplayer/BalatroMultiplayer)
