@@ -1,0 +1,23 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -11
+
+# context.final_scoring_step
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''local nu_chip, nu_mult = G.GAME.selected_back:trigger_effect{context = 'final_scoring_step', chips = hand_chips, mult = mult}'''
+match_indent = true
+position = "before"
+payload = '''
+-- context.final_scoring_step calculations
+
+
+if G.GAME and G.GAME.blind and G.GAME.blind.name == 'No Sweat Insurance' and not G.GAME.blind.disabled then
+	
+	if to_big(G.GAME.dollars) < to_big(mult) then
+		mult = G.GAME.dollars
+	end
+end
+'''

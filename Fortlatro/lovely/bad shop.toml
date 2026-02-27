@@ -1,0 +1,25 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -11
+
+# =========================
+# After cash-out go to BLIND_SELECT
+# =========================
+
+[[patches]]
+[patches.pattern]
+target = 'functions/button_callbacks.lua'
+pattern = '''G.STATE = G.STATES.SHOP'''
+position = 'at'
+match_indent = true
+payload = '''
+-- Force BLIND_SELECT after cash-out
+if G.GAME.Burger and G.GAME.Burger > 0 then
+    --print("[Fortlatro] Redirecting to BLIND_SELECT after cash-out")
+	G.GAME.Burger = G.GAME.Burger - 1
+    G.STATE = G.STATES.BLIND_SELECT
+else
+    G.STATE = G.STATES.SHOP
+end
+'''

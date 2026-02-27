@@ -26,7 +26,9 @@ end
 
 --count the music for daniel while you're here
 if G.GAME and G.GAME.blind and G.GAME.blind.boss and G.GAME.blind.name ~= 'Fracture' and G.GAME.blind.name ~= 'Blank' then
-	G.GAME.music_changes = (G.GAME.music_changes or 0) + 1
+	if not next(SMODS.find_card("j_fn_Gyatt")) then
+		G.GAME.music_changes = (G.GAME.music_changes or 0) + 1
+	end
 end
 
 -- TARGET: setting_blind effects

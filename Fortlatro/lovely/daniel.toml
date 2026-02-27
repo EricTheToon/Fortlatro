@@ -14,9 +14,66 @@ position = 'before'
 match_indent = true
 payload = '''
 if not nosave_shop then
-	SMODS.calculate_context({starting_shop = true})
-	G.GAME.music_changes = (G.GAME.music_changes or 0) + 1
-	G.GAME.videoplaying = 0
-	G.GAME.Shop_Loaded = 1
+	if not next(SMODS.find_card("j_fn_Gyatt")) then
+		G.GAME.music_changes = (G.GAME.music_changes or 0) + 1
+	end
+    G.GAME.videoplaying = 0
+    G.GAME.Shop_Loaded = 1
+
+    if G.GAME.selected_back.effect.center.key == 'b_fn_ShopDeck' and G.GAME.SHOP_SAVED and not G.GAME.SHOP_CLEARED and G.GAME.SAVED_SHOP then
+
+        -- ===== CLEAR SHOP =====
+        if G.shop_vouchers then
+            for i = #G.shop_vouchers.cards, 1, -1 do
+                local c = G.shop_vouchers:remove_card(G.shop_vouchers.cards[i])
+                c:remove()
+            end
+        end
+
+        if G.shop_booster then
+            for i = #G.shop_booster.cards, 1, -1 do
+                local c = G.shop_booster:remove_card(G.shop_booster.cards[i])
+                c:remove()
+            end
+        end
+
+        if G.shop_jokers then
+            for i = #G.shop_jokers.cards, 1, -1 do
+                local c = G.shop_jokers:remove_card(G.shop_jokers.cards[i])
+                c:remove()
+            end
+        end
+
+        -- ===== RESTORE =====
+        for _, key in ipairs(G.GAME.SAVED_SHOP.jokers or {}) do
+            local card = SMODS.create_card{
+                key = key,
+                area = G.shop_jokers
+            }
+            G.shop_jokers:emplace(card)
+            create_shop_card_ui(card)
+        end
+
+        for _, key in ipairs(G.GAME.SAVED_SHOP.vouchers or {}) do
+            local card = SMODS.create_card{
+                key = key,
+                area = G.shop_vouchers
+            }
+            G.shop_vouchers:emplace(card)
+            create_shop_card_ui(card)
+        end
+
+        for _, key in ipairs(G.GAME.SAVED_SHOP.boosters or {}) do
+            local card = SMODS.create_card{
+                key = key,
+                area = G.shop_booster
+            }
+            G.shop_booster:emplace(card)
+            create_shop_card_ui(card)
+        end
+
+        G.GAME.SHOP_CLEARED = true
+		G.GAME.SHOP_SAVED = false
+    end
 end
 '''
