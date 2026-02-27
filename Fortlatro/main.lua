@@ -14473,7 +14473,7 @@ SMODS.Joker({
     rarity = 3,
     cost = 7,
     unlocked = true,
-    discovered = true,
+    discovered = false,
 	config = {
         extra = {
             xmult = 3,
@@ -14696,6 +14696,7 @@ SMODS.Joker{
     pos = { x = 4, y = 62 },
     cost = 6,
     blueprint_compat = true,
+	discovered = false,
     config = {
         extra = {
             mult_add = 8,
@@ -14780,7 +14781,7 @@ SMODS.Joker{
     pools = { ["Brainrot"] = true,},
     
     unlocked = true,
-    discovered = true,
+    discovered = false,
     blueprint_compat = false,
     eternal_compat = false,
     perishable_compat = false,
@@ -14851,7 +14852,7 @@ SMODS.Joker{
             end
         end
 		
-		if context.discard and not context.blueprint and G.GAME.current_round.discards_used <= 0 then
+		if context.discard and not context.blueprint and context.other_card == context.full_hand[#context.full_hand] then
             card.ability.extra.xmult = card.ability.extra.xmult - card.ability.extra.xmult_penalty
 			return {
                 message = localize { type = 'variable', key = 'a_xmult_minus', vars = { card.ability.extra.xmult_penalty } },
