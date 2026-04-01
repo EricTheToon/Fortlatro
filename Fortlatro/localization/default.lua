@@ -119,7 +119,7 @@ return {
             fn_Luck_Aura = {
                 name = "Luck Aura",
                 text = {
-                    "All {C:green}probabilities{} are {C:green}guaranteed{}",
+                    "All {C:green}probabilities{}","are {C:green}guaranteed{}",
                 }
             },
 
@@ -133,10 +133,27 @@ return {
             fn_Based_Aura = {
                 name = "Based Aura",
                 text = {
-                    "This and {C:attention}Adjacent{} cards permanently gain {C:chips}+5{} Chips and {C:mult}+1{} Mult",
+                    "This and {C:attention}Adjacent{} cards", "permanently gain", "{C:chips}+5{} Chips and {C:mult}+1{} Mult",
                 }
             },
+			
+			fn_Brainrot = {
+                name = "Brainrot",
+                text = {
+                    "This card is considered a {C:attention}Brainrot{}",
+                }
+            },
+			
+			fn_April = {
+                name = "April Fools",
+                text = {
+                    "This content is limited time for April Fools",
+                }
+            },
+			
         }
+		
+		
     },
 
     misc = {
@@ -163,6 +180,8 @@ return {
             fn_kxtty_quip_1 = { "Guess I negatived your win too?" },
             fn_kxtty_quip_2 = { "You're still a winner! Just not at this game." },
             fn_kxtty_quip_3 = { "Negative and negative SHOULD equal positive." },
+			
+			fn_blank_quip_1 = { "Should have sold more jokers" },
         },
 
         labels = {
