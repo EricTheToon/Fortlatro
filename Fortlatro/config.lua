@@ -7,4 +7,5 @@ return {
 	splashes = true, --toggle the splash text added by this mod
 	speedrun = false,
     newcalccompat = true, --toggle new calc for enhancements ONLY ENABLE IF ON STEAMODDED NEW CALC
+	sidekick = 0, --track how many times you've picked up the sidekick
 }

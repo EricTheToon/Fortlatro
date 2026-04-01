@@ -1,13 +1,3 @@
---- STEAMODDED HEADER
---- MOD_NAME: Fortlatro
---- MOD_ID: Fortlatro
---- MOD_AUTHOR: [EricTheToon]
---- MOD_DESCRIPTION: A terribly coded mod to add Fortnite themed stuff + stuff for my friends to Balatro.
---- BADGE_COLOUR: 672A62
---- PREFIX: fn
---- PRIORITY: -10
---- DEPENDENCIES: [Steamodded>=1.0.0~BETA-1221a, Talisman>=2.6,]
---- VERSION: 1.2.3
 
 ----------------------------------------------
 ------------MOD CODE -------------------------
@@ -116,6 +106,12 @@ local function replaceSmodsCatWithFortlatro()
             local targetCatPath = modsDir .. "/" .. folder .. "/assets/cat.png"
             love.filesystem.write(targetCatPath, catData)
         end
+		
+		--bmm compat 
+		if folder:match("^Steamodded") then
+            local targetCatPath = modsDir .. "/" .. folder .. "/assets/cat.png"
+            love.filesystem.write(targetCatPath, catData)
+        end
     end
 end
 
@@ -141,13 +137,6 @@ local descriptions = {'Paladone', 'Paladone', 'Paladone', 'Paladone'} -- English
 -- You should only need to change things above this line --
 -----------------------------------------------------------
 
--- Registers the mod icon
-SMODS.Atlas { -- modicon
-  key = 'modicon',
-  px = 32,
-  py = 32,
-  path = 'modicon.png'
-}
 
 SMODS.Atlas{  
     key = atlas_key..'_lc',
@@ -266,7 +255,7 @@ local splashes = {
     "Gold Stake Horde Rush when?",
     "Hey folks in todays video were back with some more Gold Stake Fortlatro in this run...",
     "Why the fuck can't your GPU run the color purple?!",
-    "[[ Hyperlink Blocked ]]", --effect
+    "Say it with him folks!", --effect
     "Unreal!",
     "Epic Game!",
     "Victory Royale not guaranteed.",
@@ -360,6 +349,14 @@ local splashes = {
 	"... you know you're live right?",
 	"shoutout to doppleganger gaming!",
 	"Jonesy dies in the next event!",
+	"W event chat the _____ really showed _____ ",
+	"REVERT VBUCKS CHANGES",
+	"I saw this on fortnite once.",
+	"BRO THIS GAME IS ASS",
+	"Disappointing live event :{",
+	"Find my Medkits",
+	"Play {habanero playlist} now!",
+	
 	
 }
 
@@ -413,6 +410,7 @@ end
 
 if ((SMODS.Mods["Multiplayer"] or {}).can_load) then
 -- FIX MULTIPLAYER
+
 
 local upd = Game.update
 
@@ -470,7 +468,37 @@ function Game:update(dt)
     else
         G.GAME.isnemesis = false
     end
+	
+	-- Run your custom logic
+	if MP.GAME.timer and MP.GAME.timer == 67 then
+		-- Instead of adding 1, we add the elapsed time in seconds (dt)
+		G.GAME.Wait67 = (G.GAME.Wait67 or 0) + dt
+    
+		-- Check if 2 seconds have passed
+		if G.GAME.Wait67 >= 2.0 and G.GAME.Trigger67 ~= 1 then
+			--print("Timer paused at 67!")
+			G.GAME.Wait67 = 0
+			G.GAME.Trigger67 = 1
+			G.FUNCS.overlay_menu{
+				definition = create_UIBox_fn_custom_video("67", "67"),
+				config = {no_esc = true}
+			}
+		end
+	end
+	
 end
+
+-- Hook into end of round
+local end_round_original = end_round
+function end_round()
+    -- Call the original end_round
+    end_round_original()
+	G.GAME.Wait67 = 0
+	G.GAME.Trigger67 = 0
+end
+
+
+
 end
 
 
@@ -535,106 +563,68 @@ end
 ----------------------------------------------------------------------------------------------------------------
 ------------SET TITLE (ADD MORE FUNNY TITLES HERE AT SOME POINT)----------------------
 
---gay rights! easter egg
+--splash easter eggs
 local start_run_ref = Game.start_run
 function Game:start_run(args)
     start_run_ref(self, args)
-	if love.window.getTitle() == "Fortlatro: Gay Rights!" then
-		G.GAME.edition_rate = 3
-	else
-		G.GAME.edition_rate = 1
-	end
-end
+    
+    local title = love.window.getTitle()
 
+    -- 1. Edition Rate & Streamer Mode
+    if title == "Fortlatro: Gay Rights!" then
+        G.GAME.edition_rate = 3
+    elseif title == "Fortlatro: Streamer mode enabled." then
+        G.GAME.edition_rate = 3
+        G.GAME.ltmconsumabletype_rate = 10
+        G.GAME.rare_mod = 5
+    else
+        -- Default resets
+        G.GAME.edition_rate = 1
+    end
 
---LTMs are awesome! easter egg
-local start_run_ref = Game.start_run
-function Game:start_run(args)
-    start_run_ref(self, args)
-	if love.window.getTitle() == "Fortlatro: LTMs are awesome!" then
-		G.GAME.ltmconsumabletype_rate = 10
-	else
-		G.GAME.ltmconsumabletype_rate = 1
-	end
-end
+    -- 2. LTM Consumable Rates
+    if title == "Fortlatro: LTMs are awesome!" then
+        G.GAME.ltmconsumabletype_rate = 10
+    elseif title ~= "Fortlatro: Streamer mode enabled." then
+        -- Only reset if not already set by Streamer mode
+        G.GAME.ltmconsumabletype_rate = 1
+    end
 
+    -- 3. Victory Royale (1% chance)
+    if title == "Fortlatro: Victory Royale Guaranteed… Maybe" then
+        if math.random(1, 100) == 67 then
+            win_game()
+        end
+    end
 
---win easter egg
-local start_run_ref = Game.start_run
-function Game:start_run(args)
-    start_run_ref(self, args)
-	if love.window.getTitle() == "Fortlatro: Victory Royale Guaranteed… Maybe" then
-		local chance = math.random(1,100)
-		if chance == 67 then
-			win_game()
-		end
-	end
-end
+    -- 4. Double XP Weekend
+    if title == "Fortlatro: Double XP weekend!" then
+        G.GAME.weekend = 2
+    else
+        G.GAME.weekend = 0
+    end
 
---Double XP Weekend! easter egg
-local start_run_ref = Game.start_run
-function Game:start_run(args)
-    start_run_ref(self, args)
-	if love.window.getTitle() == "Fortlatro: Double XP weekend!" then
-		G.GAME.weekend = 2
-	else
-		G.GAME.weekend = 0
-	end
-end
-
-
---ned easter egg
-local start_run_ref = Game.start_run
-function Game:start_run(args)
-    start_run_ref(self, args)
-	if love.window.getTitle() == "Fortlatro: I know it's a lot to ask, I really can't leave without it. Its somewhere nearby." then
-		G.FUNCS.overlay_menu{
-			definition = create_UIBox_fn_custom_video1("ned","Thank you I was getting worried!"),
+    -- 5. Video/Overlay Overlays (Ned, Grave Digger, Tenna)
+    if title == "Fortlatro: I know it's a lot to ask, I really can't leave without it. Its somewhere nearby." then
+        G.FUNCS.overlay_menu{
+            definition = create_UIBox_fn_custom_video1("ned", "Thank you I was getting worried!"),
             config = {no_esc = true}
         }
-	end
-end
-
---grave digger easter egg
-local start_run_ref = Game.start_run
-function Game:start_run(args)
-    start_run_ref(self, args)
-	if love.window.getTitle() == "Fortlatro: Hey Jimmy, Gimme a Grave Digger with NOTHIN!" then
-		G.FUNCS.overlay_menu{
-			definition = create_UIBox_fn_custom_video1("grave","Thank you!"),
+    elseif title == "Fortlatro: Hey Jimmy, Gimme a Grave Digger with NOTHIN!" then
+        G.FUNCS.overlay_menu{
+            definition = create_UIBox_fn_custom_video1("grave", "Thank you!"),
             config = {no_esc = true}
         }
-	end
-end
-
---spamtong easter egg
-local start_run_ref = Game.start_run
-function Game:start_run(args)
-    start_run_ref(self, args)
-	if love.window.getTitle() == "Fortlatro: [[ Hyperlink Blocked ]]" then
-		G.FUNCS.overlay_menu{
-			definition = create_UIBox_fn_custom_video("spamton","kromer"),
+    elseif title == "Fortlatro: Say it with him folks!" then
+        G.FUNCS.overlay_menu{
+            definition = create_UIBox_fn_custom_video("tenna", "tv time"),
             config = {no_esc = true}
         }
-	end
+    end
 end
 
---Streamer mode easter egg
-local start_run_ref = Game.start_run
-function Game:start_run(args)
-    start_run_ref(self, args)
-	if love.window.getTitle() == "Fortlatro: Streamer mode enabled." then
-		G.GAME.ltmconsumabletype_rate = 10
-		G.GAME.edition_rate = 3
-		G.GAME.rare_mod = 5
-	else
-		G.GAME.ltmconsumabletype_rate = 1
-		G.GAME.edition_rate = 1
-	end
-end
 
---smods hasn't made this public yet but this is ready for when they do
---[[
+
 --monochrome easter egg
 SMODS.ScreenShader {
     key = "monochrome",
@@ -662,7 +652,7 @@ SMODS.ScreenShader {
         return love.window.getTitle() == "Fortlatro: OH MY GOD GUYS MY SCREEN IS SHAKING!"
     end
 }
---]]
+
 
 end
 
@@ -1113,156 +1103,153 @@ SMODS.Sound({
 })
 
 -- =========================
--- Global background image for Konami minigame
+-- Menu Auto-Trigger Logic
 -- =========================
-G.KONAMI_BG_IMAGE = nil
+local upd = Game.update
+function Game:update(dt)
+    upd(self, dt)
 
--- ========================= 
--- Konami Code (Secret)
--- =========================
-local konamiCode = {
-    "up","up","down","down","left","right","left","right","b","a","return"
-}
-local konamiBuffer = {}
-G.konamiActive = false
-local gameOver = false
+    G.MenuWait = G.MenuWait or 0
+	
+	if love.mouse.isDown(1) then
+		G.MenuWait = 0
+	end
 
--- =========================
--- Player & Weapons
--- =========================
-local cube = {width=64,height=64,x=0,y=0,speed=300}
-local cubeImage = nil -- pizza.png
-local turretImage = nil -- turret.png
-local launcherImage = nil -- launcher.png
-local weaponAngle = -math.pi/2
-
--- Respawn & Invincibility
-local isRespawning = false
-local respawnTimer = 0
-local invincibilityTimer = 0
-local flickerTimer = 0
-
--- =========================
--- Powerups Logic
--- =========================
-local powerups = {}
-local powerupSize = 40
-local powerupImage = nil 
-local powerup2Image = nil 
-local turretTimer = 0
-local burstTimer = 0
-local turretShootCooldown = 0.3
-local turretLastShot = 0
-
-local function spawnPowerup(x, y)
-    if math.random(1, 20) == 1 then
-        local pType = math.random(1, 2) == 1 and "turret" or "burst"
-        table.insert(powerups, {x = x, y = y, type = pType})
+    if G.STAGE == G.STAGES.MAIN_MENU and not G.konamiActive then
+        G.MenuWait = G.MenuWait + dt
+        if G.MenuWait > 300 then
+            G.FUNCS.activatekonami()
+            G.MenuWait = 0
+        end
+    else
+        G.MenuWait = 0
     end
 end
 
 -- =========================
--- Enemy Logic
+-- Konami Game Container
 -- =========================
-local enemyImage = nil 
-local enemies = {}
-local enemySize = 64 
-local enemySpeed = 120
-local enemySpawnTimer = 0
-local enemySpawnRate = 1.0
+G.KONAMI_GAME = {
+    active = false,
+    waitingToStart = true, -- NEW: Prevents enemies until input
+    gameOver = false,
+    buffer = {},
+    code = {"up","up","down","down","left","right","left","right","b","a","return"},
+    
+    cube = {width=64, height=64, x=0, y=0, speed=300},
+    score = 0, lives = 3, maxLives = 3,
+    
+    isRespawning = false, respawnTimer = 0, invincibilityTimer = 0, flickerTimer = 0,
+    powerups = {}, powerupSize = 40,
+    turretTimer = 0, burstTimer = 0, turretShootCooldown = 0.3, turretLastShot = 0,
+    enemies = {}, enemySize = 64, enemySpeed = 120, enemySpawnTimer = 0, enemySpawnRate = 1.0,
+    bullets = {}, bulletSpeed = 500, bulletSize = 12, shootCooldown = 0.5, lastShotTimer = 0.5,
+    
+    boss = nil, bossWidth = 128, bossHeight = 128, bossSpeed = 200, 
+    bossBulletSpeed = 300, bossCooldown = 0, bossCooldownRate = 1.0,
+    bossHitsRequired = 20, bossKills = 0, bossBullets = {},
+    
+    explosions = {}, floatingPoints = {}, explosionDuration = 0.3, floatingDuration = 0.8,
+    images = {}
+}
+
+-- =========================
+-- Activation & Reset Function
+-- =========================
+G.FUNCS = G.FUNCS or {}
+G.FUNCS.activatekonami = function()
+    local k = G.KONAMI_GAME
+    G.konamiActive = true
+    k.waitingToStart = true -- Enable wait state on activation
+    k.gameOver = false
+    k.isRespawning = false
+    k.invincibilityTimer = 0
+    k.score = 0
+    k.lives = k.maxLives
+    k.enemySpeed = 120
+    k.enemySpawnRate = 1.0
+    k.bossKills = 0
+    k.bossBulletSpeed = 300
+    
+    k.bullets, k.enemies, k.bossBullets, k.powerups, k.explosions, k.floatingPoints = {}, {}, {}, {}, {}, {}
+    k.boss = nil
+    
+    k.cube.x = (love.graphics.getWidth() - k.cube.width) / 2
+    k.cube.y = love.graphics.getHeight() - k.cube.height - 20
+
+    local function loadImg(name) 
+        local f = NFS.newFileData(SMODS.Mods["Fortlatro"].path .. "/customimages/" .. name) 
+        return love.graphics.newImage(love.image.newImageData(f)) 
+    end
+    
+    if not k.images.bg then
+        k.images.bg = loadImg("space.png")
+        k.images.cube = loadImg("pizza.png")
+        k.images.enemy = loadImg("burger.png")
+        k.images.bossBullet = loadImg("pineapple.png")
+        k.images.bullet = loadImg("bullet.png")
+        k.images.explosion = loadImg("explosion.png")
+        k.images.p1 = loadImg("powerup.png")
+        k.images.p2 = loadImg("powerup2.png")
+        k.images.turret = loadImg("turret.png")
+        k.images.launcher = loadImg("launcher.png")
+    end
+end
+
+-- =========================
+-- Local Helpers
+-- =========================
+local function spawnPowerup(x, y)
+    local k = G.KONAMI_GAME
+    if math.random(1, 20) == 1 then
+        local pType = math.random(1, 2) == 1 and "turret" or "burst"
+        table.insert(k.powerups, {x = x, y = y, type = pType})
+    end
+end
 
 local function spawnEnemy()
-    table.insert(enemies,{
-        x = math.random(0, love.graphics.getWidth() - enemySize),
-        y = -enemySize,
+    local k = G.KONAMI_GAME
+    table.insert(k.enemies,{
+        x = math.random(0, love.graphics.getWidth() - k.enemySize),
+        y = -k.enemySize,
         id = math.random(1, 1000000)
     })
 end
 
--- =========================
--- Bullets
--- =========================
-local bullets = {}
-local bulletSpeed = 500
-local bulletSize = 12 
-local bulletImage = nil 
-local shootCooldown = 0.5 
-local lastShotTimer = shootCooldown
-
 local function shoot()
-    if gameOver or isRespawning then return end
-    if lastShotTimer < shootCooldown then return end 
+    local k = G.KONAMI_GAME
+    if k.gameOver or k.isRespawning or k.lastShotTimer < k.shootCooldown then return end 
 
-    if burstTimer > 0 then
-        -- Grenade Launcher Turret logic (3-way spread)
+    if k.burstTimer > 0 then
         for i = -1, 1 do
-            table.insert(bullets,{
-                x = cube.x + cube.width/2 - bulletSize/2 + (i * 15),
-                y = cube.y,
-                homing = false, targetId = nil, vx = i * 40, vy = -bulletSpeed
+            table.insert(k.bullets,{
+                x = k.cube.x + k.cube.width/2 - k.bulletSize/2 + (i * 15),
+                y = k.cube.y, homing = false, vx = i * 40, vy = -k.bulletSpeed
             })
         end
     else
-        table.insert(bullets,{
-            x = cube.x + cube.width/2 - bulletSize/2,
-            y = cube.y,
-            homing = false, targetId = nil, vx = 0, vy = -bulletSpeed
+        table.insert(k.bullets,{
+            x = k.cube.x + k.cube.width/2 - k.bulletSize/2,
+            y = k.cube.y, homing = false, vx = 0, vy = -k.bulletSpeed
         })
     end
-    lastShotTimer = 0 
+    k.lastShotTimer = 0 
+end
+
+local function triggerDeath()
+    local k = G.KONAMI_GAME
+    k.lives = k.lives - 1
+    k.isRespawning = true
+    k.respawnTimer = 0.5 
+    table.insert(k.explosions, {x = k.cube.x, y = k.cube.y, timer = k.explosionDuration})
+    table.insert(k.floatingPoints, {x = k.cube.x + k.cube.width/2, y = k.cube.y, text = "-1 Life", timer = k.floatingDuration})
+    k.bullets, k.turretTimer, k.burstTimer = {}, 0, 0
+    if k.lives <= 0 then k.gameOver = true; k.isRespawning = false end
 end
 
 -- =========================
--- Boss
+-- Collision Helpers
 -- =========================
-local boss = nil
-local bossWidth = 128
-local bossHeight = 128
-local bossSpeed = 200
-local bossBulletSpeed = 300
-local bossCooldown = 0
-local bossCooldownRate = 1.0
-local bossHitsRequired = 20
-local bossKills = 0
-local bossBullets = {}
-local bossBulletImage = nil 
-
-local function spawnBoss()
-    boss = {x=(love.graphics.getWidth()-bossWidth)/2,y=50,hitsTaken=0,dir=1, id="BOSS"}
-end
-
--- =========================
--- Score, Lives, Explosions
--- =========================
-local score = 0
-local lives = 3
-local maxLives = 3
-local explosions = {}
-local floatingPoints = {}
-local explosionDuration = 0.3 
-local floatingDuration = 0.8
-local explosionImage = nil 
-
--- =========================
--- Helpers
--- =========================
-local function triggerPlayerDeath()
-    lives = lives - 1
-    isRespawning = true
-    respawnTimer = 0.5 
-    table.insert(explosions, {x = cube.x, y = cube.y, timer = explosionDuration})
-    table.insert(floatingPoints, {x = cube.x + cube.width/2, y = cube.y, text = "-1 Life", timer = floatingDuration})
-    
-    bullets = {}
-    turretTimer = 0
-    burstTimer = 0
-
-    if lives <= 0 then
-        gameOver = true
-        isRespawning = false
-    end
-end
-
 local function pointInTriangle(px, py, x1, y1, x2, y2, x3, y3)
     local function sign(x1,y1,x2,y2,x3,y3) return (x1-x3)*(y2-y3) - (x2-x3)*(y1-y3) end
     local b1 = sign(px,py,x1,y1,x2,y2,x3,y3) < 0.0
@@ -1279,325 +1266,279 @@ local function rectIntersectsTriangle(rx, ry, rw, rh, tri)
     return false
 end
 
-local function getPizzaTriangle()
-    local x, y, w, h = cube.x, cube.y, cube.width, cube.height
+local function getPizzaTri()
+    local k = G.KONAMI_GAME
+    local x, y, w, h = k.cube.x, k.cube.y, k.cube.width, k.cube.height
     return {x1 = x + w/2, y1 = y, x2 = x, y2 = y + h, x3 = x + w, y3 = y + h}
 end
 
 -- =========================
--- Update
+-- Main Update
 -- =========================
 local old_update = love.update or function() end
 function love.update(dt)
     old_update(dt)
-    if not G.konamiActive or gameOver then return end
+    local k = G.KONAMI_GAME
+    
+    -- Added waitingToStart check here
+    if not G.konamiActive or k.gameOver or k.waitingToStart then return end
 
     local w, h = love.graphics.getDimensions()
 
-    -- Respawn logic
-    if isRespawning then
-        respawnTimer = respawnTimer - dt
-        if respawnTimer <= 0 then
-            isRespawning = false
-            cube.x = (w - cube.width) / 2
-            cube.y = h - cube.height - 20
-            invincibilityTimer = 2.0 
+    if k.isRespawning then
+        k.respawnTimer = k.respawnTimer - dt
+        if k.respawnTimer <= 0 then
+            k.isRespawning = false
+            k.cube.x, k.cube.y = (w - k.cube.width) / 2, h - k.cube.height - 20
+            k.invincibilityTimer = 2.0 
         end
         return 
     end
 
-    if invincibilityTimer > 0 then
-        invincibilityTimer = invincibilityTimer - dt
-        flickerTimer = flickerTimer + dt
-    end
+    k.invincibilityTimer = math.max(0, k.invincibilityTimer - dt)
+    k.flickerTimer = k.flickerTimer + dt
+    k.lastShotTimer = k.lastShotTimer + dt 
+    if k.burstTimer > 0 then k.burstTimer = k.burstTimer - dt end
 
-    lastShotTimer = lastShotTimer + dt 
-    if burstTimer > 0 then burstTimer = burstTimer - dt end
+    if love.keyboard.isDown("left") then k.cube.x = k.cube.x - k.cube.speed*dt end
+	if love.keyboard.isDown("a") then k.cube.x = k.cube.x - k.cube.speed*dt end
+    if love.keyboard.isDown("right") then k.cube.x = k.cube.x + k.cube.speed*dt end
+	if love.keyboard.isDown("d") then k.cube.x = k.cube.x + k.cube.speed*dt end
+    k.cube.x = math.max(0, math.min(w - k.cube.width, k.cube.x))
 
-    if love.keyboard.isDown("left") then cube.x = cube.x - cube.speed*dt end
-    if love.keyboard.isDown("right") then cube.x = cube.x + cube.speed*dt end
-    cube.x = math.max(0, math.min(w-cube.width, cube.x))
-
-    -- Targeting
+    -- Target Acquisition
     local targetObj = nil
-    if #enemies > 0 then
+    if #k.enemies > 0 then
         local minDist = 999999
-        for _, e in ipairs(enemies) do
-            local dist = math.sqrt((e.x - (cube.x + cube.width/2))^2 + (e.y - (cube.y + cube.height/2))^2)
+        for _, e in ipairs(k.enemies) do
+            local dist = math.sqrt((e.x - (k.cube.x + k.cube.width/2))^2 + (e.y - (k.cube.y + k.cube.height/2))^2)
             if dist < minDist then minDist = dist; targetObj = e end
         end
-    elseif boss then targetObj = boss end
+    elseif k.boss then targetObj = k.boss end
 
     if targetObj then
-        local tx, ty = targetObj.x + (targetObj.width or enemySize)/2, targetObj.y + (targetObj.height or enemySize)/2
-        weaponAngle = math.atan2(ty - (cube.y + cube.height/2), tx - (cube.x + cube.width/2))
-    else weaponAngle = -math.pi/2 end
+        local tx, ty = targetObj.x + (targetObj.width or k.enemySize)/2, targetObj.y + (targetObj.height or k.enemySize)/2
+        k.weaponAngle = math.atan2(ty - (k.cube.y + k.cube.height/2), tx - (k.cube.x + k.cube.width/2))
+    else k.weaponAngle = -math.pi/2 end
 
-    -- Powerups Collection
-    for i=#powerups, 1, -1 do
-        local p = powerups[i]
-        p.y = p.y + enemySpeed * 0.8 * dt
-        if rectIntersectsTriangle(p.x, p.y, powerupSize, powerupSize, getPizzaTriangle()) then
-            local displayName = ""
-            if p.type == "turret" then 
-                turretTimer = 10 
-                displayName = "MACHINE GUN TURRET!"
-            elseif p.type == "burst" then 
-                burstTimer = 10 
-                displayName = "GRENADE LAUNCHER TURRET!"
-            end
-            table.insert(floatingPoints, {x = p.x, y = p.y, text = displayName, timer = floatingDuration})
-            table.remove(powerups, i)
-        elseif p.y > h then table.remove(powerups, i) end
+    -- Powerups
+    for i=#k.powerups, 1, -1 do
+        local p = k.powerups[i]
+        p.y = p.y + k.enemySpeed * 0.8 * dt
+        if rectIntersectsTriangle(p.x, p.y, k.powerupSize, k.powerupSize, getPizzaTri()) then
+            if p.type == "turret" then k.turretTimer = 10 else k.burstTimer = 10 end
+            table.insert(k.floatingPoints, {x = p.x, y = p.y, text = "POWERUP!", timer = k.floatingDuration})
+            table.remove(k.powerups, i)
+        elseif p.y > h then table.remove(k.powerups, i) end
     end
 
-    -- Machine Gun Turret Firing
-    if turretTimer > 0 then
-        turretTimer = turretTimer - dt
-        turretLastShot = turretLastShot + dt
-        if turretLastShot >= turretShootCooldown and targetObj then
-            table.insert(bullets, {
-                x = cube.x + cube.width/2 - bulletSize/2, y = cube.y + cube.height/2,
-                homing = true, targetId = targetObj.id or "BOSS", vx = 0, vy = -bulletSpeed
+    -- Turret
+    if k.turretTimer > 0 then
+        k.turretTimer = k.turretTimer - dt
+        k.turretLastShot = k.turretLastShot + dt
+        if k.turretLastShot >= k.turretShootCooldown and targetObj then
+            table.insert(k.bullets, {
+                x = k.cube.x + k.cube.width/2 - k.bulletSize/2, y = k.cube.y + k.cube.height/2,
+                homing = true, targetId = targetObj.id or "BOSS", vx = 0, vy = -k.bulletSpeed
             })
-            turretLastShot = 0
+            k.turretLastShot = 0
         end
     end
 
-    -- Bullets Update
-    for i=#bullets,1,-1 do
-        local b = bullets[i]
+    -- Bullet Movement
+    for i=#k.bullets,1,-1 do
+        local b = k.bullets[i]
         if b.homing and b.targetId then
-            local targetFound = nil
-            if b.targetId == "BOSS" then if boss then targetFound = boss end
-            else for _, e in ipairs(enemies) do if e.id == b.targetId then targetFound = e break end end end
+            local targetFound = (b.targetId == "BOSS" and k.boss) or nil
+            if not targetFound then for _, e in ipairs(k.enemies) do if e.id == b.targetId then targetFound = e break end end end
             if targetFound then
-                local tx, ty = targetFound.x + (targetFound.width or enemySize)/2, targetFound.y + (targetFound.height or enemySize)/2
+                local tx, ty = targetFound.x + (targetFound.width or k.enemySize)/2, targetFound.y + (targetFound.height or k.enemySize)/2
                 local angle = math.atan2(ty - b.y, tx - b.x)
-                b.vx, b.vy = math.cos(angle) * bulletSpeed, math.sin(angle) * bulletSpeed
+                b.vx, b.vy = math.cos(angle) * k.bulletSpeed, math.sin(angle) * k.bulletSpeed
             else b.targetId = nil end
         end
-        b.x, b.y = b.x + (b.vx or 0) * dt, b.y + (b.vy or -bulletSpeed) * dt
-        if b.y + bulletSize < 0 or b.y > h or b.x < 0 or b.x > w then table.remove(bullets,i) end
+        b.x, b.y = b.x + (b.vx or 0) * dt, b.y + (b.vy or -k.bulletSpeed) * dt
+        if b.y + k.bulletSize < 0 or b.y > h or b.x < 0 or b.x > w then table.remove(k.bullets,i) end
     end
 
-    if not boss then
-        enemySpawnTimer = enemySpawnTimer + dt
-        if enemySpawnTimer >= enemySpawnRate then enemySpawnTimer = 0; spawnEnemy() end
+    -- Spawning
+    if not k.boss then
+        k.enemySpawnTimer = k.enemySpawnTimer + dt
+        if k.enemySpawnTimer >= k.enemySpawnRate then k.enemySpawnTimer = 0; spawnEnemy() end
     end
 
-    -- Enemy logic
-    local pizzaTri = getPizzaTriangle()
-    for i=#enemies,1,-1 do
-        local e = enemies[i]
-        e.y = e.y + enemySpeed*dt
-        if invincibilityTimer <= 0 and rectIntersectsTriangle(e.x, e.y, enemySize, enemySize, pizzaTri) then
-            triggerPlayerDeath()
-            table.remove(enemies, i)
-            break
+    -- Collision & Enemy Logic
+    local pTri = getPizzaTri()
+    for i=#k.enemies,1,-1 do
+        local e = k.enemies[i]
+        e.y = e.y + k.enemySpeed*dt
+        if k.invincibilityTimer <= 0 and rectIntersectsTriangle(e.x, e.y, k.enemySize, k.enemySize, pTri) then
+            triggerDeath(); table.remove(k.enemies, i); break
         end
-        if e.y > h then table.remove(enemies,i) end
+        if e.y > h then table.remove(k.enemies,i) end
     end
 
-    for i=#enemies,1,-1 do
-        local e = enemies[i]
-        for j=#bullets,1,-1 do
-            local b = bullets[j]
-            if b.x < e.x + enemySize and b.x + bulletSize > e.x and b.y < e.y + enemySize and b.y + bulletSize > e.y then
+    -- Enemy Destruction
+    for i=#k.enemies,1,-1 do
+        local e = k.enemies[i]
+        for j=#k.bullets,1,-1 do
+            local b = k.bullets[j]
+            if b.x < e.x + k.enemySize and b.x + k.bulletSize > e.x and b.y < e.y + k.enemySize and b.y + k.bulletSize > e.y then
                 spawnPowerup(e.x, e.y)
-                table.remove(enemies,i); table.remove(bullets,j)
-                score = score + 100; bossKills = bossKills + 1
-                table.insert(explosions, {x = e.x, y = e.y, timer = explosionDuration})
-                table.insert(floatingPoints, {x = e.x + enemySize/2, y = e.y, text = "+100", timer = floatingDuration})
-                if bossKills % 30 == 0 then spawnBoss() end
+                table.remove(k.enemies,i); table.remove(k.bullets,j)
+                k.score, k.bossKills = k.score + 100, k.bossKills + 1
+                table.insert(k.explosions, {x = e.x, y = e.y, timer = k.explosionDuration})
+                table.insert(k.floatingPoints, {x = e.x + k.enemySize/2, y = e.y, text = "+100", timer = k.floatingDuration})
+                if k.bossKills % 30 == 0 then 
+                    k.boss = {x=(w-k.bossWidth)/2, y=50, hitsTaken=0, dir=1, id="BOSS"}
+                end
                 break
             end
         end
     end
 
-    -- Boss
-    if boss then
-        boss.x = boss.x + boss.dir*bossSpeed*dt
-        if boss.x <= 0 then boss.x=0; boss.dir=1 elseif boss.x + bossWidth >= w then boss.x=w-bossWidth; boss.dir=-1 end
-        bossCooldown = bossCooldown + dt
-        if bossCooldown >= bossCooldownRate then
-            bossCooldown = 0
+    -- Boss Logic
+    if k.boss then
+        k.boss.x = k.boss.x + k.boss.dir*k.bossSpeed*dt
+        if k.boss.x <= 0 then k.boss.x=0; k.boss.dir=1 elseif k.boss.x + k.bossWidth >= w then k.boss.x=w-k.bossWidth; k.boss.dir=-1 end
+        k.bossCooldown = k.bossCooldown + dt
+        if k.bossCooldown >= k.bossCooldownRate then
+            k.bossCooldown = 0
             local spreadAngles = {math.pi/2 - 0.4, math.pi/2, math.pi/2 + 0.4}
             for _,angle in ipairs(spreadAngles) do
-                table.insert(bossBullets,{x=boss.x + bossWidth/2, y=boss.y + bossHeight, dx=math.cos(angle)*bossBulletSpeed, dy=math.sin(angle)*bossBulletSpeed})
+                table.insert(k.bossBullets,{x=k.boss.x + k.bossWidth/2, y=k.boss.y + k.bossHeight, dx=math.cos(angle)*k.bossBulletSpeed, dy=math.sin(angle)*k.bossBulletSpeed})
             end
         end
-
-        for i=#bullets,1,-1 do
-            local b = bullets[i]
-            if b.x < boss.x + bossWidth and b.x + bulletSize > boss.x and b.y < boss.y + bossHeight and b.y + bulletSize > boss.y then
-                boss.hitsTaken = boss.hitsTaken + 1
-                table.remove(bullets,i)
-                if boss.hitsTaken >= bossHitsRequired then
-                    score = score + 5000
-                    table.insert(explosions, {x = boss.x, y = boss.y, timer = explosionDuration})
-                    table.insert(floatingPoints, {x = boss.x + bossWidth/2, y = boss.y, text = "+5000", timer = floatingDuration})
-                    enemySpeed = enemySpeed + 5; enemySpawnRate = enemySpawnRate - 0.05; bossBulletSpeed = bossBulletSpeed + 5
-                    boss = nil; bossBullets = {}
+        for i=#k.bullets,1,-1 do
+            local b = k.bullets[i]
+            if b.x < k.boss.x + k.bossWidth and b.x + k.bulletSize > k.boss.x and b.y < k.boss.y + k.bossHeight and b.y + k.bulletSize > k.boss.y then
+                k.boss.hitsTaken = k.boss.hitsTaken + 1; table.remove(k.bullets,i)
+                if k.boss.hitsTaken >= k.bossHitsRequired then
+                    k.score = k.score + 5000
+                    table.insert(k.explosions, {x = k.boss.x, y = k.boss.y, timer = k.explosionDuration})
+                    k.enemySpeed, k.enemySpawnRate = k.enemySpeed + 5, k.enemySpawnRate - 0.05
+                    k.boss, k.bossBullets = nil, {}
                     break
                 end
             end
         end
     end
 
-    -- Boss Bullets
-    for i=#bossBullets,1,-1 do
-        local b = bossBullets[i]
-        b.x, b.y = b.x + (b.dx or 0)*dt, b.y + (b.dy or bossBulletSpeed)*dt
-        if invincibilityTimer <= 0 and rectIntersectsTriangle(b.x, b.y, bulletSize, bulletSize, pizzaTri) then 
-            triggerPlayerDeath()
-            table.remove(bossBullets, i)
-        elseif b.y > h or b.x < 0 or b.x > w then table.remove(bossBullets,i) end
+    -- Final Visual Timers
+    for i=#k.bossBullets,1,-1 do
+        local b = k.bossBullets[i]
+        b.x, b.y = b.x + (b.dx or 0)*dt, b.y + (b.dy or k.bossBulletSpeed)*dt
+        if k.invincibilityTimer <= 0 and rectIntersectsTriangle(b.x, b.y, k.bulletSize, k.bulletSize, pTri) then 
+            triggerDeath(); table.remove(k.bossBullets, i)
+        elseif b.y > h or b.x < 0 or b.x > w then table.remove(k.bossBullets,i) end
     end
-
-    -- FX Updates
-    for i=#explosions,1,-1 do
-        explosions[i].timer = explosions[i].timer - dt
-        if explosions[i].timer <= 0 then table.remove(explosions,i) end
-    end
-    for i=#floatingPoints,1,-1 do
-        local fp = floatingPoints[i]
+    for i=#k.explosions,1,-1 do k.explosions[i].timer = k.explosions[i].timer - dt; if k.explosions[i].timer <= 0 then table.remove(k.explosions,i) end end
+    for i=#k.floatingPoints,1,-1 do
+        local fp = k.floatingPoints[i]
         fp.y, fp.timer = fp.y - 50 * dt, fp.timer - dt
-        if fp.timer <= 0 then table.remove(floatingPoints,i) end
+        if fp.timer <= 0 then table.remove(k.floatingPoints,i) end
     end
 end
 
 -- =========================
--- Draw
+-- Main Draw
 -- =========================
 local old_draw = love.draw or function() end
 function love.draw()
     old_draw()
+    local k = G.KONAMI_GAME
     if not G.konamiActive then return end
     local gw, gh = love.graphics.getDimensions()
     
-    -- BG
-    if G.KONAMI_BG_IMAGE then
-        love.graphics.setColor(1,1,1,1)
-        love.graphics.draw(G.KONAMI_BG_IMAGE, 0, 0, 0, gw/G.KONAMI_BG_IMAGE:getWidth(), gh/G.KONAMI_BG_IMAGE:getHeight())
-    else love.graphics.setColor(0,0,0,1); love.graphics.rectangle("fill",0,0,gw,gh) end
-
-    -- HUD
     love.graphics.setColor(1,1,1,1)
-    love.graphics.printf(tostring(score),0,10,gw,"center")
-    love.graphics.printf("Lives: "..lives, 0, 10, gw-10, "right")
+    if k.images.bg then love.graphics.draw(k.images.bg, 0, 0, 0, gw/k.images.bg:getWidth(), gh/k.images.bg:getHeight()) end
 
-    -- Player Draw with Flicker
-    if not isRespawning then
-        local showPlayer = true
-        if invincibilityTimer > 0 and math.floor(flickerTimer * 10) % 2 == 0 then showPlayer = false end
-        
-        if showPlayer then
-            if cubeImage then love.graphics.draw(cubeImage, cube.x, cube.y, 0, cube.width/cubeImage:getWidth(), cube.height/cubeImage:getHeight())
-            else love.graphics.rectangle("fill",cube.x,cube.y,cube.width,cube.height) end
+    love.graphics.printf(tostring(k.score),0,10,gw,"center")
+    love.graphics.printf("Lives: "..k.lives, 0, 10, gw-10, "right")
 
-            local weaponImg = (turretTimer > 0 and turretImage) or (burstTimer > 0 and launcherImage)
-            if weaponImg then
-                local s = 0.4
-                love.graphics.draw(weaponImg, cube.x + cube.width/2, cube.y + cube.height/2, weaponAngle + math.pi/2, (cube.width*s)/weaponImg:getWidth(), (cube.height*s)/weaponImg:getHeight(), weaponImg:getWidth()/2, weaponImg:getHeight()/2)
-            end
+    -- Draw Ship
+    if not k.isRespawning and (k.invincibilityTimer <= 0 or math.floor(k.flickerTimer * 10) % 2 == 0) then
+        love.graphics.draw(k.images.cube, k.cube.x, k.cube.y, 0, k.cube.width/k.images.cube:getWidth(), k.cube.height/k.images.cube:getHeight())
+        local weaponImg = (k.turretTimer > 0 and k.images.turret) or (k.burstTimer > 0 and k.images.launcher)
+        if weaponImg then
+            love.graphics.draw(weaponImg, k.cube.x + k.cube.width/2, k.cube.y + k.cube.height/2, k.weaponAngle + math.pi/2, (k.cube.width*0.4)/weaponImg:getWidth(), (k.cube.height*0.4)/weaponImg:getHeight(), weaponImg:getWidth()/2, weaponImg:getHeight()/2)
         end
     end
 
-    -- Powerups
-    for _, p in ipairs(powerups) do
-        local img = (p.type == "turret") and powerupImage or powerup2Image
-        if img then love.graphics.draw(img, p.x, p.y, 0, powerupSize/img:getWidth(), powerupSize/img:getHeight()) end
+    -- Draw Entities
+    for _, p in ipairs(k.powerups) do
+        local img = (p.type == "turret") and k.images.p1 or k.images.p2
+        love.graphics.draw(img, p.x, p.y, 0, k.powerupSize/img:getWidth(), k.powerupSize/img:getHeight())
     end
-
-    -- Bullets
-    for _,b in ipairs(bullets) do
+    for _,b in ipairs(k.bullets) do
         if b.homing then love.graphics.setColor(0, 1, 1) end
-        if bulletImage then love.graphics.draw(bulletImage, b.x, b.y, 0, bulletSize/bulletImage:getWidth(), bulletSize/bulletImage:getHeight())
-        else love.graphics.rectangle("fill", b.x, b.y, bulletSize, bulletSize) end
+        love.graphics.draw(k.images.bullet, b.x, b.y, 0, k.bulletSize/k.images.bullet:getWidth(), k.bulletSize/k.images.bullet:getHeight())
         love.graphics.setColor(1,1,1)
     end
+    for _,e in ipairs(k.enemies) do
+        love.graphics.draw(k.images.enemy, e.x, e.y, 0, k.enemySize/k.images.enemy:getWidth(), k.enemySize/k.images.enemy:getHeight())
+    end
+    if k.boss then
+        love.graphics.draw(k.images.enemy, k.boss.x, k.boss.y, 0, k.bossWidth/k.images.enemy:getWidth(), k.bossHeight/k.images.enemy:getHeight())
+    end
+    for _,b in ipairs(k.bossBullets) do love.graphics.draw(k.images.bossBullet, b.x, b.y, 0, k.bulletSize/k.images.bossBullet:getWidth(), k.bulletSize/k.images.bossBullet:getHeight()) end
+    for _,ex in ipairs(k.explosions) do love.graphics.draw(k.images.explosion, ex.x, ex.y, 0, k.enemySize/k.images.explosion:getWidth(), k.enemySize/k.images.explosion:getHeight()) end
 
-    -- Enemies
-    for _,e in ipairs(enemies) do
-        if enemyImage then love.graphics.draw(enemyImage, e.x, e.y, 0, enemySize/enemyImage:getWidth(), enemySize/enemyImage:getHeight())
-        else love.graphics.rectangle("line",e.x,e.y,enemySize,enemySize) end
+    -- Floating Text
+    for _,fp in ipairs(k.floatingPoints) do
+        love.graphics.setColor(1,1,0); love.graphics.printf(fp.text, fp.x-150, fp.y, 300, "center"); love.graphics.setColor(1,1,1)
     end
 
-    -- Boss
-    if boss and enemyImage then
-        love.graphics.draw(enemyImage, boss.x, boss.y, 0, bossWidth/enemyImage:getWidth(), bossHeight/enemyImage:getHeight())
+    -- Overlays
+    if k.waitingToStart then
+        love.graphics.printf("PRESS Z OR ENTER TO PLAY OR ESC TO QUIT", 0, gh/2 - 20, gw, "center")
     end
-
-    -- Boss projectiles
-    for _,b in ipairs(bossBullets) do
-        if bossBulletImage then love.graphics.draw(bossBulletImage, b.x, b.y, 0, bulletSize/bossBulletImage:getWidth(), bulletSize/bossBulletImage:getHeight()) end
+    if k.gameOver then 
+        love.graphics.printf("GAME OVER",0,gh/2-20,gw,"center") 
     end
-
-    -- FX
-    for _,ex in ipairs(explosions) do
-        if explosionImage then love.graphics.draw(explosionImage, ex.x, ex.y, 0, enemySize/explosionImage:getWidth(), enemySize/explosionImage:getHeight()) end
-    end
-
-    for _,fp in ipairs(floatingPoints) do
-        love.graphics.setColor(1,1,0); 
-        love.graphics.printf(fp.text, fp.x-150, fp.y, 300, "center"); 
-        love.graphics.setColor(1,1,1)
-    end
-
-    if gameOver then love.graphics.printf("GAME OVER press enter/z to retry or esc to quit",0,gh/2-20,gw,"center") end
 end
 
 -- =========================
--- Input
+-- Input handling
 -- =========================
-local old_keypressed = love.keypressed or function() end
-function love.keypressed(key,scancode,isrepeat)
-    old_keypressed(key,scancode,isrepeat)
+local old_kp = love.keypressed or function() end
+function love.keypressed(key)
+    old_kp(key)
+    local k = G.KONAMI_GAME
+
+    -- Handling Konami Code Entry
     if not G.konamiActive then
         if G.STAGE ~= G.STAGES.MAIN_MENU then return end
-        table.insert(konamiBuffer,key)
-        if #konamiBuffer > #konamiCode then table.remove(konamiBuffer,1) end
-        if #konamiBuffer == #konamiCode then
-            local matched = true
-            for i=1,#konamiCode do if konamiBuffer[i] ~= konamiCode[i] then matched=false break end end
-            if matched then
-                konamiBuffer = {}; G.konamiActive = true; gameOver = false; lives = maxLives
-                isRespawning = false; invincibilityTimer = 0
-                cube.x = (love.graphics.getWidth() - cube.width)/2; cube.y = love.graphics.getHeight() - cube.height - 20
-                local function loadImage(p) local f=NFS.newFileData(p) return love.graphics.newImage(love.image.newImageData(f)) end
-                local p = SMODS.Mods["Fortlatro"].path .. "/customimages/"
-                G.KONAMI_BG_IMAGE = loadImage(p.."space.png"); cubeImage = loadImage(p.."pizza.png"); enemyImage = loadImage(p.."burger.png")
-                bossBulletImage = loadImage(p.."pineapple.png"); bulletImage = loadImage(p.."bullet.png"); explosionImage = loadImage(p.."explosion.png")
-                powerupImage = loadImage(p.."powerup.png"); powerup2Image = loadImage(p.."powerup2.png"); turretImage = loadImage(p.."turret.png"); launcherImage = loadImage(p.."launcher.png")
-            end
+        table.insert(k.buffer, key)
+        if #k.buffer > #k.code then table.remove(k.buffer, 1) end
+        local match = true
+        for i=1,#k.code do if k.buffer[i] ~= k.code[i] then match = false end end
+        if match then
+            G.FUNCS.activatekonami()
+            k.waitingToStart = false -- If they typed the code, don't wait for input
         end
         return
     end
-    if key == "escape" then
-		score = 0
-        enemySpawnTimer = 0
-        bossKills = 0
-        lives = maxLives
-		enemySpeed = 120
-        enemySpawnRate = 1.0
-		bossBulletSpeed = 300
-        G.konamiActive = false; bullets = {}; enemies = {}; boss = nil; bossBullets = {}; powerups = {}; return
+    
+    -- Active Game Input
+    if key == "escape" then 
+        G.konamiActive = false 
+        return
     end
-    if gameOver and (key=="return" or key=="z") then
-        gameOver = false; score = 0; lives = maxLives; bullets = {}; enemies = {}; boss = nil; bossBullets = {}; powerups = {}
-        isRespawning = false; invincibilityTimer = 0
-		score = 0
-        enemySpawnTimer = 0
-        bossKills = 0
-        lives = maxLives
-		enemySpeed = 120
-        enemySpawnRate = 1.0
-		bossBulletSpeed = 300
-        cube.x = (love.graphics.getWidth()-cube.width)/2; return
+
+    if k.waitingToStart then
+        if key == "z" or key == "return" then
+            k.waitingToStart = false
+            k.invincibilityTimer = 1.0
+        end
+        return
     end
-    if not gameOver and (key=="return" or key=="z") then shoot() end
-    if score >= 100000 then check_for_unlock({ type = "ach_arcade" }) end
+    
+    if k.gameOver and (key == "z" or key == "return") then 
+        G.FUNCS.activatekonami()
+    elseif not k.gameOver and (key == "z" or key == "return") then 
+        shoot() 
+    end
 end
 
 
@@ -1607,6 +1548,740 @@ function love.mousepressed(x,y,button,istouch,presses) if not G.konamiActive the
 local old_mousereleased = love.mousereleased or function() end
 function love.mousereleased(x,y,button,istouch,presses) if not G.konamiActive then old_mousereleased(x,y,button,istouch,presses) end end
 
+SMODS.Sound({
+    key = 'music_luigi',
+    path = 'music_luigi.ogg',
+	pitch = 1,
+	speed = 1,
+    select_music_track = function(self)
+        -- If it's luigi time play music
+        if G.FIND_GAME.active then
+            return 1e10
+        end
+    end
+})
+
+SMODS.Sound({
+	key = "ned",
+	path = "ned.ogg",
+})
+
+local function loadImg(name) 
+    local path = SMODS.Mods["Fortlatro"].path .. "/customimages/" .. name
+    local fileData = NFS.newFileData(path) 
+    return love.graphics.newImage(love.image.newImageData(fileData)) 
+end
+
+-- =========================
+-- Find Target Game Container
+-- =========================
+G.FIND_GAME = {
+    active = false,
+    won = false,
+    target = nil,
+    decoys = {},
+    decoyCount = 0,
+    baseSpeed = 300,    
+    entitiesSize = 64,  
+    images = {},
+    -- VIRTUAL DIMENSIONS
+    virtualW = 1280,
+    virtualH = 720
+}
+
+-- =========================
+-- Initialization Logic
+-- =========================
+G.FUNCS = G.FUNCS or {}
+G.FUNCS.start_find_game = function()
+    local f = G.FIND_GAME
+    local vw, vh = f.virtualW, f.virtualH
+    
+    f.active = true
+    f.won = false
+    f.decoys = {}
+    f.decoyCount = math.random(100, 400)
+
+    local function loadImg(name) 
+        local path = SMODS.Mods["Fortlatro"].path .. "/customimages/" .. name
+        local fileData = NFS.newFileData(path) 
+        return love.graphics.newImage(love.image.newImageData(fileData)) 
+    end
+
+    if not f.images.target then
+        f.images.target = loadImg("luigi.png")
+        f.images.d1 = loadImg("mario.png")
+        f.images.d2 = loadImg("wario.png")
+        f.images.d3 = loadImg("yoshi.png")
+    end
+
+    -- 1. Setup the Target (Using Virtual Space)
+    f.target = {
+        x = math.random(100, vw - 100),
+        y = math.random(100, vh - 100),
+        vx = math.random(-f.baseSpeed, f.baseSpeed),
+        vy = math.random(-f.baseSpeed, f.baseSpeed),
+        size = f.entitiesSize - 20,
+        img = f.images.target
+    }
+
+    -- 2. Setup the Crowd (Using Virtual Space)
+    local decoyPool = {f.images.d1, f.images.d2, f.images.d3}
+    for i = 1, f.decoyCount do
+        table.insert(f.decoys, {
+            x = math.random(0, vw - f.entitiesSize),
+            y = math.random(0, vh - f.entitiesSize),
+            vx = math.random(-f.baseSpeed, f.baseSpeed),
+            vy = math.random(-f.baseSpeed, f.baseSpeed),
+            size = f.entitiesSize,
+            img = decoyPool[math.random(#decoyPool)]
+        })
+    end
+end
+
+-- =========================
+-- Update Loop
+-- =========================
+local old_update = love.update or function() end
+function love.update(dt)
+    old_update(dt)
+    local f = G.FIND_GAME
+    if not f.active or f.won then return end
+
+    local vw, vh = f.virtualW, f.virtualH
+
+    local function moveAndBounce(obj)
+        obj.x = obj.x + obj.vx * dt
+        obj.y = obj.y + obj.vy * dt
+
+        -- Boundary check using Virtual Resolution
+        if obj.x <= 0 then 
+            obj.x = 0
+            obj.vx = math.abs(obj.vx) 
+        end
+        if obj.x >= vw - obj.size then 
+            obj.x = vw - obj.size
+            obj.vx = -math.abs(obj.vx) 
+        end
+        if obj.y <= 0 then 
+            obj.y = 0
+            obj.vy = math.abs(obj.vy) 
+        end
+        if obj.y >= vh - obj.size then 
+            obj.y = vh - obj.size
+            obj.vy = -math.abs(obj.vy) 
+        end
+    end
+
+    moveAndBounce(f.target)
+    for _, d in ipairs(f.decoys) do moveAndBounce(d) end
+end
+
+-- =========================
+-- Drawing Loop
+-- =========================
+local old_draw = love.draw or function() end
+function love.draw()
+    old_draw()
+    local f = G.FIND_GAME
+    if not f.active then return end
+
+    local realW, realH = love.graphics.getDimensions()
+    local scaleX = realW / f.virtualW
+    local scaleY = realH / f.virtualH
+
+    love.graphics.push()
+    love.graphics.scale(scaleX, scaleY)
+    love.graphics.setColor(1, 1, 1, 1)
+
+    -- LAYER 1: Target
+    local t = f.target
+    if t then
+        love.graphics.draw(t.img, t.x, t.y, 0, t.size/t.img:getWidth(), t.size/t.img:getHeight())
+    end
+
+    -- LAYER 2: Decoys
+    for i = 1, #f.decoys do
+        local d = f.decoys[i]
+        love.graphics.draw(d.img, d.x, d.y, 0, d.size/d.img:getWidth(), d.size/d.img:getHeight())
+    end
+
+    -- LAYER 3: UI
+    if f.won then
+        love.graphics.setColor(0, 0, 0, 0.6)
+        love.graphics.rectangle("fill", 0, 0, f.virtualW, f.virtualH)
+        love.graphics.setColor(1, 1, 1, 1)
+        -- Note: printf scale is handled by the graphics.push/scale above
+        love.graphics.printf("FOUND LUIGI!", 0, f.virtualH/2 - 40, f.virtualW, "center", 0, 3, 3)
+    end
+
+    love.graphics.pop()
+end
+
+-- =========================
+-- Mouse Interaction
+-- =========================
+local old_mouse = love.mousepressed or function() end
+function love.mousepressed(rx, ry, button)
+    local f = G.FIND_GAME
+    
+    -- Convert Real Mouse Click to Virtual Space Click
+    local realW, realH = love.graphics.getDimensions()
+    local x = rx * (f.virtualW / realW)
+    local y = ry * (f.virtualH / realH)
+
+    if not f.active or f.won then 
+        old_mouse(rx, ry, button)
+        return 
+    end
+
+    if button == 1 then
+        local t = f.target
+        -- Hitbox Check now uses translated 'x' and 'y'
+        if x >= t.x and x <= t.x + t.size and y >= t.y and y <= t.y + t.size then
+            if G.SETTINGS and G.SETTINGS.sfx ~= false then
+                play_sound("fn_ned") 
+            end
+            f.won = true
+            f.active = false -- Optional: stop updates immediately
+            G.GAME.find_wins = (G.GAME.find_wins or 0) + 1
+        end
+    end
+end
+
+
+SMODS.Sound({
+	key = "wonkee",
+	path = "wonkee.ogg",
+})
+
+SMODS.Sound({
+	key = "hit",
+	path = "hit.ogg",
+})
+
+SMODS.Sound({
+    key = 'music_wonkee',
+    path = 'music_wonkee.ogg',
+	pitch = 1,
+	speed = 1,
+    select_music_track = function(self)
+        -- If it's Wonkee time play music
+        if G.CARNIVAL_GAME.active then
+            return 1e10
+        end
+    end
+})
+
+
+-- =========================
+-- Carnival Game Container
+-- =========================
+G.CARNIVAL_GAME = {
+    active = false,
+    waiting_to_start = false,
+    timer = 0,
+    score = 0,
+    shots_taken = 0,    -- Tracked for accuracy
+    hits = 0,           -- Tracked for accuracy
+    display_timer = 0,
+    targets = {},
+    blockers = {},
+    rows = 2,           
+    cols = 5,           
+    blockerCount = 4,   
+    entitiesSize = 80,
+    images = {},
+    font = nil,
+    -- VIRTUAL DIMENSIONS
+    virtualW = 1280,
+    virtualH = 720
+}
+
+-- =========================
+-- Initialization Logic
+-- =========================
+G.FUNCS = G.FUNCS or {}
+G.FUNCS.start_carnival_game = function()
+    local c = G.CARNIVAL_GAME
+    -- Use Virtual Bounds for setup
+    local vw, vh = c.virtualW, c.virtualH
+    
+    c.waiting_to_start = true 
+    c.active = false
+    c.timer = 30
+    c.score = 0
+    c.shots_taken = 0   -- Reset stats
+    c.hits = 0          -- Reset stats
+    c.display_timer = 0
+    c.targets = {}
+    c.blockers = {}
+
+    local function loadImg(name) 
+        local path = SMODS.Mods["Fortlatro"].path .. "/customimages/" .. name
+        local fileData = NFS.newFileData(path) 
+        return love.graphics.newImage(love.image.newImageData(fileData)) 
+    end
+
+    if not c.images.target then
+        c.images.target = loadImg("target.png")
+        c.images.wonkee = loadImg("wonkee.png")
+        c.font = love.graphics.newFont(40)
+    end
+
+    -- Setup Pop-up Targets (Using Virtual Width/Height)
+    for r = 1, c.rows do
+        for i = 1, c.cols do
+            table.insert(c.targets, {
+                x = (vw / (c.cols + 1)) * i - (c.entitiesSize / 2),
+                y = vh * (0.30 + (r * 0.18)), 
+                row = r,
+                offsetY = 0,
+                state = "down",
+                timer = math.random(2, 7),
+                size = c.entitiesSize - (r == 1 and 20 or 0),
+                img = c.images.target
+            })
+        end
+    end
+
+    -- Setup Sliding Blockers (Using Virtual Width/Height)
+    for i = 1, c.blockerCount do
+        local row_assign = (i % 2) + 1 
+        local target_size = c.entitiesSize - (row_assign == 1 and 20 or 0)
+        table.insert(c.blockers, {
+            x = math.random(0, vw - c.entitiesSize),
+            y = vh * (0.30 + (row_assign * 0.18)) - target_size, 
+            row = row_assign,
+            vx = math.random(250, 500) * (math.random() > 0.5 and 1 or -1),
+            size = c.entitiesSize + 20,
+            img = c.images.wonkee
+        })
+    end
+end
+
+-- =========================
+-- Update Loop
+-- =========================
+local old_update = love.update or function() end
+function love.update(dt)
+    old_update(dt)
+    local c = G.CARNIVAL_GAME
+    
+    -- Display results briefly before clearing
+    if not c.active and not c.waiting_to_start and c.timer <= 0 and (c.score ~= 0 or c.shots_taken > 0) then
+        c.display_timer = c.display_timer + dt
+        if c.display_timer >= 4 then  -- Increased to 4 seconds to read stats
+            c.score = 0
+            c.shots_taken = 0
+            c.hits = 0
+            c.display_timer = 0
+        end
+        return
+    end
+
+    if not c.active then return end
+
+    -- Use Virtual Bounds for movement logic
+    local vw = c.virtualW
+    c.timer = c.timer - dt
+    
+    if c.timer <= 0 then
+        c.timer = 0
+        c.active = false
+        G.GAME.WonkeeScore = c.score
+        c.targets = {}   
+        c.blockers = {}  
+        return 
+    end
+
+    -- Update Targets (Timing and Animation)
+    for _, t in ipairs(c.targets) do
+        t.timer = t.timer - dt
+        if t.timer <= 0 then
+            if t.state == "down" then t.state = "popping" 
+            elseif t.state == "up" then t.state = "hiding" end
+        end
+        if t.state == "popping" then
+            t.offsetY = t.offsetY + 450 * dt
+            if t.offsetY >= t.size then t.state = "up"; t.timer = math.random(1, 2) end
+        elseif t.state == "hiding" then
+            t.offsetY = t.offsetY - 450 * dt
+            if t.offsetY <= 0 then t.offsetY = 0; t.state = "down"; t.timer = math.random(3, 8) end
+        end
+    end
+
+    -- Update Blockers (Virtual Boundary Snapping)
+    for _, b in ipairs(c.blockers) do
+        b.x = b.x + b.vx * dt
+        if b.x <= 0 then 
+            b.x = 0
+            b.vx = math.abs(b.vx)
+        elseif b.x >= vw - b.size then 
+            b.x = vw - b.size
+            b.vx = -math.abs(b.vx)
+        end
+    end
+end
+
+-- =========================
+-- Drawing Loop
+-- =========================
+local old_draw = love.draw or function() end
+function love.draw()
+    old_draw()
+    local c = G.CARNIVAL_GAME
+    local realW, realH = love.graphics.getDimensions()
+    local scaleX = realW / c.virtualW
+    local scaleY = realH / c.virtualH
+    local old_font = love.graphics.getFont()
+
+    love.graphics.push()
+    love.graphics.scale(scaleX, scaleY)
+
+    -- START SCREEN
+    if c.waiting_to_start then
+        love.graphics.setColor(0, 0, 0, 0.8)
+        love.graphics.rectangle("fill", 0, 0, c.virtualW, c.virtualH)
+        love.graphics.setColor(1, 1, 1, 1)
+        if c.font then love.graphics.setFont(c.font) end
+        local instruct = "Zip Zonk Bang\n\nShoot the outlaws for points!\nAvoid shooting Wonkee! (-1 point)\n\nCLICK ANYWHERE TO START"
+        love.graphics.printf(instruct, 0, c.virtualH/2 - 120, c.virtualW, "center")
+    end
+
+    -- GAMEPLAY
+    if c.active then
+        love.graphics.setColor(1, 1, 1, 1)
+        for r = 1, c.rows do
+            for _, t in ipairs(c.targets) do
+                if t.row == r and t.state ~= "down" then
+                    love.graphics.draw(t.img, t.x, t.y - t.offsetY, 0, t.size/t.img:getWidth(), t.size/t.img:getHeight())
+                end
+            end
+            for _, b in ipairs(c.blockers) do
+                if b.row == r then
+                    love.graphics.draw(b.img, b.x, b.y, 0, b.size/b.img:getWidth(), b.size/b.img:getHeight())
+                end
+            end
+        end
+        -- UI (Optional: Add a live score/timer here if desired)
+    end
+
+    -- END SCREEN (Accuracy Added)
+    if not c.active and not c.waiting_to_start and c.timer <= 0 and (c.score ~= 0 or c.shots_taken > 0) then
+        love.graphics.setColor(0, 0, 0, 0.7)
+        love.graphics.rectangle("fill", 0, 0, c.virtualW, c.virtualH)
+        love.graphics.setColor(1, 1, 1, 1)
+        if c.font then love.graphics.setFont(c.font) end
+        
+        -- Calculate Accuracy Percentage
+        local accuracy = 0
+        if c.shots_taken > 0 then
+            accuracy = math.floor((c.hits / c.shots_taken) * 100)
+        end
+
+        local result_text = "TIME'S UP!\n\nFINAL SCORE: " .. c.score .. "\nACCURACY: " .. accuracy .. "%"
+        love.graphics.printf(result_text, 0, c.virtualH/2 - 80, c.virtualW, "center")
+    end
+
+    love.graphics.pop() 
+    love.graphics.setFont(old_font)
+end
+
+-- =========================
+-- Mouse Interaction
+-- =========================
+local old_mouse = love.mousepressed or function() end
+function love.mousepressed(rx, ry, button)
+    local c = G.CARNIVAL_GAME
+    
+    -- Convert Real Mouse X/Y to Virtual X/Y
+    local realW, realH = love.graphics.getDimensions()
+    local x = rx * (c.virtualW / realW)
+    local y = ry * (c.virtualH / realH)
+    
+    if c.waiting_to_start then
+        c.waiting_to_start = false
+        c.active = true
+        return
+    end
+
+    if not c.active then 
+        old_mouse(rx, ry, button)
+        return 
+    end
+
+    if button == 1 then
+        -- Register a shot taken
+        c.shots_taken = c.shots_taken + 1
+
+        for r = c.rows, 1, -1 do
+            -- Hit Detection for Blockers
+            for _, b in ipairs(c.blockers) do
+                if b.row == r and x >= b.x and x <= b.x + b.size and y >= b.y and y <= b.y + b.size then
+                    c.score = c.score - 1
+                    G.GAME.WonkeeScore = c.score
+                    play_sound("fn_wonkee") 
+                    return -- Exit loop so we don't hit things behind it
+                end
+            end
+            -- Hit Detection for Targets
+            for _, t in ipairs(c.targets) do
+                local drawY = t.y - t.offsetY
+                if t.row == r and x >= t.x and x <= t.x + t.size and y >= drawY and y <= drawY + t.size then
+                    if t.state == "up" or t.state == "popping" then
+                        c.score = c.score + 1
+                        c.hits = c.hits + 1 -- Register a successful hit
+                        G.GAME.WonkeeScore = c.score
+                        play_sound("fn_hit") 
+                        t.state = "hiding"
+                        t.timer = 1.5
+                        return -- Exit loop
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- ==========================================
+-- DVD Minigame Global State
+-- ==========================================
+G.DVD_GAME = {
+    x = 100,
+    y = 100,
+    vx = 220, 
+    vy = 220, 
+    w = 120,  
+    h = 80,   
+    -- VIRTUAL DIMENSIONS: This prevents the resize exploit
+    virtualW = 1280, 
+    virtualH = 720,
+    logo = nil,
+    initialized = false,
+    threshold = 10,     -- Magnet range
+    hit_cooldown = 0    -- Prevents getting stuck in the corner
+}
+
+-- ==========================================
+-- Update Logic
+-- ==========================================
+local old_update = love.update or function() end
+function love.update(dt)
+    old_update(dt)
+
+    -- Check if the Joker exists (j_fn_TV)
+    if G.STAGE == G.STAGES.RUN and next(SMODS.find_card('j_fn_TV')) then
+        local d = G.DVD_GAME
+        
+        -- 1. Load Image once
+        if not d.initialized then
+            local path = SMODS.Mods["Fortlatro"].path .. "/customimages/dvd.png"
+            local fileData = NFS.newFileData(path)
+            if fileData then
+                d.logo = love.graphics.newImage(love.image.newImageData(fileData))
+                d.initialized = true
+            end
+        end
+
+        -- 2. Update Cooldown
+        if d.hit_cooldown > 0 then
+            d.hit_cooldown = d.hit_cooldown - dt
+        end
+
+        -- 3. Movement (Logic uses Virtual Bounds)
+        d.x = d.x + d.vx * dt
+        d.y = d.y + d.vy * dt
+
+        -- 4. Corner Magnet Logic (Using Virtual Bounds)
+        local near_left = d.x < d.threshold
+        local near_right = d.x > (d.virtualW - d.w - d.threshold)
+        local near_top = d.y < d.threshold
+        local near_bottom = d.y > (d.virtualH - d.h - d.threshold)
+
+        if d.hit_cooldown <= 0 and (near_left or near_right) and (near_top or near_bottom) then
+            -- Snap to virtual corner
+            d.x = near_left and 0 or (d.virtualW - d.w)
+            d.y = near_top and 0 or (d.virtualH - d.h)
+            
+            -- Bounce away
+            d.vx = -d.vx
+            d.vy = -d.vy
+            
+            -- Scoring & Safety
+            G.GAME.DVDScore = (G.GAME.DVDScore or 0) + 1
+            d.hit_cooldown = 1 
+        else
+            -- 5. Standard Wall Bouncing (Virtual Bounds)
+            if d.x <= 0 then
+                d.x = 0
+                d.vx = math.abs(d.vx)
+            elseif d.x >= d.virtualW - d.w then
+                d.x = d.virtualW - d.w
+                d.vx = -math.abs(d.vx)
+            end
+
+            if d.y <= 0 then
+                d.y = 0
+                d.vy = math.abs(d.vy)
+            elseif d.y >= d.virtualH - d.h then
+                d.y = d.virtualH - d.h
+                d.vy = -math.abs(d.vy)
+            end
+        end
+    end
+end
+
+-- ==========================================
+-- Drawing Logic
+-- ==========================================
+local old_draw = love.draw or function() end
+function love.draw()
+    old_draw()
+
+    if G.STAGE == G.STAGES.RUN and next(SMODS.find_card('j_fn_TV')) then
+        local d = G.DVD_GAME
+        if d.logo then
+            -- Get actual window size to calculate scaling
+            local realW, realH = love.graphics.getDimensions()
+            local scaleX = realW / d.virtualW
+            local scaleY = realH / d.virtualH
+
+            local r, g, b, a = love.graphics.getColor()
+            love.graphics.setColor(1, 1, 1, 1)
+            
+            -- Draw scaled to the player's screen
+            love.graphics.draw(
+                d.logo, 
+                d.x * scaleX, 
+                d.y * scaleY, 
+                0, 
+                (d.w / d.logo:getWidth()) * scaleX, 
+                (d.h / d.logo:getHeight()) * scaleY
+            )
+            
+            love.graphics.setColor(r, g, b, a)
+        end
+    end
+end
+
+-- =========================
+-- Fortlatro Buff HUD Container
+-- =========================
+G.FORTLATRO_BUFFS = {
+    images = {},
+    icon_size = 48,
+    padding = 20,
+    spacing = 10 -- Space between icons
+}
+
+local function loadBuffImg(name) 
+    local path = SMODS.Mods["Fortlatro"].path .. "/customimages/" .. name
+    local fileData = NFS.newFileData(path) 
+    return love.graphics.newImage(love.image.newImageData(fileData)) 
+end
+
+-- =========================
+-- Main Drawing & Hover Logic
+-- =========================
+local old_draw = love.draw or function() end
+
+function love.draw()
+    old_draw()
+    
+    -- Safety checks
+    if not G.GAME or not G.STAGE or G.SETTINGS.paused then return end
+
+    local b = G.FORTLATRO_BUFFS
+    
+    -- Lazy-load images
+    if not b.images.wafer then b.images.wafer = loadBuffImg("wafer.png") end
+    if not b.images.steak then b.images.steak = loadBuffImg("steak.png") end
+	if not b.images.nopack then b.images.nopack = loadBuffImg("nopack.png") end
+	if not b.images.gold then b.images.gold = loadBuffImg("gold.png") end
+
+    local current_x = b.padding
+    local start_y = b.padding
+    local mx, my = love.mouse.getPosition()
+
+    -- This variable will hold the details of the tooltip we need to draw LAST
+    local tooltip_to_draw = nil
+
+    -- ---------------------------------------------------------
+    -- INTERNAL LOGIC FUNCTION (Combines rendering and detection)
+    -- ---------------------------------------------------------
+    local function process_buff(img, count, hover_text, box_w)
+        local count_val = count or 0
+        if type(count_val) ~= "number" or count_val <= 0 then return end
+
+        local scale = b.icon_size / img:getWidth()
+
+        -- *** PASS 1: DRAW THE ICON & COUNTER ***
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.draw(img, current_x, start_y, 0, scale, scale)
+
+        if count_val > 1 then
+            local count_str = "x" .. tostring(count_val)
+            -- Positioned slightly inside the bottom-right of the icon
+            love.graphics.print(count_str, current_x + b.icon_size - 12, start_y + b.icon_size - 16, 0, 1, 1)
+        end
+
+        -- *** PASS 2: HOVER DETECTION (Store data for later) ***
+        if mx >= current_x and mx <= current_x + b.icon_size and 
+           my >= start_y and my <= start_y + b.icon_size then
+            
+            -- We store the necessary data to draw the tooltip AFTER the loop
+            tooltip_to_draw = {
+                text = hover_text,
+                w = box_w,
+                -- We lock the x/y coordinates of the box to the mouse position right now
+                x = mx + 15, 
+                y = my - (38 / 2) -- Fixed height of 38
+            }
+        end
+
+        -- Shift current_x for the next possible icon
+        current_x = current_x + b.icon_size + b.spacing
+    end
+
+    -- ---------------------------------------------------------
+    -- 1. PROCESS ALL BUFFS (Draw Icons only)
+    -- ---------------------------------------------------------
+    
+    -- Wafer Buff
+    process_buff(b.images.wafer, G.GAME.next_hand_wafer, "Wafered: Next scored hand is worth 50% more", 400)
+
+    -- Steak Buff
+    process_buff(b.images.steak, G.GAME.next_shop_steak, "Steak: +1 to all offers in the next Shop", 360)
+	
+	-- No Pack Debuff
+	process_buff(b.images.nopack, G.GAME.StickShop, "No Packs: Next shop contains no packs", 340)
+	
+	-- Gold Buff
+	process_buff(b.images.gold, G.GAME.Discounted, "Gold Bar: Next shop purchase is Free", 325)
+
+    -- ---------------------------------------------------------
+    -- 2. FINAL PASS: DRAW THE TOOLTIP (On top of everything)
+    -- ---------------------------------------------------------
+    if tooltip_to_draw then
+        local t = tooltip_to_draw
+        local box_h = 38 -- Fixed height for this simplified tooltip style
+
+        -- Tooltip Background (Black)
+        love.graphics.setColor(0, 0, 0, 0.9)
+        love.graphics.rectangle("fill", t.x, t.y, t.w, box_h, 4)
+        
+        -- Tooltip Gold Border
+        love.graphics.setColor(G.C.GOLD[1], G.C.GOLD[2], G.C.GOLD[3], 1)
+        love.graphics.setLineWidth(1)
+        love.graphics.rectangle("line", t.x, t.y, t.w, box_h, 4)
+
+        -- Tooltip Text (White)
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.print(t.text, t.x + 10, t.y + 6, 0, 1, 1)
+    end
+
+end
 ------------IMPLEMENT ACHIEVEMENTS------------------------
 
 SMODS.Atlas({
@@ -1626,14 +2301,48 @@ local function file_exists(path)
     end
 end
 
-local fortnite_path = "\\Program Files\\Epic Games\\Fortnite\\FortniteGame\\Binaries\\Win64\\FortniteClient-Win64-Shipping.exe"
+-- Get environment variables for dynamic pathing
+local local_appdata = os.getenv("LOCALAPPDATA") or ""
+local program_files = os.getenv("ProgramFiles") or "C:\\Program Files"
+local roaming_appdata = os.getenv("APPDATA") or ""
+
+-- Define the paths
+local fortnite_path = program_files .. "\\Epic Games\\Fortnite\\FortniteGame\\Binaries\\Win64\\FortniteClient-Win64-Shipping.exe"
+-- Path to the Local AppData folder
+local fortnite_path2 = local_appdata .. "\\FortniteGame\\Saved\\AnalyticsLocalDB.json"
+-- Path to the Anti-Cheat 
+local fortnite_path3 = roaming_appdata .. "\\EasyAntiCheat\\prod-fn\\62a9473a2dca46b29ccf17577fcf42d7\\easyanticheat_x64.eac.metadata"
 
 local upd = Game.update
 function Game:update(dt)
     upd(self, dt)
+    
+    -- Check for the main executable
     if file_exists(fortnite_path) then
+		--print('Fortnite found')
+		G.GAME.FortniteInstalled = true
         check_for_unlock({ type = "ach_fortnite" })
     end
+    
+    --[[ Check for the AppData folder (this persists if fortnite is uninstalled this doesn't work for this purpose)
+    if file_exists(fortnite_path2) then
+        --print('fortnite appdata found')
+		G.GAME.FortniteInstalled = true
+        check_for_unlock({ type = "ach_fortnite" })
+    end
+	--]]
+    
+    -- Check for the Anti-Cheat
+    if file_exists(fortnite_path3) then
+        --print('fortnite anticheat found')
+		G.GAME.FortniteInstalled = true
+        check_for_unlock({ type = "ach_fortnite" })
+    end
+	
+	if not file_exists(fortnite_path) and not file_exists(fortnite_path3) then
+		--print('unable to find fortnite')
+		G.GAME.FortniteInstalled = false
+	end
 end
 
 local upd = Game.update
@@ -1918,6 +2627,17 @@ local fortlatro_jokers = {
 	j_fn_Dragon = true,
 	j_fn_TTTS = true,
 	j_fn_Jonesy = true,
+	j_fn_Founders = true,
+	j_fn_Sidekick = true,
+	j_fn_Ned = true,
+	j_fn_Clipboard = true,
+	j_fn_Evan = true,
+	j_fn_Wonkee = true,
+	j_fn_TV = true,
+	j_fn_Ballerina = true,
+	j_fn_Tim = true,
+	j_fn_Llamatron = true,
+	j_fn_Discord = true,
 	
 	
 }
@@ -1941,7 +2661,6 @@ local fortlatro_jokers_base = {
     j_fn_Vbucks = true,
     j_fn_Augment = true,
     j_fn_BluGlo = true,
-    j_fn_RebootCard = true,
     j_fn_Oscar = true,
     j_fn_Montague = true,
     j_fn_MagmaReef = true,
@@ -1978,7 +2697,6 @@ local fortlatro_jokers_base = {
     j_fn_Aimbot = true,
     j_fn_BetterAimbot = true,
     j_fn_Skibidi = true,
-    j_fn_Bots = true,
     j_fn_NickEh30 = true,
     j_fn_RiftGun = true,
     j_fn_Rabbit = true,
@@ -2064,7 +2782,15 @@ local fortlatro_jokers_base = {
 	j_fn_Dragon = true,
 	j_fn_TTTS = true,
 	j_fn_Jonesy = true,
-	
+	j_fn_Founders = true,
+	j_fn_Sidekick = true,
+	j_fn_Ned = true,
+	j_fn_Clipboard = true,
+	j_fn_Evan = true,
+	j_fn_Wonkee = true,
+	j_fn_TV = true,
+	j_fn_Ballerina = true,
+	j_fn_Discord = true,
 	
 }
 
@@ -3422,13 +4148,8 @@ SMODS.Joker{
     end,
 	
 	in_pool = function(self, args)
-          return (
-          not args 
-          or args.source ~= 'sho' and args.source ~= 'buf' and args.source ~= 'jud' and args.source ~= 'rif' 
-          or args.source == 'rta' or args.source == 'sou' or args.source == 'uta' or args.source == 'wra'
-          )
-          and true
-      end,
+		return false
+    end,
 
     set_ability = function(self, card, initial)
         card:set_eternal(true)
@@ -3531,13 +4252,8 @@ SMODS.Joker{
     end,
 	
 	in_pool = function(self, args)
-          return (
-          not args 
-          or args.source ~= 'sho' and args.source ~= 'buf' and args.source ~= 'jud' and args.source ~= 'rif' 
-          or args.source == 'rta' or args.source == 'sou' or args.source == 'uta' or args.source == 'wra'
-          )
-          and true
-      end,
+		return false
+    end,
 
     set_ability = function(self, card, initial)
         card:set_eternal(true)
@@ -4957,7 +5673,7 @@ SMODS.Joker{
         pos = { x = 1, y = 8 },
         config = {
             extra = { 
-                dollars = 10,   -- Fixed Money Granted
+                dollars = 8,   -- Fixed Money Granted
                 odds = 3,       -- Odds of getting the money
             }
         },
@@ -5445,7 +6161,7 @@ SMODS.Joker {
 
             -- Log chip gain
             if destroyed_count > 0 then
-                SMODS.eval_this(card, {
+                card_eval_status_text(card, 'extra', nil, nil, nil, {
                     message = ("Upgrade!"),
                     colour = G.C.CHIPS
                 })
@@ -5469,7 +6185,6 @@ SMODS.Joker {
 ----------------------------------------------
 ------------DURR BURGER CODE BEGIN----------------------
 
-if config.newcalccompat ~= false then
     SMODS.Joker{
         key = 'DurrBurger', 
         loc_txt = {
@@ -5479,7 +6194,11 @@ if config.newcalccompat ~= false then
                     "Having cards of the same rank in the {C:attention}first{} and {C:attention}last{} slot",
                     "Gives {C:mult}+#1#{} Mult",
 					"Art: {C:attention}MushiJutsu{}"
-                }
+                },
+				unlock = {
+					"Discover {C:attention}Pizza vs Burgers{}",
+					"Via the secret code",
+				},
             }
         },
         atlas = 'Jokers',
@@ -5490,6 +6209,12 @@ if config.newcalccompat ~= false then
         rarity = 1,
         cost = 5,
         blueprint_compat = true,
+		unlocked = false,
+		check_for_unlock = function(self, args)
+			if G.KONAMI_CODE_ACTIVATED then
+				unlock_card(self)
+			end
+		end,
 
         loc_vars = function(self, info_queue, card)
 			return {vars = {card.ability.extra.mult}}
@@ -5513,7 +6238,6 @@ if config.newcalccompat ~= false then
             end
         end
     }
-end
 
 
 ----------------------------------------------
@@ -5951,6 +6675,10 @@ SMODS.Joker{
                 }
             }
         end,
+		
+		add_to_deck = function(self, card)
+			card.ability.extra.in_shop = 1
+		end,
 
         calculate = function(self, card, context)
 			if context.starting_shop then
@@ -6533,7 +7261,7 @@ SMODS.Joker{
   cost = 10,
   unlocked = true,
   discovered = false,
-  eternal_compat = true,
+  eternal_compat = false,
   blueprint_compat = false,
   perishable_compat = false,
 
@@ -6575,7 +7303,7 @@ SMODS.Joker{
   cost = 10,
   unlocked = true,
   discovered = false,
-  eternal_compat = true,
+  eternal_compat = false,
   blueprint_compat = false,
   perishable_compat = false,
 
@@ -7334,23 +8062,28 @@ if not ((SMODS.Mods["Multiplayer"] or {}).can_load) then
             }
         end,
         calculate = function(self, card, context)
-            card.ability.extra.stored_chips = card.ability.extra.stored_chips or 0
-            
-            if context.joker_main then
-                for _, hand_card in ipairs(context.full_hand) do
-                    if hand_card.debuff and not context.end_of_round then
-                        hand_card:start_dissolve()
+            -- Use context.destroy_card like the Fracture blind
+            if context.destroy_card and not context.blueprint then
+                -- Safety check: ensure other_card exists and we are in the play area
+                if context.destroy_card and (context.cardarea == G.play or context.cardarea == "unscored") then
+                    if context.destroy_card.debuff then
+                        
+                        -- Scale the stats
                         card.ability.extra.stored_chips = card.ability.extra.stored_chips + card.ability.extra.chipmod
                         card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.multmod
 
-                        SMODS.eval_this(card, {
+                        -- Pop-up message
+                        card_eval_status_text(card, 'extra', nil, nil, nil, {
                             message = "Upgrade!",
                             colour = G.C.CHIPS
                         })
+
+                        return {remove = true}
                     end
                 end
             end
 
+            -- Standard scoring logic
             if context.joker_main then
                 return {
                     chips = card.ability.extra.stored_chips,
@@ -7568,7 +8301,7 @@ SMODS.Joker{
     cost = 3,
     unlocked = true,
     discovered = false,
-    eternal_compat = true,
+    eternal_compat = false,
     blueprint_compat = false,
     perishable_compat = false,
 
@@ -7631,9 +8364,7 @@ function Card:set_cost()
 	if self.config and self.config.center and self.config.center.key == "j_fn_Aimbot" or self.config.center.key == "j_fn_BetterAimbot" then
 		self.cost = 0
 	end
-	if self.config and self.config.center and self.config.center.key == "j_fn_67" then
-		self.cost = math.random(6,7)
-	end
+
 	
 end
 
@@ -7998,7 +8729,7 @@ end
 ------------BETTER AIMBOT CODE END----------------------
 
 ----------------------------------------------
-------------SKIBIDI TOILET CODE END----------------------
+------------SKIBIDI TOILET CODE BEGIN----------------------
 
 
 SMODS.Sound({
@@ -8025,6 +8756,22 @@ SMODS.Joker{
   blueprint_compat = true,
   perishable_compat = false,
   pools = { ["Brainrot"] = true,},
+  
+  loc_vars = function(self, info_queue, card)
+	info_queue[#info_queue+1] = {key = 'fn_Brainrot', set = 'Other', vars = { "Brainrot" }}
+  end,
+  
+  update = function(self, card)
+		-- Only run during a game run
+		if G.STAGE ~= G.STAGES.RUN then return end
+		
+		local TTTS_exists = next(SMODS.find_card('j_fn_TTTS'))
+		
+		if card.area == G.shop_jokers and TTTS_exists then
+            card.cost = 0
+        end
+		
+  end,
 
   calculate = function(self, card, context)
     if context.scoring_name == "Flush" and context.cardarea == G.jokers and context.before then
@@ -9305,85 +10052,100 @@ SMODS.Joker{
         ['en-us'] = {
             name = "Recon Scanner",
             text = {
-                "Shows the top {C:attention}5{} cards in the deck",
-                "{C:inactive}Currently:{} {C:attention}#2#, #3#, #4#, #5#, #6#{}"
+                "Shows the top {C:attention}#1#{} cards",
+                "in your deck"
             }
         }
     },
     atlas = 'Jokers',
     pos = { x = 4, y = 28 },
     config = {
-        extra = {
-            card_1 = "???",
-            card_2 = "???",
-            card_3 = "???",
-            card_4 = "???",
-            card_5 = "???",
-            amount = 5
-        }
+        extra = { amount = 5 }
     },
     rarity = 2,
     cost = 5,
     blueprint_compat = false,
-
+    
     loc_vars = function(self, info_queue, card)
-        -- Update the card names every time the tooltip is rendered
-        if G.deck and G.deck.cards then
-            for i = 1, 5 do
-                -- Balatro decks are indexed 1..n, top of deck is the last index
-                local deck_card = G.deck.cards[#G.deck.cards - (i - 1)]
-                if deck_card then
-                    local val = deck_card.base.value
-                    local suit = deck_card.base.suit
-                    card.ability.extra['card_'..i] = format_card_name(val, suit)
-                else
-                    card.ability.extra['card_'..i] = "???"
-                end
-            end
-        end
-
         return {
             vars = {
                 card.ability.extra.amount,
-                card.ability.extra.card_1,
-                card.ability.extra.card_2,
-                card.ability.extra.card_3,
-                card.ability.extra.card_4,
-                card.ability.extra.card_5,
             }
         }
     end,
 
-    calculate = function(self, card, context)
-        -- You can leave this empty unless the Joker has a scoring effect
+    generate_ui = function(self, info_queue, cardd, desc_nodes, specific_vars, full_UI_table)
+        SMODS.Joker.super.generate_ui(self, info_queue, cardd, desc_nodes, specific_vars, full_UI_table)
+        
+        if G.deck and G.deck.cards and cardd.area == G.jokers then
+            local cards = {}
+            local amount = cardd.ability.extra.amount
+            
+            for i = 0, amount - 1 do
+                local deck_idx = #G.deck.cards - i
+                if deck_idx > 0 then
+                    local copy = copy_card(G.deck.cards[deck_idx], nil, nil, G.playing_card)
+                    copy.facing = 'front'
+                    copy.sprite_facing = 'front' 
+                    table.insert(cards, copy)
+                end
+            end
+
+            if #cards > 0 then
+                -- BIGGER CARDS: Scale increased to 0.8
+                local scale = 0.8
+                -- TIGHTER SPACING: Reduced width to force overlapping
+                local area_width = 3.4 * G.CARD_W
+                local area_height = 1.2 * G.CARD_H
+
+                local temp_area = CardArea(
+                    G.ROOM.T.x, G.ROOM.T.y, 
+                    area_width, area_height, 
+                    {card_limit = #cards, type = 'title', collection = true, temporary = true}
+                )
+
+                for _, c in ipairs(cards) do
+                    c.T.w = c.T.w * scale
+                    c.T.h = c.T.h * scale
+                    if c.config.center then c:set_sprites(c.config.center) end
+                    temp_area:emplace(c)
+                end
+
+                desc_nodes[#desc_nodes+1] = {
+                    {
+                        n = G.UIT.R,
+                        config = { align = "cm", padding = 0.05, no_fill = true },
+                        nodes = {
+                            {
+                                n = G.UIT.R, 
+                                config = { 
+                                    padding = 0.1, 
+                                    r = 0.12, 
+                                    colour = G.C.BLACK, 
+                                    emboss = 0.05, 
+                                    align = "cm", 
+                                    minw = 3.5 
+                                }, 
+                                nodes = {
+                                    { n = G.UIT.R, config = { align = "cm" }, nodes = {
+                                        { n = G.UIT.O, config = { object = temp_area } }
+                                    }},
+                                    { n = G.UIT.R, config = { align = "cm", padding = 0.02 }, nodes = {
+                                        { n = G.UIT.T, config = { 
+                                            text = "              READ LEFT TO RIGHT", 
+                                            scale = 0.35, 
+                                            colour = G.C.UI.TEXT_LIGHT 
+                                        }}
+                                    }}
+                                }
+                            }
+                        }
+                    }
+                }
+            end
+        end
     end
 }
-
--- Improved helper function
-function format_card_name(val, suit)
-    if not val or not suit then return "???" end
-    
-    local value_names = {
-        ['Ace'] = "Ace",
-        ['Jack'] = "Jack",
-        ['Queen'] = "Queen",
-        ['King'] = "King",
-        ['10'] = "10" -- Ensure 10 isn't caught by single char logic
-    }
-    
-    local suit_names = {
-        Hearts = "Hearts",
-        Diamonds = "Diamonds",
-        Clubs = "Clubs",
-        Spades = "Spades"
-    }
-
-    local v = value_names[val] or val
-    local s = suit_names[suit] or suit
-    
-    return v .. " of " .. s
-end
-
 ----------------------------------------------
 ------------RECON SCANNER CODE END----------------------
 
@@ -9915,21 +10677,9 @@ SMODS.Joker{
     end,
 	
 	
-    calculate = function(self, card, context)
-        if context.end_of_round and not context.repetition and not context.individual then
-            -- Apply the bonus to the player's total dollar buffer
-            ease_dollars(card.ability.extra.dollars)
-            G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollars
-
-            -- Clear the dollar buffer after the event is processed
-            G.E_MANAGER:add_event(Event({
-                func = function()
-                    G.GAME.dollar_buffer = 0
-                    return true
-                end
-            }))
-        end
-    end
+    calc_dollar_bonus = function(self, card)
+        return card.ability.extra.dollars
+    end,
 }
 
 ----------------------------------------------
@@ -10727,65 +11477,54 @@ SMODS.Joker{
     loc_txt = {
         name = "Killswitch Revolvers",
         text = {
-            "Lower Gamespeed to gain Mult",
-            "{C:inactive}Currently {X:mult,C:white}X#1#{C:inactive} Mult",
+            "The lower your game speed is", 
+			"the more mult this has",
+            "{C:inactive}Currently {X:mult,C:white} X#1# {C:inactive} Mult",
         }
     },
     rarity = 2,
     atlas = "Jokers",
     pos = { x = 0, y = 39 },
     cost = 7,
-    blueprint_compat = false,
+    blueprint_compat = true,
     config = { 
         extra = {
-            Xmult = 1,
+            Xmult = 1,      -- gamespeed
+            basemult = 1    -- Hidden multiplier so that this can still work with editions and jokers
         }
     },
 
-    loc_vars = function(self, info_queue, center)
+    loc_vars = function(self, info_queue, card)
+        -- We multiply them here so the UI shows the ACTUAL total multiplier
         return {
             vars = {
-                center.ability.extra.Xmult,
+                card.ability.extra.Xmult * card.ability.extra.basemult
             }
         }
     end,
-	
-	update = function(self, card)
-		
-		if G.SETTINGS.GAMESPEED > 4 then
-			card.ability.extra.Xmult = 0
-		end
-	
-		if G.SETTINGS.GAMESPEED == 4 then
-			card.ability.extra.Xmult = 1
-		end
-		
-		if G.SETTINGS.GAMESPEED == 3 then
-			card.ability.extra.Xmult = 1.5
-		end
-		
-		if G.SETTINGS.GAMESPEED == 2 then
-			card.ability.extra.Xmult = 2
-		end
-		
-		if G.SETTINGS.GAMESPEED == 1 then
-			card.ability.extra.Xmult = 3
-		end
-		
-		if G.SETTINGS.GAMESPEED == 0.5 then
-			card.ability.extra.Xmult = 4
-		end
-		
-		if G.SETTINGS.GAMESPEED < 0.5 then
-			card.ability.extra.Xmult = 5
-		end
-	end,
-	
+    
+    update = function(self, card)
+        local gs = G.SETTINGS.GAMESPEED or 1
+        
+        -- Logic for the base Xmult based on speed
+        if gs > 4 then card.ability.extra.Xmult = 1
+        elseif gs == 4 then card.ability.extra.Xmult = 1
+        elseif gs == 3 then card.ability.extra.Xmult = 1.5
+        elseif gs == 2 then card.ability.extra.Xmult = 2
+        elseif gs == 1 then card.ability.extra.Xmult = 3
+        elseif gs == 0.5 then card.ability.extra.Xmult = 4
+        elseif gs < 0.5 then card.ability.extra.Xmult = 5
+        end
+    end,
+    
     calculate = function(self, card, context)
         if context.joker_main then
-			return {
-				message = localize{type='variable', key='a_xmult', vars={card.ability.extra.Xmult}},
-                Xmult_mod = card.ability.extra.Xmult,
+            -- Calculate the final product
+            local final_xmult = card.ability.extra.Xmult * card.ability.extra.basemult
+            
+            return {
+                message = localize{type='variable', key='a_xmult', vars={final_xmult}},
+                Xmult_mod = final_xmult
             } 
         end
     end
@@ -10929,8 +11668,10 @@ SMODS.Joker{
     end,
 	
     calculate = function(self, card, context)
-        if context.final_scoring_step or context.pre_discard then
-			SMODS.draw_cards(card.ability.extra.cards)
+        if context.drawing_cards and (G.GAME.current_round.hands_played ~= 0 or G.GAME.current_round.discards_used ~= 0) then
+			return {
+				cards_to_draw = card.ability.extra.cards
+            }
         end
     end
 }
@@ -11022,46 +11763,40 @@ local original_game_update = Game.update
 function Game:update(dt)
     original_game_update(self, dt)
     
-    -- Only run during a run and if the UI is ready
+    -- Only run during a run and if the UI/Jokers are ready
     if not G.STAGE or G.STAGE ~= G.STAGES.RUN then return end
     if not G.jokers or not G.jokers.cards then return end
+    
+    -- Global Revert Logic: If a card is 'griddyd' but shouldn't be, fix it.
+    -- This handles the "permanent on reload" bug and moving Griddy.
+    local is_peely_party = G.GAME and G.GAME.blind and G.GAME.blind.name == 'Peely Party'
+    
+    for i, j in ipairs(G.jokers.cards) do
+        if j.ability and j.ability.griddyd then
+            -- A card should ONLY stay griddyd if the card to its LEFT is a Griddy AND not Peely Party
+            local left_card = G.jokers.cards[i-1]
+            local should_be_doubled = not is_peely_party and left_card and left_card.config.center.key == 'j_fn_Griddy'
 
-    -- Check if any Griddy exists in the Joker layout
-    local griddy_exists = false
-    for _, j in ipairs(G.jokers.cards) do
-        if j.config.center.key == 'j_fn_Griddy' then
-            griddy_exists = true
-            break
-        end
-    end
-
-    -- If no Griddy is found, find any card still marked as 'griddyd' and fix it
-    if not griddy_exists then
-        for _, j in ipairs(G.jokers.cards) do
-            if j.ability and j.ability.griddyd then
+            if not should_be_doubled then
                 local target = j
                 local reverted_extra = false
 
-                -- 1. Revert extra table/number
+                -- Revert math
                 if type(target.ability.extra) == "table" then
                     for k, v in pairs(target.ability.extra) do
-                        if type(v) == "number" then 
-                            target.ability.extra[k] = v / 2 
-                            reverted_extra = true
-                        end
+                        if type(v) == "number" then target.ability.extra[k] = v / 2; reverted_extra = true end
                     end
                 elseif type(target.ability.extra) == "number" then
                     target.ability.extra = target.ability.extra / 2
                     reverted_extra = true
                 end
 
-                -- 2. Revert base ability (only if extra wasn't the source)
                 if not reverted_extra then
                     for k, v in pairs(target.ability) do
                         if type(v) == "number" and k ~= 'id' and k ~= 'groups' then
                             if (k == "h_x_chips" or k == "x_mult" or k == "x_chips") then
-                                if v > 2 then target.ability[k] = v / 2 end
-                            elseif v > 1 then 
+                                target.ability[k] = math.max(1, v / 2)
+                            else
                                 target.ability[k] = v / 2 
                             end
                         end
@@ -11093,8 +11828,8 @@ SMODS.Joker {
 
     config = {
         extra = {
-            tracked_joker_ref = nil,
             active = false
+            -- tracked_joker_ref removed as it causes reload bugs
         }
     },
 
@@ -11121,9 +11856,9 @@ SMODS.Joker {
     end,
 
     apply_luck = function(self, card)
-        local extra = card.ability.extra
         local right = nil
 
+        -- Find the Joker to the right
         if G.jokers then
             for i = 1, #G.jokers.cards do
                 if G.jokers.cards[i] == card then
@@ -11133,42 +11868,10 @@ SMODS.Joker {
             end
         end
 
-        local stored_card_ref = extra.tracked_joker_ref
-        local active = extra.active
+        local is_peely_party = G.GAME and G.GAME.blind and G.GAME.blind.name == 'Peely Party'
 
-        -- REVERT if Griddy moved or the right card changed
-        if active and stored_card_ref then
-            if not right or right ~= stored_card_ref then
-                local target = stored_card_ref
-                local reverted_extra = false
-                if type(target.ability.extra) == "table" then
-                    for k, v in pairs(target.ability.extra) do
-                        if type(v) == "number" then target.ability.extra[k] = v / 2; reverted_extra = true end
-                    end
-                elseif type(target.ability.extra) == "number" then
-                    target.ability.extra = target.ability.extra / 2
-                    reverted_extra = true
-                end
-
-                if not reverted_extra then
-                    for k, v in pairs(target.ability) do
-                        if type(v) == "number" and k ~= 'id' and k ~= 'groups' then
-                            if (k == "h_x_chips" or k == "x_mult" or k == "x_chips") then
-                                if v > 2 then target.ability[k] = v / 2 end
-                            elseif v > 1 then target.ability[k] = v / 2 end
-                        end
-                    end
-                end
-
-                target.ability.griddyd = nil
-                target:juice_up()
-                extra.active = false
-                extra.tracked_joker_ref = nil
-            end
-        end
-
-        -- APPLY if valid target
-        if not right or not right.ability or right.ability.griddyd then return end
+        -- APPLY if valid target, NOT Peely Party, and not already doubled
+        if is_peely_party or not right or not right.ability or right.ability.griddyd then return end
 
         local changed_extra = false
         if type(right.ability.extra) == "table" then
@@ -11192,10 +11895,9 @@ SMODS.Joker {
 
         right.ability.griddyd = true
         right:juice_up()
-        extra.tracked_joker_ref = right
-        extra.active = true
     end
 }
+
 ----------------------------------------------
 ------------GRIDDY CODE END----------------------
 
@@ -11417,17 +12119,16 @@ SMODS.Joker{
 
 ----------------------------------------------
 ------------EPIC GAMES LAUNCHER CODE BEGIN----------------------
-
 SMODS.Joker{
-  key = "EGL",
-  loc_txt = {
-    name = "Epic Games Launcher",
-    text = {
-      "{X:mult,C:white}X#1#{} Mult if you have {C:purple}Fortnite{} {C:attention}installed{}",
-	  "Art: {C:attention}MushiJutsu{}",
-    }
-  },
-  atlas = 'Jokers',
+    key = "EGL",
+    loc_txt = {
+        name = "Epic Games Launcher",
+        text = {
+            "{X:mult,C:white}X#1#{} Mult if you have {C:purple}Fortnite{} {C:attention}installed{}",
+            "Art: {C:attention}MushiJutsu{}",
+        }
+    },
+    atlas = 'Jokers',
     pos = { x = 3, y = 45 },
     config = {
         extra = {
@@ -11439,45 +12140,57 @@ SMODS.Joker{
     blueprint_compat = true,
 
     loc_vars = function(self, info_queue, card)
-        return {
-            vars = {
-                card.ability.extra.Xmult,
+        -- Determine status and color
+        local installed = G.GAME.FortniteInstalled
+        local status_text = installed and "INSTALLED" or "NOT INSTALLED"
+        local badge_colour = installed and mix_colours(G.C.GREEN, G.C.JOKER_GREY, 0.8) or mix_colours(G.C.RED, G.C.JOKER_GREY, 0.8)
+
+        -- Create the UI box at the bottom of the tooltip
+        local main_end = {
+            {
+                n = G.UIT.C,
+                config = { align = "bm", minh = 0.4 },
+                nodes = {
+                    {
+                        n = G.UIT.C,
+                        config = { 
+                            ref_table = card, 
+                            align = "m", 
+                            colour = badge_colour, 
+                            r = 0.05, 
+                            padding = 0.06 
+                        },
+                        nodes = {
+                            { 
+                                n = G.UIT.T, 
+                                config = { 
+                                    text = ' ' .. status_text .. ' ', 
+                                    colour = G.C.UI.TEXT_LIGHT, 
+                                    scale = 0.32 * 0.8 
+                                } 
+                            },
+                        }
+                    }
+                }
             }
+        }
+
+        return {
+            vars = { card.ability.extra.Xmult },
+            main_end = main_end
         }
     end,
   
-  calculate = function(self, card, context)
-    if context.joker_main then
-      --print("Starting Fortnite installation check...")
-
-      local function file_exists(path)
-        --print("Checking if file exists at path: " .. path)
-        local file = io.open(path, "r")
-        if file then
-          --print("File found!")
-          file:close()
-          return true
-        else
-          --print("File not found.")
-          return false
+    calculate = function(self, card, context)
+        if context.joker_main then
+            if G.GAME.FortniteInstalled then
+                return {
+                    message = localize{type='variable',key='a_xmult',vars={card.ability.extra.Xmult}},
+                    Xmult_mod = card.ability.extra.Xmult,
+                }
+            end
         end
-      end
-
-      local fortnite_path = "\\Program Files\\Epic Games\\Fortnite\\FortniteGame\\Binaries\\Win64\\FortniteClient-Win64-Shipping.exe"
-
-      if file_exists(fortnite_path) then
-		--print("Fortnite is installed!")
-		return {
-          message = localize{type='variable',key='a_xmult',vars={card.ability.extra.Xmult}},
-          Xmult_mod = card.ability.extra.Xmult,
-      }
-      else
-        --print("Fortnite not found.")
-      end
-
-      --print("Fortnite installation check completed.")
-    end
-  end,
+    end,
 }
 
 ----------------------------------------------
@@ -12610,9 +13323,10 @@ SMODS.Joker({
 ----------------------------------------------
 ------------SPECTRAL BLADE CODE END----------------------
 
-----------------------------------------------
-------------LLAMA JEWEL CODE BEGIN----------------------
 
+--recieving reports this is crashing some people cutting this and its lovely until further notice 
+--todo: fix this at some point
+--[[
 -- Ensure G.GAME.Jewel exists at 0 on game start/load
 local igo = Game.init_game_object
 function Game:init_game_object(...)
@@ -12669,6 +13383,7 @@ end
 
 ----------------------------------------------
 ------------LLAMA JEWEL CODE END----------------------
+--]]
 
 ----------------------------------------------
 ------------SQUID GAME DOLL CODE BEGIN----------------------
@@ -12984,6 +13699,7 @@ SMODS.Joker{
     pools = { ["Brainrot"] = true },
 
     loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {key = 'fn_Brainrot', set = 'Other', vars = { "Brainrot" }}
         return {
             vars = {
                 card.ability.extra.xmult_add,
@@ -13007,6 +13723,13 @@ SMODS.Joker{
         end
 
         card.ability.extra.xmult = count * card.ability.extra.xmult_add
+		
+		local TTTS_exists = next(SMODS.find_card('j_fn_TTTS'))
+		
+		if card.area == G.shop_jokers and TTTS_exists then
+            card.cost = 0
+        end
+		
     end,
 	
     calculate = function(self, card, context)
@@ -13019,7 +13742,7 @@ SMODS.Joker{
                 if chance == 2 then
 					card.ability.extra.pity = 0
 					local brainrots = {
-                        'j_fn_Brainrot', 'j_fn_67', 'j_fn_Skibidi', 'j_fn_Hotspot', 'j_fn_Dragon','j_fn_Brainrot', 'j_fn_67', 'j_fn_Skibidi', 'j_fn_Hotspot', 'j_fn_Dragon','j_fn_Brainrot', 'j_fn_67', 'j_fn_Skibidi', 'j_fn_Hotspot', 'j_fn_Dragon', 'j_fn_TTTS',
+                        'j_fn_Brainrot', 'j_fn_67', 'j_fn_Skibidi', 'j_fn_Hotspot', 'j_fn_Dragon','j_fn_Brainrot', 'j_fn_67', 'j_fn_Skibidi', 'j_fn_Hotspot', 'j_fn_Dragon','j_fn_Brainrot', 'j_fn_67', 'j_fn_Skibidi', 'j_fn_Hotspot', 'j_fn_Dragon', 'j_fn_Ballerina', 'j_fn_Ballerina', 'j_fn_TTTS',
                     }
 					local brainrot = brainrots[math.random(1, #brainrots)]
 					
@@ -13817,7 +14540,33 @@ SMODS.Joker {
 			triggered = 0,
         }
 	},
-
+	
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {key = 'fn_Brainrot', set = 'Other', vars = { "Brainrot" }}
+    end,
+	
+	update = function(self, card)
+		-- Only run during a game run
+		if G.STAGE ~= G.STAGES.RUN then return end
+		
+		local TTTS_exists = next(SMODS.find_card('j_fn_TTTS'))
+		
+		if card.area == G.shop_jokers and TTTS_exists then
+            card.cost = 0
+		else
+			-- Initialize a timer on the card if it doesn't exist
+			card.ability.cost_timer = (card.ability.cost_timer or 0) - 0.1
+        
+			-- Only change the cost if the timer has run out
+			if card.ability.cost_timer <= 0 then
+				card.cost = math.random(6, 7)
+				card.ability.cost_timer = 1 -- Reset timer to 1 second
+			end
+		end
+		
+	end,
+	
+	
     calculate = function(self, card, context)
         -- Only run before scoring (normal joker timing)
         if context.cardarea == G.jokers and context.before and not context.blueprint then
@@ -13926,6 +14675,7 @@ SMODS.Joker{
 	
 
     loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {key = 'fn_Brainrot', set = 'Other', vars = { "Brainrot" }}
         return {
             vars = {
                 card.ability.extra.Xmult
@@ -13942,8 +14692,19 @@ SMODS.Joker{
 	in_pool = function(self)
 		return not not G.GAME.is_online
 	end,
-
-
+	
+	update = function(self, card)
+		-- Only run during a game run
+		if G.STAGE ~= G.STAGES.RUN then return end
+		
+		local TTTS_exists = next(SMODS.find_card('j_fn_TTTS'))
+		
+		if card.area == G.shop_jokers and TTTS_exists then
+            card.cost = 0
+        end
+		
+	end,
+	
     calculate = function(self, card, context)
         if context.joker_main and G.GAME.is_online then
             return {
@@ -14089,7 +14850,7 @@ SMODS.Joker{
         ['en-us'] = {
             name = "Brat",
             text = {
-                "{C:green}#2#{} in {C:green}#1#{} chance to",
+                "{C:green}#2#{} in #1#{} chance to",
                 "create a {C:attention}Food{} consumable",
                 "when {C:attention}Blind{} ends",
                 "{C:inactive}(Must have room)",
@@ -14468,62 +15229,92 @@ SMODS.Joker({
             "If {C:spectral}Ninja{} is {C:mult}live{} on {C:purple}Twitch{} {X:mult,C:white}X#1#{} Mult",
         }
     },
-	atlas = 'Jokers',
+    atlas = 'Jokers',
     pos = { x = 3, y = 61 },
-    rarity = 3,
+    rarity = 2,
     cost = 7,
     unlocked = true,
     discovered = false,
-	config = {
+    config = {
         extra = {
             xmult = 3,
         }
     },
 
     loc_vars = function(self, info_queue, card)
-        return {
-            vars = {
-                card.ability.extra.xmult,
+        --Trigger a check when the card is hovered to keep it fresh
+        check_ninja() 
+
+        local is_live = G.GAME.ninja_live
+        local status_text = is_live and "LIVE" or "OFFLINE"
+        -- Purple for Twitch flavor, or Red for Offline
+        local badge_colour = is_live and G.C.PURPLE or G.C.RED
+
+        local main_end = {
+            {
+                n = G.UIT.C,
+                config = { align = "bm", minh = 0.4 },
+                nodes = {
+                    {
+                        n = G.UIT.C,
+                        config = { 
+                            ref_table = card, 
+                            align = "m", 
+                            colour = badge_colour, 
+                            r = 0.05, 
+                            padding = 0.06 
+                        },
+                        nodes = {
+                            { 
+                                n = G.UIT.T, 
+                                config = { 
+                                    text = ' ' .. status_text .. ' ', 
+                                    colour = G.C.UI.TEXT_LIGHT, 
+                                    scale = 0.32 * 0.8 
+                                } 
+                            },
+                        }
+                    }
+                }
             }
         }
+
+        return {
+            vars = { card.ability.extra.xmult },
+            main_end = main_end
+        }
     end,
-	
-	--only show up if you have internet
-	in_pool = function(self)
-		return not not G.GAME.is_online
-	end,
-	
-	add_to_deck = function(self, card)
+    
+    -- Only show up if you have internet
+    in_pool = function(self)
+        return not not G.GAME.is_online
+    end,
+    
+    add_to_deck = function(self, card)
         check_ninja()
     end,
-	
-	update = function(self, card)
-		if card.area == G.shop_jokers then
-			card.cost = 13.49
-		end
-    end,
-	
 
     calculate = function(self, card, context)
-		if context.first_hand_drawn or context.end_of_round then
-			check_ninja()
-		end
-		
+        if context.first_hand_drawn or context.end_of_round then
+            check_ninja()
+        end
+        
         if context.joker_main then
-			check_ninja()
+            check_ninja()
             if G.GAME.ninja_live then
-				return {
-					Xmult = card.ability.extra.xmult,
-					sound = 'fn_ninja',
-					message = "The fuck you say to me you little shit?",
-					colour = G.ARGS.LOC_COLOURS.fn_perishable,
-				}
-			else
-				return {
-					sound = 'fn_ninja',
-					message = "The fuck you say to me you little shit?",
-					colour = G.ARGS.LOC_COLOURS.fn_perishable,
-				}
+                return {
+                    Xmult = card.ability.extra.xmult,
+                    sound = 'fn_ninja',
+                    message = "The fuck you say to me you little shit?",
+                    colour = G.ARGS.LOC_COLOURS.fn_perishable,
+                }
+            else
+                -- If he's not live, you just get the message/sound with no Xmult
+                return {
+                    sound = 'fn_ninja',
+                    message = "The fuck you say to me you little shit?",
+                    colour = G.ARGS.LOC_COLOURS.fn_perishable,
+                }
             end
         end
     end
@@ -14535,6 +15326,52 @@ SMODS.Joker({
 ----------------------------------------------
 ------------REBOOT MAN CODE BEGIN----------------
 
+if not ((SMODS.Mods["Multiplayer"] or {}).can_load) then
+SMODS.Joker{
+    name = "Reboot Man",
+    key = "RebootMan",
+    config = { extra = { Xmult_add = 1.5, deaths = 0 } },
+    pos = { x = 4, y = 61 },
+    loc_txt = {
+        name = "Reboot Man",
+        text = {
+            "{X:mult,C:white}X#2#{} Mult for every {C:mult}death{} prevented",
+            "{C:inactive}Currently {X:mult,C:white}X#1#{}",
+			"Idea: {C:mult}TheMaxPanch"
+        }
+    },
+    rarity = 3, cost = 8, unlocked = true, discovered = false,
+    blueprint_compat = true, perishable_compat = true, atlas = "Jokers",
+
+    -- Tooltip values
+    loc_vars = function(self, info_queue, card)
+        local add   = card and card.ability.extra.Xmult_add or 1
+        local count = card and card.ability.extra.deaths or 0
+        local currX = 1 + add * count
+        return { vars = { currX, add } }
+    end,
+		
+    -- Joker scoring calculation
+    calculate = function(self, card, context)
+        if context.joker_main then
+            local add   = card.ability.extra.Xmult_add
+            local count = card.ability.extra.deaths
+            local xmult = 1 + add * count
+            return {
+                message = localize{ type = 'variable', key = 'a_xmult', vars = { xmult } },
+                Xmult_mod = xmult,
+            }
+        end
+    end,
+
+    -- Poll usage every frame
+    update = function(self, card, dt)
+        card.ability.extra.deaths = (G.GAME.reboots or 0) + (G.GAME.lives_lost or 0)
+    end,
+}
+end
+
+if ((SMODS.Mods["Multiplayer"] or {}).can_load) then
 SMODS.Joker{
     name = "Reboot Man",
     key = "RebootMan",
@@ -14577,6 +15414,7 @@ SMODS.Joker{
         card.ability.extra.deaths = (G.GAME.reboots or 0) + (G.GAME.lives_lost or 0)
     end,
 }
+end
 
 ----------------------------------------------
 ------------REBOOT MAN CODE END----------------
@@ -14706,6 +15544,7 @@ SMODS.Joker{
     pools = { ["Brainrot"] = true },
 
     loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {key = 'fn_Brainrot', set = 'Other', vars = { "Brainrot" }}
         return {
             vars = {
                 card.ability.extra.mult_add,
@@ -14728,6 +15567,13 @@ SMODS.Joker{
         end
 
         card.ability.extra.mult = count * card.ability.extra.mult_add
+		
+		local TTTS_exists = next(SMODS.find_card('j_fn_TTTS'))
+		
+		if card.area == G.shop_jokers and TTTS_exists then
+            card.cost = 0
+        end
+		
     end,
 	
     calculate = function(self, card, context)
@@ -14773,6 +15619,7 @@ SMODS.Joker{
         name = 'Tung Tung Tung Sahur',
         text = {
             "You can buy {C:attention}Brainrots{} past Joker limit",
+			"Brainrots are now {C:attention}Free{}",
         }
     },
     atlas = 'Jokers',
@@ -14790,15 +15637,29 @@ SMODS.Joker{
     config = { extra = {jokerslots = 1}},
 
     loc_vars = function(self, info_queue, center)
+		info_queue[#info_queue+1] = {key = 'fn_Brainrot', set = 'Other', vars = { "Brainrot" }}
 		return { vars = { center.ability.extra.jokerslots }  }
 	end,
+	
+	update = function(self, card)
+		-- Only run during a game run
+		if G.STAGE ~= G.STAGES.RUN then return end
+		
+		local TTTS_exists = next(SMODS.find_card('j_fn_TTTS'))
+		
+		if card.area == G.shop_jokers and TTTS_exists then
+            card.cost = 0
+        end
+		
+  end,
+	
 }
 
 ----------------------------------------------
 ------------TRIPLE T CODE END----------------
 
 ----------------------------------------------
-------------JONESY THE FIRST CODE BEGIN ----------------
+------------JONESY THE FIRST CODE BEGIN----------------
 SMODS.Joker{
     key = 'Jonesy',
     loc_txt = {
@@ -14852,7 +15713,7 @@ SMODS.Joker{
             end
         end
 		
-		if context.discard and not context.blueprint and context.other_card == context.full_hand[#context.full_hand] then
+		if context.discard and not context.blueprint and context.other_card == context.full_hand[#context.full_hand] and G.GAME.current_round.discards_used == 0 then
             card.ability.extra.xmult = card.ability.extra.xmult - card.ability.extra.xmult_penalty
 			return {
                 message = localize { type = 'variable', key = 'a_xmult_minus', vars = { card.ability.extra.xmult_penalty } },
@@ -14861,6 +15722,756 @@ SMODS.Joker{
         end
 		
 		
+    end
+}
+
+----------------------------------------------
+------------JONESY THE FIRST CODE END----------------
+
+----------------------------------------------
+------------FOUNDERS CODE BEGIN----------------
+
+SMODS.Joker{
+    key = 'Founders',
+    loc_txt = {
+        ['en-us'] = {
+            name = "Founders",
+            text = {
+                "Earn {C:money}$#1#{} every {C:attention}round{}",
+				"Idea: {C:fn_eternal}opal \"stuff\"{}"
+            },
+			unlock = {
+				"Win with {C:purple}Save The World{}",
+			},
+        }
+    },
+    atlas = 'Jokers',
+    pos = { x = 3, y = 64 },
+    config = {
+        extra = { dollars = 2 } 
+    },
+    rarity = 1,
+    cost = 4,
+    blueprint_compat = true,
+	unlocked = false,
+	check_for_unlock = function(self, args)
+		if args.type == 'win' then
+			for _, joker in ipairs(G.jokers.cards) do
+                if joker.config and joker.config.center and joker.config.center.key == "j_fn_SaveTheWorld" then
+                    unlock_card(self)
+                end
+            end
+		end
+	end,
+
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.extra.dollars,
+            }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        -- Check if the Blind effect is starting
+        if context.setting_blind then
+			ease_dollars(card.ability.extra.dollars)
+        end
+    end -- End of calculate function
+} -- End of Joker
+
+----------------------------------------------
+------------FOUNDERS CODE END----------------
+
+----------------------------------------------
+------------SIDEKICK CODE BEGIN----------------
+
+local start_run_ref = Game.start_run
+function Game:start_run(args)
+    start_run_ref(self, args)
+	G.GAME.SidekickArt = math.random(0,4)
+	
+	local obj = G.P_CENTERS.j_fn_Sidekick
+	obj.pos.x = G.GAME.SidekickArt
+end
+
+
+SMODS.Joker{
+    key = "Sidekick",
+    loc_txt = {
+        name = "Sidekick",
+        text = {
+            "Gains {C:mult}+1{} Mult every time this Joker is obtained", 
+			"{C:inactive}(Persists across runs){}",
+            "{C:inactive}Currently {C:mult}+#2#{C:inactive} Mult",
+        }
+    },
+    rarity = 1,
+    atlas = "Jokers",
+    pos = { x = 0, y = 65 },
+    cost = 6,
+    blueprint_compat = true,
+	discovered = false,
+    config = {
+        extra = {
+            mult_add = 1,
+            mult = 0,
+        },
+    },
+
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.extra.mult_add,
+				card.ability.extra.mult,
+            }
+        }
+    end,
+	
+	update = function(self, card)
+        card.ability.extra.mult = config.sidekick
+    end,
+	
+	add_to_deck = function(self, card)
+        config.sidekick = config.sidekick + 1
+		--print("Current sidekick value: " .. tostring(config.sidekick))
+		SMODS.save_all_config()
+    end,
+	
+    calculate = function(self, card, context)
+
+        if context.joker_main then
+            return { mult = card.ability.extra.mult }
+        end
+    end,
+}
+
+----------------------------------------------
+------------SIDEKICK CODE END----------------
+
+----------------------------------------------
+------------NED CODE BEGIN----------------
+
+local igo = Game.init_game_object
+function Game:init_game_object(...)
+    local ret = igo(self, ...)
+    -- preserve values if loading a save; otherwise seed to 1
+    ret.find_wins    = tonumber(ret.find_wins)     or 1
+    return ret
+end
+
+local original_game_update = Game.update
+function Game:update(dt)
+    original_game_update(self, dt)
+    
+    if G.STAGE ~= G.STAGES.RUN then return end
+
+
+    --Ned Global cleanup
+    if G.STATE == 8 or G.STATE == 6 or G.STATE == G.STATES.SELECTING_HAND or G.STATE == G.STATES.BLIND_SELECT then
+        if G.FIND_GAME.active then
+			G.FIND_GAME.active = false
+		end
+    end
+end
+
+SMODS.Joker{
+    key = "Ned",
+    loc_txt = {
+        name = "Ned",
+        text = {
+            "Gain {X:mult,C:white}X#1#{} Mult for every {C:attention}consecutive{}",
+            "{C:attention}successful{} round of find {C:mult}Medkit{}",
+            "{C:inactive}Currently {X:mult,C:white}X#2#{} {C:inactive}Mult{}",
+        }
+    },
+    rarity = 2,
+    atlas = "Jokers",
+    pos = { x = 4, y = 64 },
+    cost = 6,
+    blueprint_compat = true,
+    discovered = false,
+    config = {
+        extra = {
+            mult_add = 0.5, -- How much it grows per win
+            x_mult = 1,    -- Current value
+			triggered = 0, -- Has this triggered yet?
+        },
+    },
+
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.extra.mult_add,
+                card.ability.extra.x_mult,
+            }
+        }
+    end,
+	
+	update = function(self, card)
+        card.ability.extra.x_mult = (G.GAME.find_wins * card.ability.extra.mult_add) + 0.5
+    end,
+    
+    calculate = function(self, card, context)
+		
+		if context.before then
+			G.FUNCS.start_find_game()
+			card.ability.extra.triggered = 0
+		end
+		
+        -- Provide the Xmult during scoring
+        if context.joker_main then
+            return {
+                message = localize{type='variable', key='a_xmult', vars={card.ability.extra.x_mult}},
+                Xmult_mod = card.ability.extra.x_mult
+            }
+        end
+
+        if context.end_of_round or context.hand_drawn and not context.first_hand_drawn then
+            if G.FIND_GAME.active then
+				G.FIND_GAME.active = false
+                card.ability.extra.x_mult = 1
+				card.ability.extra.triggered = 1
+				G.GAME.find_wins = 1				
+                
+                return {
+                    card_eval_status_text(card, 'extra', nil, nil, nil, {
+                        message = "Reset!",
+                        colour = G.C.FILTER,
+                    })
+                }
+            end
+			
+			if not G.FIND_GAME.active and card.ability.extra.triggered ~= 1 then
+				card.ability.extra.triggered = 1 
+                
+                card_eval_status_text(card, 'extra', nil, nil, nil, {
+                    message = "Upgrade!",
+                    colour = G.C.MULT,
+                })
+			end
+        end
+    end,
+}
+
+----------------------------------------------
+------------NED CODE END----------------
+
+----------------------------------------------
+------------CLIPBOARD CODE BEGIN----------------
+
+local lastClipboard = ""
+local clipboard_timer = 0
+
+-- Hook into Game:update to track clipboard changes
+local upd = Game.update
+function Game:update(dt)
+    upd(self, dt)
+
+    -- Initialize the variable if it doesn't exist to prevent crashes
+    if G.GAME and not G.GAME.ClipboardCount then
+        G.GAME.ClipboardCount = 0
+    end
+
+    -- Check clipboard every 0.1s instead of every frame to save CPU
+    clipboard_timer = clipboard_timer + dt
+    if clipboard_timer > 1 then
+        clipboard_timer = 0
+        local currentClipboard = love.system.getClipboardText()
+            
+        local lowerText = currentClipboard:lower()
+        local seen = {}
+        local count = 0
+            
+        -- Loop through and find unique characters
+        for char in lowerText:gmatch(".") do
+            if not seen[char] then
+                seen[char] = true
+                count = count + 1
+            end
+        end
+
+        if G.GAME then
+            G.GAME.ClipboardCount = count
+        end
+    end
+end
+
+SMODS.Joker{
+    key = "Clipboard",
+    loc_txt = {
+        name = "Clipboard",
+        text = {
+            "{C:mult}+#1#{} Mult per {C:attention}unique{} character on clipboard",
+            "{C:inactive}Currently {C:mult}+#2#{}{C:inactive} Mult",
+        }
+    },
+    rarity = 2,
+    atlas = "Jokers",
+    pos = { x = 0, y = 66 }, 
+    cost = 6,
+    blueprint_compat = true,
+    discovered = false,
+    config = {
+        extra = {
+            mult_add = 0.5,
+            mult = 0,
+        },
+    },
+
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.extra.mult_add,
+                card.ability.extra.mult,
+            }
+        }
+    end,
+    
+    update = function(self, card)
+        -- Use "or 0" to prevent arithmetic errors if G.GAME.ClipboardCount is nil
+        local count = (G.GAME and G.GAME.ClipboardCount) or 0
+        card.ability.extra.mult = count * card.ability.extra.mult_add
+    end,
+    
+    calculate = function(self, card, context)
+        -- Provide the mult during scoring
+        if context.joker_main then
+            return {
+                mult = card.ability.extra.mult,
+                card = card
+            }
+        end
+    end,
+}
+
+----------------------------------------------
+------------CLIPBOARD CODE END----------------
+
+----------------------------------------------
+------------EVAN CODE BEGIN----------------
+
+SMODS.Joker{
+  key = 'Evan',
+  loc_txt = {
+    name = '[EPIC] Evan Kinney',
+    text = {
+      "Gains a charge when a hand is played",
+      "At 2 charges upgrade {C:attention}played hand{}",
+	  "Idea: {C:tarot}kxttyfrickfish{}",
+    }
+  },
+  rarity = 2,
+  atlas = "Jokers", pos = {x = 1, y = 66},
+  cost = 5,
+  unlocked = true,
+  discovered = false,
+  eternal_compat = true,
+  blueprint_compat = true,
+  perishable_compat = true,
+  config = {extra = {Xmult = 3, charge = 0}},
+
+  loc_vars = function(self, info_queue, card)
+    return {vars = {card.ability.extra.Xmult, card.ability.extra.charge}}
+  end,
+
+  calculate = function(self, card, context)
+    -- Gain charge when any hand is played
+    if context.cardarea == G.jokers and context.before and not context.blueprint then
+		card.ability.extra.charge = card.ability.extra.charge + 1
+		if card.ability.extra.charge < 2 then
+			return {message = "Charge Gained! (" .. card.ability.extra.charge .. "/2)", colour = G.C.Mult, card = card}
+		else
+			card.ability.extra.charge = 0
+			return {
+				level_up = true,
+				message = localize('k_level_up_ex')
+			}
+		end
+    end
+  end,
+}
+
+----------------------------------------------
+------------EVAN CODE END----------------
+
+----------------------------------------------
+------------WONKEE CODE BEGIN----------------
+
+SMODS.Joker{
+    key = "Wonkee",
+    loc_txt = {
+        name = "Wonkee",
+        text = {
+            "When {C:attention}blind selected{} play a round of {C:mult}Zip Zonk Bang{}",
+			"{C:attention}Score{} will be converted to {C:mult}Mult{}",
+            "{C:inactive}Currently {C:mult}#1#{}{C:inactive} Mult",
+        }
+    },
+    rarity = 2,
+    atlas = "Jokers",
+    pos = { x = 3, y = 66 }, 
+    cost = 6,
+    blueprint_compat = true,
+    discovered = false,
+    config = {
+        extra = {
+            mult = 0,
+        },
+    },
+
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.extra.mult,
+            }
+        }
+    end,
+    
+    update = function(self, card)
+        card.ability.extra.mult = (G.GAME.WonkeeScore or 0)
+    end,
+    
+    calculate = function(self, card, context)
+		--start the minigame
+		if context.setting_blind then
+            G.FUNCS.start_carnival_game()
+        end
+		
+		--reset score so they have to play again
+		if context.end_of_round and context.main_eval and not context.blueprint then
+			G.GAME.WonkeeScore = 0
+			return {
+                message = localize('k_reset'),
+				card = card
+            }
+		end
+	
+        -- Provide the mult during scoring
+        if context.joker_main then
+            return {
+                mult = card.ability.extra.mult,
+                card = card
+            }
+        end
+    end,
+}
+
+----------------------------------------------
+------------WONKEE CODE END----------------
+
+----------------------------------------------
+------------TV CART CODE BEGIN----------------
+
+SMODS.Joker{
+    key = "TV",
+    loc_txt = {
+        name = "TV Cart",
+        text = {
+            "Gain {X:mult,C:white}X#1#{} Mult when",
+			"The {C:mult}DVD logo{} hits the {C:attention}corner{}",
+            "{C:inactive}Currently {X:mult,C:white}X#2#{C:inactive} Mult",
+			"Idea: {C:mult}TheMaxPanch"
+        }
+    },
+    rarity = 2,
+    atlas = "Jokers",
+    pos = { x = 1, y = 67 }, 
+    cost = 6,
+    blueprint_compat = true,
+    discovered = false,
+    config = {
+        extra = {
+            xmult = 1,
+			xmult_add = 1,
+        },
+    },
+
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.extra.xmult_add,
+				card.ability.extra.xmult
+            }
+        }
+    end,
+    
+    update = function(self, card)
+		if card.ability.extra.xmult < card.ability.extra.xmult_add * (G.GAME.DVDScore or 0) + 1 then
+			card.ability.extra.xmult = card.ability.extra.xmult_add * (G.GAME.DVDScore or 0) + 1
+			card_eval_status_text(card, 'extra', nil, nil, nil, {
+                message = "Upgrade!", -- Display "Upgrade!" message
+                colour = G.C.Mult,
+            })
+		end
+    end,
+    
+    calculate = function(self, card, context)
+	
+        -- Provide the mult during scoring
+        if context.joker_main then
+            return {
+                xmult = card.ability.extra.xmult,
+                card = card
+            }
+        end
+    end,
+}
+
+----------------------------------------------
+------------TV CART CODE END----------------
+
+----------------------------------------------
+------------BALLERINA CAPUCCINA CODE BEGIN----------------
+
+SMODS.Joker{
+    name = "Ballerina Capuccina",
+    key = "Ballerina",
+    config = { extra = { dollars = 0, dollars_add = 4 } }, -- Fixed money granted
+    pos = { x = 2, y = 67 },
+    loc_txt = {
+        name = "Ballerina Capuccina",
+        text = {
+            "Earn {C:money}$#2#{} at end of round for every owned {C:attention}Brainrot{}",
+            "{C:inactive} Currently {C:money}$#1#{}",
+			"Idea: {C:tarot}kxttyfrickfish{}",
+        }
+    },
+    rarity = 3,
+    cost = 12,
+    unlocked = true,
+    discovered = false,
+    blueprint_compat = true,
+    perishable_compat = true,
+    atlas = "Jokers",
+	pools = { ["Brainrot"] = true,},
+	
+    loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {key = 'fn_Brainrot', set = 'Other', vars = { "Brainrot" }}
+        return { vars = { card.ability.extra.dollars, card.ability.extra.dollars_add } }
+    end,
+	
+	update = function(self, card, dt)
+        -- Only run during a game run
+		if G.STAGE ~= G.STAGES.RUN then return end
+		
+		-- count Brainrots
+        local count = 0
+        for i = 1, #G.jokers.cards do
+            local j = G.jokers.cards[i]
+            if j.config.center.pools and j.config.center.pools.Brainrot then
+                count = count + 1
+            end
+        end
+
+        -- Update the dollars field based on the number of brainrots owned
+        local money_bonus = card.ability.extra.dollars_add * count
+        card.ability.extra.dollars = money_bonus  -- Add the bonus to dollars directly
+		
+		local TTTS_exists = next(SMODS.find_card('j_fn_TTTS'))
+		
+		if card.area == G.shop_jokers and TTTS_exists then
+            card.cost = 0
+        end
+		
+    end,
+	
+	
+    calc_dollar_bonus = function(self, card)
+        return card.ability.extra.dollars
+    end,
+}
+
+----------------------------------------------
+------------BALLERINA CAPUCCINA CODE END----------------
+
+----------------------------------------------
+------------TIM SWEENEY CODE BEGIN----------------
+
+local original_game_update = Game.update
+function Game:update(dt)
+    original_game_update(self, dt)
+    
+    -- Basic safety checks
+    if G.STAGE ~= G.STAGES.RUN or not G.shop_jokers or not G.shop_jokers.cards then return end
+
+    -- Check if we are in the shop and it's April Fools
+    if G.STATE == G.STATES.SHOP then
+        local now = os.date("*t")
+        if now.month == 4 then 
+            
+            --Check if Tim is ALREADY in the shop
+            local tim_in_shop = false
+            for _, v in pairs(G.shop_jokers.cards) do
+                if v.config.center.key == 'j_fn_Tim' then
+                    tim_in_shop = true
+					G.GAME.TimSpotted = 1
+                    break
+                end
+            end
+
+            --If Tim isn't there, spawn him
+            if not tim_in_shop and not next(SMODS.find_card('j_fn_Tim')) and G.GAME.TimSpotted == 1  then
+                local new_card = SMODS.create_card{
+                    key = 'j_fn_Tim',
+                    area = G.shop_jokers
+                }
+                new_card:add_to_deck()
+                G.shop_jokers:emplace(new_card)
+                create_shop_card_ui(new_card)
+            end
+        end
+    end
+end
+
+SMODS.Joker{
+    name = "Tim Sweeney",
+    key = "Tim",
+    config = { extra = { dollars = 1000, } }, -- Fixed money lost
+    pos = { x = 3, y = 67 },
+    loc_txt = {
+        name = "Tim Sweeney",
+        text = {
+            "Spend {C:money}$#1#{} on {C:planet}UEFN{} after every round",
+			"Idea: {C:tarot}kxttyfrickfish{}",
+        }
+    },
+    rarity = 1,
+    cost = 0,
+    unlocked = true,
+    discovered = false,
+    blueprint_compat = true,
+    perishable_compat = true,
+    atlas = "Jokers",
+	
+    loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {key = 'fn_April', set = 'Other', vars = { "Fools" }}
+        return { vars = { card.ability.extra.dollars } }
+    end,
+	
+	--only here for april fools
+	in_pool = function(self)
+		local now = os.date("*t")
+		if now.month == 4 then
+			return true
+		end
+		return false
+	end,
+	
+	remove_from_deck = function(self, card)
+        G.GAME.TimSpotted = 1
+    end,
+	
+    calc_dollar_bonus = function(self, card)
+        return card.ability.extra.dollars
+    end,
+}
+
+----------------------------------------------
+------------TIM SWEENEY CODE END----------------
+
+----------------------------------------------
+------------LLAMATRON CODE BEGIN----------------
+
+SMODS.Joker{
+    name = "Llamatron",
+    key = "Llamatron",
+    pos = { x = 4, y = 67 },
+    loc_txt = {
+        name = "Llamatron",
+        text = {
+            "Watch a {C:attention}random video{} after every round",
+        }
+    },
+    rarity = 1,
+    cost = 0,
+    unlocked = true,
+    discovered = false,
+    blueprint_compat = true,
+    perishable_compat = true,
+    atlas = "Jokers",
+    
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = {key = 'fn_April', set = 'Other', vars = { "Fools" }}
+    end,
+    
+    in_pool = function(self)
+        local now = os.date("*t")
+        return now.month == 4
+    end,
+
+    calculate = function(self, card, context)
+        if context.end_of_round and not context.repetition and not context.individual then
+            -- Define the list of video keys
+            local videos = {"67", "block", "grave", "lars", "ned", "tenna"}
+            
+            -- Pick a random key from the list
+            local chosen_video = pseudorandom_element(videos, pseudoseed('llamatron'))
+
+            G.FUNCS.overlay_menu{
+                definition = create_UIBox_fn_custom_video1(chosen_video, "Ok"),
+                config = {no_esc = true}
+            }
+        end
+    end,
+}
+
+----------------------------------------------
+------------LLAMATRON CODE END----------------
+
+SMODS.Joker{
+    key = 'Discord',
+    loc_txt = {
+        ['en-us'] = {
+            name = "Fortnite Discord Bot",
+            text = {
+                "{C:green}#2# in #1#{} chance to lose {C:attention}ALL{} money and",
+				"create a {C:fn_boogie}Grande Lucky Rot Secret",
+                "when {C:attention}Blind{} ends",
+                "{C:inactive}(Must have room)",
+				"Idea: {C:fn_eternal}Gavinia"
+            }
+        }
+    },
+    atlas = 'Jokers',
+    pos = { x = 1, y = 68 },
+    config = {
+        extra = { odds = 3 } -- 1 in 3 chance
+    },
+    rarity = 1,
+    cost = 5,
+    blueprint_compat = true,
+
+    loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue + 1] = G.P_CENTERS.c_fn_LTMBrainrot
+        return {
+            vars = {
+                card.ability.extra.odds or 1,
+                '' .. (G.GAME and G.GAME.probabilities.normal or 1)
+            }
+        }
+    end,
+
+    calculate = function(self, card, context)
+        context = context or {}
+        if context.end_of_round and not context.repetition and not context.individual then
+            if #G.consumeables.cards + (G.GAME.consumeable_buffer or 0) < G.consumeables.config.card_limit then
+                if pseudorandom('grande') < (G.GAME.probabilities.normal or 1) / card.ability.extra.odds then
+					ease_dollars(-G.GAME.dollars)
+                    local _card = create_card('Tarot', G.consumeables, nil, nil, nil, nil, 'c_fn_LTMBrainrot')
+					_card:add_to_deck()
+					G.consumeables:emplace(_card)
+				else
+					if config.sfx ~= false then
+						play_sound("fn_sad")
+					end
+					card_eval_status_text(card, 'extra', nil, nil, nil, {
+					message = "NOPE!",
+					colour = G.C.PURPLE,
+					})
+                end
+            end
+        end
     end
 }
 
@@ -16610,67 +18221,82 @@ function Game:init_game_object(...)
     return ret
 end
 
-
-    SMODS.Enhancement({
-        loc_txt = {
-            name = 'Xp Boost',
-            text = {
-                '{X:mult,C:white}X#1#{} the base {C:chips}Chips{} and {C:mult}Mult{}',
-                'of played {C:attention}poker hand{} when {C:attention}held{} in hand',
-                'Idea: BoiRowan',
-            },
+SMODS.Enhancement({
+    loc_txt = {
+        name = 'Xp Boost',
+        text = {
+            '{X:mult,C:white}X#1#{} the base {C:chips}Chips{} and {C:mult}Mult{}',
+            'of played {C:attention}poker hand{} when {C:attention}held{} in hand',
+            'Idea: BoiRowan',
         },
-        key = "Xp",
-        atlas = "Jokers",
-        pos = {x = 2, y = 44},
-        discovered = false,
-        no_rank = false,
-        no_suit = false,
-        replace_base_card = false,
-        always_scores = false,
-        config = {
-            extra = {
-                level_up = 2,
-				scored = 0
+    },
+    key = "Xp",
+    atlas = "Jokers",
+    pos = {x = 2, y = 44},
+    discovered = false,
+    no_rank = false,
+    no_suit = false,
+    replace_base_card = false,
+    always_scores = false,
+    config = {
+        extra = {
+            level_up = 2,
+            scored = 0
+        }
+    },
+
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.extra.level_up + (G.GAME.weekend or 0),
             }
-        },
+        }
+    end,
 
-        loc_vars = function(self, info_queue, card)
-            return {
-                vars = {
-                    card.ability.extra.level_up + G.GAME.weekend,
+    calculate = function(self, card, context)
+        -- Print when the game checks this card's calculate function
+        if context.before and card.area == G.hand and not context.individual then
+            --print("--- XP Boost: Calculation Started ---")
+            --print("Current Hand: " .. tostring(context.scoring_name))
+            
+            card.ability.extra.scored = 1
+            local multiplier = (card.ability.extra.level_up + (G.GAME.weekend or 0))
+            
+            -- Apply the boost
+            G.GAME.hands[context.scoring_name].mult = G.GAME.hands[context.scoring_name].mult * multiplier
+            G.GAME.hands[context.scoring_name].chips = G.GAME.hands[context.scoring_name].chips * multiplier
+            
+            --print("Applied Boost: x" .. tostring(multiplier))
+
+            if config.sfx ~= false then
+                return {
+                    message = "XP BOOSTED!",
+                    colour = G.C.PURPLE,
+                    sound = 'fn_xp',
+                    card = card,
                 }
-            }
-        end,
-
-        calculate = function(self, card, context)
-            if context.before and card.area == G.hand and not context.individual then
-				card.ability.extra.scored = 1
-                G.GAME.hands[context.scoring_name].mult = G.GAME.hands[context.scoring_name].mult * (card.ability.extra.level_up+G.GAME.weekend)
-				G.GAME.hands[context.scoring_name].chips = G.GAME.hands[context.scoring_name].chips * (card.ability.extra.level_up+G.GAME.weekend)
-				if config.sfx ~= false then
-					return {
-						message = "XP BOOSTED!",
-						colour = G.C.PURPLE,
-						sound = 'fn_xp',
-						card = card,
-					}
-				else
-					return {
-						message = "XP BOOSTED!",
-						colour = G.C.PURPLE,
-						card = card,
-					}
-				end
+            else
+                return {
+                    message = "XP BOOSTED!",
+                    colour = G.C.PURPLE,
+                    card = card,
+                }
             end
-			
-			if context.final_scoring_step and card.ability.extra.scored == 1 then 
-				card.ability.extra.scored = 0
-				G.GAME.hands[context.scoring_name].mult = G.GAME.hands[context.scoring_name].mult / (card.ability.extra.level_up+G.GAME.weekend)
-				G.GAME.hands[context.scoring_name].chips = G.GAME.hands[context.scoring_name].chips / (card.ability.extra.level_up+G.GAME.weekend)
-            end
-        end,
-    })
+        end
+        
+        -- Print when resetting the hand values
+        if context.final_scoring_step and card.ability.extra.scored == 1 then 
+            --print("--- XP Boost: Resetting Hand Values ---")
+            card.ability.extra.scored = 0
+            local multiplier = (card.ability.extra.level_up + (G.GAME.weekend or 0))
+            
+            G.GAME.hands[context.scoring_name].mult = G.GAME.hands[context.scoring_name].mult / multiplier
+            G.GAME.hands[context.scoring_name].chips = G.GAME.hands[context.scoring_name].chips / multiplier
+            
+            --print("Reset Hand: " .. tostring(context.scoring_name) .. " back to base.")
+        end
+    end,
+})
 
 ----------------------------------------------
 ------------XP BOOST CODE END----------------------
@@ -16756,13 +18382,13 @@ SMODS.Edition({
         text = {
             "{C:green}#1# in 3{} chance to retrigger adjacent {C:attention}Jokers{}",
             "Retriggers adjacent played cards once",
-            "Idea: BoiRowan",
+            "{C:inactive}(Can retrigger other Shockwaves up to 2 times){}",
         },
     },
     discovered = false,
     unlocked = true,
     shader = 'shockwaved',
-	config = { card_limit = 0 },
+    config = { card_limit = 0 },
     in_shop = true,
     weight = 0.5,
     extra_cost = 4,
@@ -16776,33 +18402,34 @@ SMODS.Edition({
     end,
 
     calculate = function(self, card, context)
-        -- Played card retriggers adjacent cards (excluding other Shockwaved cards)
+        -- 1. PLAYED CARD LOGIC
         if context.repetition and context.cardarea == G.play then
+            -- Cap the "chain reaction" for played cards to prevent lag/loops
+            -- We check a custom 'shockwave_depth' we pass in the scoring call
+            if context.shockwave_depth and context.shockwave_depth >= 2 then return end
+
             local idx
             for i, v in ipairs(context.scoring_hand) do
-                if v == card then
-                    idx = i
-                    break
-                end
+                if v == card then idx = i; break end
             end
             if not idx then return end
 
             local results = {}
-
             local function add_result(adj_card)
                 if not adj_card then return end
-                if adj_card.edition and adj_card.edition.key == "e_fn_Shockwaved" then return end
-
+                
                 results[#results+1] = card_eval_status_text(adj_card, 'extra', nil, nil, nil, {
                     message = 'Again!',
                     colour = G.C.SECONDARY_SET.Tarot,
                 })
+                -- We pass 'shockwave_depth' so the next card knows it's being triggered by a shockwave
                 results[#results+1] = SMODS.score_card(adj_card, {
                     cardarea = G.play,
                     full_hand = context.full_hand,
                     scoring_hand = context.scoring_hand,
                     scoring_name = context.scoring_name,
-                    poker_hands = context.poker_hands
+                    poker_hands = context.poker_hands,
+                    shockwave_depth = (context.shockwave_depth or 0) + 1
                 })
             end
 
@@ -16812,14 +18439,14 @@ SMODS.Edition({
             if #results > 0 then return results end
         end
 
-        -- Joker retrigger logic (1 in 3 chance for adjacent Jokers)
+        -- 2. JOKER RETRIGGER LOGIC
         if context.retrigger_joker_check and not context.retrigger_joker and context.other_card then
+            -- Cap the chain at 2 depth (Shockwave A -> Shockwave B -> Shockwave C -> STOP)
+            if context.shockwave_depth and context.shockwave_depth >= 2 then return end
+
             local idx
             for i, v in ipairs(G.jokers.cards) do
-                if v == card then
-                    idx = i
-                    break
-                end
+                if v == card then idx = i; break end
             end
             if not idx then return end
 
@@ -16832,7 +18459,9 @@ SMODS.Edition({
                         message = localize('k_again_ex'),
                         colour = G.C.SECONDARY_SET.Tarot,
                         repetitions = 1,
-                        card = card
+                        card = card,
+                        -- Pass the depth forward to the next check
+                        shockwave_depth = (context.shockwave_depth or 0) + 1
                     }
                 end
             end
@@ -16959,17 +18588,94 @@ SMODS.Edition({
 
 SMODS.Shader({key = 'overshielded', path = "overshielded.fs"})
 
-local Card_set_debuff=Card.set_debuff
+local Card_set_debuff_ref = Card.set_debuff
+
 function Card:set_debuff(should_debuff)
-	if self.edition and self.edition.key == 'e_fn_Overshielded' then -- always be impossible to disable
-		self.debuff = false
+    -- 1. Handle Immunity
+    if self.edition and self.edition.key == 'e_fn_Overshielded' then
+        self.debuff = false
         return
     end
-    Card_set_debuff(self,should_debuff)
+
+    -- 2. Logic & Tracking
+    -- We check if 'wasdebuffed' is already true so we don't print 60 times a second
+    if (should_debuff or self.debuff) and not self.wasdebuffed then
+        self.wasdebuffed = true 
+        
+        -- Confirmation Print
+        --local card_name = (self.ability and self.ability.name) or "Unknown Card"
+        --print("DEBUG: [" .. card_name .. "] has been marked as 'wasdebuffed'")
+    end
+
+    -- 3. Original Function
+    Card_set_debuff_ref(self, should_debuff)
 end
 
-if not ((SMODS.Mods["Cryptid"] or {}).can_load) then
+local original_game_update = Game.update
+function Game:update(dt)
+    original_game_update(self, dt)
+    
+    if G.STAGE ~= G.STAGES.RUN or not G.jokers or not G.jokers.cards then return end
 
+    -- 1. Handle the "Overshielded" logic ONLY during active play
+    if G.STATE ~= 8 then 
+        local card_areas = {G.jokers, G.hand, G.consumeables}
+        
+        -- Check if ANY Overshielded card exists in the playing deck or active areas
+        local overshield_exists = false
+        for _, card in ipairs(G.playing_cards) do
+            if card.edition and card.edition.key == 'e_fn_Overshielded' then
+                overshield_exists = true
+                break
+            end
+        end
+
+        if not overshield_exists then
+            -- Clean up the flag if the source of the mechanic is gone
+            for _, card in ipairs(G.playing_cards) do
+                card.wasdebuffed = false
+            end
+		end
+        if overshield_exists or not overshield_exists then
+            --Apply neighbor shielding
+            for _, area in ipairs(card_areas) do
+                if area and area.cards then
+                    for i, card in ipairs(area.cards) do
+                        if card.wasdebuffed then
+                            local left_card = area.cards[i - 1]
+                            local right_card = area.cards[i + 1]
+                            
+                            local shielded_left = left_card and left_card.edition and left_card.edition.key == 'e_fn_Overshielded'
+                            local shielded_right = right_card and right_card.edition and right_card.edition.key == 'e_fn_Overshielded'
+                            
+                            if shielded_left or shielded_right then
+                                if card.debuff then card:set_debuff(false) end
+                            else
+                                if not card.debuff then card:set_debuff(true) end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    -- 2. Global cleanup (e.g., End of Round/Game Over)
+    if G.STATE == 8 then
+        for _, area in pairs({G.hand, G.deck, G.jokers, G.consumeables, G.vouchers, G.discard, G.playing_cards}) do
+			if area and area.cards then
+				for _, card in ipairs(area.cards) do
+					-- Reset all flags that cause debuffing
+					card.wasdebuffed = false
+					card:set_debuff(false)
+				end
+			end
+		end
+    end
+end
+
+
+if not ((SMODS.Mods["Multiplayer"] or {}).can_load) then
 SMODS.Edition({
     key = "Overshielded",
     loc_txt = {
@@ -16991,104 +18697,12 @@ SMODS.Edition({
     apply_to_float = true,
 
     on_apply = function(self, card)
-        -- defensive: card might be nil during copies
-        if type(card) ~= "table" or type(card.ability) ~= "table" then
-            return
-        end
-
-        -- ensure extra exists
-        card.ability.extra = card.ability.extra or {}
-        local extra = card.ability.extra
-
-        -- safely set defaults without overwriting existing keys
-        extra._tracked_left = extra._tracked_left or nil
-        extra._left_prev_debuff = extra._left_prev_debuff or nil
-        extra._tracked_right = extra._tracked_right or nil
-        extra._right_prev_debuff = extra._right_prev_debuff or nil
+		self:set_debuff(false)
     end,
 
-    update = function(self, card)
-        if type(card) == "table" then
-            self:apply_overshield(card)
-        end
-    end,
-
-    calculate = function(self, card)
-        if type(card) == "table" then
-            self:apply_overshield(card)
-        end
-    end,
-
-    apply_overshield = function(self, card)
-        -- defensive: card or ability or extra might not exist
-        if type(card) ~= "table" or type(card.ability) ~= "table" or type(card.ability.extra) ~= "table" then
-            return
-        end
-
-        local extra = card.ability.extra
-
-        -- determine area safely
-        local area_table = nil
-        if card.area == G.hand and G.hand and type(G.hand.cards) == "table" then
-            area_table = G.hand.cards
-        elseif card.ability.set == 'Joker' and G.jokers and type(G.jokers.cards) == "table" then
-            area_table = G.jokers.cards
-        elseif card.ability.consumeable and G.consumeables and type(G.consumeables.cards) == "table" then
-            area_table = G.consumeables.cards
-        end
-        if type(area_table) ~= "table" then return end
-
-        -- find index of this card
-        local index = nil
-        for i = 1, #area_table do
-            if area_table[i] == card then
-                index = i
-                break
-            end
-        end
-        if not index then return end
-
-        local left_card = area_table[index - 1]
-        local right_card = area_table[index + 1]
-
-        -- helper to safely restore debuff
-        local function restore(card_ref, prev_debuff)
-            if type(card_ref) == "table" and type(card_ref.set_debuff) == "function" then
-                card_ref:set_debuff(prev_debuff)
-            end
-        end
-
-        -- restore previous neighbors if changed
-        if extra._tracked_left and extra._tracked_left ~= left_card then
-            restore(extra._tracked_left, extra._left_prev_debuff)
-            extra._tracked_left = nil
-            extra._left_prev_debuff = nil
-        end
-        if extra._tracked_right and extra._tracked_right ~= right_card then
-            restore(extra._tracked_right, extra._right_prev_debuff)
-            extra._tracked_right = nil
-            extra._right_prev_debuff = nil
-        end
-
-        -- apply overshield to neighbors
-        if type(left_card) == "table" and type(left_card.set_debuff) == "function" then
-            if extra._tracked_left ~= left_card then
-                extra._tracked_left = left_card
-                extra._left_prev_debuff = left_card.debuff
-            end
-            left_card:set_debuff(false)
-        end
-        if type(right_card) == "table" and type(right_card.set_debuff) == "function" then
-            if extra._tracked_right ~= right_card then
-                extra._tracked_right = right_card
-                extra._right_prev_debuff = right_card.debuff
-            end
-            right_card:set_debuff(false)
-        end
-    end
 })
-
 end
+
 
 ----------------------------------------------
 ------------OVERSHIELDED CODE END----------------------
@@ -17796,7 +19410,7 @@ SMODS.Consumable{
         name = 'Rift to Go', -- name of card
         text = { -- text of card
             'Select up to {C:attention}#1#{} cards and Discard them',
-            '{C:inactive}Doesn\'t use a Discard'
+            '{C:inactive}(Doesn\'t use a Discard)'
         }
     },
     config = {
@@ -21184,6 +22798,12 @@ SMODS.Consumable{
         },
     },
 	
+	in_pool = function(self)
+		if not ((SMODS.Mods["Multiplayer"] or {}).can_load) then
+			return true
+		end
+	end,
+	
 	
 	can_use = function(self, card)
         return false
@@ -21270,19 +22890,28 @@ end
 SMODS.Consumable {
   set = "Tarot",
   key = "Save",
+  atlas = "Jokers",
+  pos = { x = 3, y = 43 },
   loc_txt = {
     name = 'Save Point Device',
     text = {
       "Creates the last",
       "{C:purple}LTM Card{} used",
       "during this run",
-	  "{C:inactive} (Must have room)",
+      "{C:inactive}(Must have room)",
     }
   },
-  pos = { x = 3, y = 43 },
-  atlas = "Jokers",
   loc_vars = function(self, info_queue, card)
-    local shard_card = G.GAME.last_ltm and G.P_CENTERS[G.GAME.last_ltm] or nil
+    -- Identify the last LTM card used from the Game state
+    local last_key = G.GAME and G.GAME.last_ltm
+    local shard_card = last_key and G.P_CENTERS[last_key] or nil
+
+    -- This adds the floating description box (Tooltip) of the LTM card
+    if shard_card then
+      info_queue[#info_queue + 1] = shard_card
+    end
+
+    -- Returns the custom UI element at the bottom of the tooltip
     return {
       main_end = {
         {
@@ -21291,9 +22920,22 @@ SMODS.Consumable {
           nodes = {
             {
               n = G.UIT.C,
-              config = { align = "m", colour = ((not shard_card or shard_card.key == 'c_phanta_shard') and G.C.RED or G.C.GREEN), r = 0.05, padding = 0.05 },
+              config = { 
+                align = "m", 
+                colour = (not shard_card and G.C.RED or G.C.GREEN), 
+                r = 0.05, 
+                padding = 0.05 
+              },
               nodes = {
-                { n = G.UIT.T, config = { text = ' ' .. (shard_card and localize { type = 'name_text', key = shard_card.key, set = shard_card.set } or localize('k_none')) .. ' ', colour = G.C.UI.TEXT_LIGHT, scale = 0.3, shadow = true } },
+                { 
+                  n = G.UIT.T, 
+                  config = { 
+                    text = ' ' .. (shard_card and localize{type = 'name_text', key = shard_card.key, set = shard_card.set} or localize('k_none')) .. ' ', 
+                    colour = G.C.UI.TEXT_LIGHT, 
+                    scale = 0.3, 
+                    shadow = true 
+                  } 
+                },
               }
             }
           }
@@ -21302,7 +22944,8 @@ SMODS.Consumable {
     }
   end,
   can_use = function(self, card)
-    return G.consumeables.config.card_limit >= count_consumables() and G.GAME.last_ltm ~= nil
+    -- Only usable if there is inventory space AND a card was previously used
+    return G.consumeables.config.card_limit > count_consumables() and G.GAME.last_ltm ~= nil
   end,
   use = function(self, card, area, copier)
     G.E_MANAGER:add_event(Event({
@@ -21311,6 +22954,7 @@ SMODS.Consumable {
       func = function()
         if G.consumeables.config.card_limit > count_consumables() then
           play_sound('timpani')
+          -- Create the card using the stored key
           local new_card = create_card('LTMConsumableType', G.consumeables, nil, nil, nil, nil, G.GAME.last_ltm, 'shard')
           new_card:add_to_deck()
           G.consumeables:emplace(new_card)
@@ -21823,10 +23467,9 @@ SMODS.Consumable{
 ------------BIG BUSH BOMB CODE END----------------------
 
 ----------------------------------------------
-------------SHIELD BUBBLE CODE BEGIN----------------------
+------------SHIELD BUBBLE CODE BEGIN---------------------
 
-if not ((SMODS.Mods["Cryptid"] or {}).can_load) then
-
+if not ((SMODS.Mods["Multiplayer"] or {}).can_load) then
 SMODS.Consumable{
         key = 'LTMBubble', -- key
         set = 'LTMConsumableType', -- the set of the card: corresponds to a consumable type
@@ -21870,7 +23513,6 @@ SMODS.Consumable{
             end
         end,
     }
-	
 end
 	
 ----------------------------------------------
@@ -22318,6 +23960,7 @@ SMODS.Consumable {
     local _card = create_card('Tarot', G.consumeables, nil, nil, nil, nil, 'c_fn_LTMWafer')
     _card:add_to_deck()
     G.vouchers:emplace(_card)
+	G.GAME.next_hand_wafer = (G.GAME.next_hand_wafer or 0) + 1
   end,
 
   calculate = function(self, card, context)
@@ -22346,6 +23989,7 @@ SMODS.Consumable {
       G.GAME.chips = G.GAME.chips + card.ability.extra.bonus
       card.ability.extra.triggered = 1
       G.GAME.Wafer_Score_Applied = 0
+	  G.GAME.next_hand_wafer = 0
 
       -- Blind check (nemesis first)
       local blind_chips = G.GAME.blind and G.GAME.blind.chips or 0
@@ -22383,12 +24027,14 @@ SMODS.Consumable {
 }
 
 
+
 ----------------------------------------------
 ------------SUB WAFER CODE END----------------------
 
 ----------------------------------------------
 ------------SMOKE BOMB CODE BEGIN----------------------
 
+if not ((SMODS.Mods["Multiplayer"] or {}).can_load) then
 SMODS.Consumable {
   key = "LTMSmoke",
   set = 'LTMConsumableType',
@@ -22449,6 +24095,7 @@ SMODS.Consumable {
 	end
   end,
 }
+end
 
 ----------------------------------------------
 ------------SMOKE BOMB CODE END----------------------
@@ -22551,11 +24198,13 @@ SMODS.Consumable{
 		_card:add_to_deck()
 		_card.ability.extra.choices = card.ability.extra.choices
 		G.vouchers:emplace(_card)
+		G.GAME.next_shop_steak = (G.GAME.next_shop_steak or 0) + 1
 	end,
 	
 	calculate = function(self, card, context)
 		if context.starting_shop and card.area == G.vouchers and card.ability.extra.triggered == 0 then
 			card.ability.extra.triggered = 1
+			G.GAME.next_shop_steak = 0
 			change_shop_size(card.ability.extra.choices)
 			SMODS.change_booster_limit(card.ability.extra.choices)
 			G.shop_vouchers.config.card_limit = G.shop_vouchers.config.card_limit + card.ability.extra.choices
@@ -22663,6 +24312,7 @@ SMODS.Consumable {
 ----------------------------------------------
 ------------REPLACE DAILY QUEST CODE BEGIN----------------------
 
+if not ((SMODS.Mods["Multiplayer"] or {}).can_load) then
 SMODS.Consumable{
     key = 'LTMDQReset',
     set = 'LTMConsumableType',
@@ -22672,6 +24322,7 @@ SMODS.Consumable{
         name = 'Replace Quest',
         text = {
             '{C:attention}Reroll{} the {C:attention}Boss Blind{}',
+			'{C:inactive}Must be during blind selection{}',
         }
     },
     
@@ -22689,6 +24340,38 @@ SMODS.Consumable{
     end
 end
 }
+end
+
+if ((SMODS.Mods["Multiplayer"] or {}).can_load) then
+SMODS.Consumable{
+    key = 'LTMDQReset',
+    set = 'LTMConsumableType',
+    atlas = 'Jokers',
+    pos = {x = 3, y = 60},
+    loc_txt = {
+        name = 'Replace Quest',
+        text = {
+            '{C:attention}Reroll{} the {X:purple,C:white}Nemesis{} Fight',
+			'Fight a random {C:attention}Boss Blind{} instead',
+			'{C:inactive}Must be during blind selection{}',
+        }
+    },
+    
+    can_use = function(self, card)
+        return G.STATE == G.STATES.BLIND_SELECT
+    end,
+    
+    use = function(self, card, area, copier)
+	G.GAME.ltms_spent = (G.GAME.ltms_spent or 0) + 3
+
+	
+    if G.STATE == 6 then
+		G.from_boss_tag = true
+		G.FUNCS.reroll_boss()
+    end
+end
+}
+end
 
 ----------------------------------------------
 ------------REPLACE DAILY QUEST CODE END----------------------
@@ -23089,6 +24772,8 @@ end
 ----------------------------------------------
 ------------THORN RING CODE END----------------------
 
+----------------------------------------------
+------------CHEAP VBUCKS CODE BEGIN----------------------
 
 SMODS.Consumable{
     key = 'LTMCheap',
@@ -23132,6 +24817,11 @@ SMODS.Consumable{
     end,
 }
 
+----------------------------------------------
+------------CHEAP VBUCKS CODE END----------------------
+
+----------------------------------------------
+------------MOD BENCH CODE BEGIN----------------------
 
 SMODS.Consumable{
     key = 'ModBench',
@@ -23187,7 +24877,323 @@ SMODS.Consumable{
         end
     end,
 }
+----------------------------------------------
+------------MOD BENCH CODE END----------------------
 
+----------------------------------------------
+------------GOLD BAR CODE BEGIN----------------------
+
+local upd = Game.update
+-- Initialize a variable to track the state across frames
+local last_state = nil
+
+function Game:update(dt)
+    upd(self, dt)
+    
+    --APPLY DISCOUNT (If in Shop and have charges)
+    if G.STATE == G.STATES.SHOP and (G.GAME.Discounted or 0) >= 1 then
+        local shop_areas = {G.shop_booster, G.shop_vouchers, G.shop_jokers}
+        for _, area in ipairs(shop_areas) do
+            if area and area.cards then
+                for _, card in ipairs(area.cards) do
+                    card.cost = 0
+                    card.discounted = true
+                end
+            end
+        end
+
+    --RESTORE PRICES
+    elseif G.STATE == G.STATES.SHOP and (G.GAME.Discounted or 0) <= 0 then
+        local shop_areas = {G.shop_booster, G.shop_vouchers, G.shop_jokers}
+        for _, area in ipairs(shop_areas) do
+            if area and area.cards then
+                for _, card in ipairs(area.cards) do
+                    card:set_cost()
+                end
+            end
+        end
+    end
+end
+
+-- Save reference to original add_to_deck
+local add_to_deckref = Card.add_to_deck
+
+-- hook Jokers (and consumables bought to hand)
+function Card.add_to_deck(self, from_debuff)
+    -- If this card was one of our discounted purchases
+    if self.discounted and not from_debuff then
+        G.GAME.Discounted = (G.GAME.Discounted or 0) - 1
+    end
+
+    return add_to_deckref(self, from_debuff)
+end
+
+-- hook Vouchers
+local redeem_ref = Card.redeem
+function Card.redeem(self)
+    if self.discounted then
+        G.GAME.Discounted = (G.GAME.Discounted or 0) - 1
+        self.discounted = false -- Prevent double-triggering
+    end
+    return redeem_ref(self)
+end
+
+
+SMODS.Consumable{
+    key = 'LTMBar',
+    set = 'LTMConsumableType',
+    atlas = 'Jokers',
+    pos = {x = 2, y = 66},
+    loc_txt = {
+        name = 'Gold Bar',
+        text = {
+            'Next {C:green}shop{} purchase is {C:attention}Free{}',
+			'Idea: {C:mult}TheMaxPanch',
+        }
+    },
+	
+	can_use = function(self, card)
+		return true
+	end,
+	use = function(self, card, area, copier)
+		G.GAME.ltms_spent = (G.GAME.ltms_spent or 0) + 3
+		G.GAME.Discounted = (G.GAME.Discounted or 0) + 1 
+	end,
+}
+
+----------------------------------------------
+------------GOLD BAR CODE END----------------------
+
+----------------------------------------------
+------------SHIP IN A BOTTLE CODE BEGIN----------------------
+
+SMODS.Consumable {
+    key = 'LTMShip',
+    set = 'LTMConsumableType',
+    atlas = 'Jokers',
+    pos = {x = 4, y = 66},
+    loc_txt = {
+        name = 'Ship In A Bottle',
+        text = {
+            'Make up to {C:attention}#1#{} selected things {C:attention,s:1.5}BIGGER{}',
+			'Idea: {C:mult}TheMaxPanch',
+        }
+    },
+
+    config = {
+        extra = {
+            cards = 2, -- number of cards that can be affected
+        }
+    },
+
+    loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {key = 'fn_April', set = 'Other', vars = { "Fools" }}
+        return {
+            vars = {
+                card.ability.extra.cards - 1
+            }
+        }
+    end,
+	
+	--only here for april fools
+	in_pool = function(self)
+		local now = os.date("*t")
+		if now.month == 4 then
+			return true
+		end
+		return false
+	end,
+
+    can_use = function(self, card)
+        if card.ability and card.ability.extra then
+            local n = 0
+            n = n + #G.hand.highlighted
+            n = n + #G.jokers.highlighted
+            n = n + #G.consumeables.highlighted
+            n = n + (G.pack_cards and #G.pack_cards.highlighted or 0)
+
+            return n > 0 and n <= card.ability.extra.cards
+        end
+        return false
+    end,
+
+    use = function(self, card, area, copier)
+		G.GAME.ltms_spent = (G.GAME.ltms_spent or 0) + 3
+        local highlightedCards = {}
+
+        for _, category in ipairs({
+            G.hand.highlighted,
+            G.jokers.highlighted,
+            G.consumeables.highlighted,
+            G.pack_cards and G.pack_cards.highlighted or {}
+        }) do
+            for i = 1, #category do
+                table.insert(highlightedCards, category[i])
+            end
+        end
+
+        for i = 1, math.min(#highlightedCards, card.ability.extra.cards) do
+            local c = highlightedCards[i]
+			
+
+            c:juice_up(0.3, 0.5)
+            
+            -- Increase individual card scale
+            -- 1.2 is a 20% increase; adjust as desired
+            local scale_mod = 1.2
+            c.T.w = c.T.w * scale_mod
+            c.T.h = c.T.h * scale_mod
+
+        end
+    end,
+}
+
+----------------------------------------------
+------------SHIP IN A BOTTLE CODE END----------------------
+
+----------------------------------------------
+------------PROP GUN CODE BEGIN----------------------
+
+SMODS.Consumable {
+    key = 'LTMProp',
+    set = 'LTMConsumableType',
+    atlas = 'Jokers',
+    pos = {x = 0, y = 67},
+    loc_txt = {
+        name = 'Prop Gun',
+        text = {
+            'Make up to {C:attention}#1#{} selected things {C:attention,s:0.7}SMALLER{}',
+			'Idea: {C:mult}TheMaxPanch',
+        }
+    },
+
+    config = {
+        extra = {
+            cards = 2, -- number of cards that can be affected
+        }
+    },
+
+    loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {key = 'fn_April', set = 'Other', vars = { "Fools" }}
+        return {
+            vars = {
+                card.ability.extra.cards - 1
+            }
+        }
+    end,
+	
+	--only here for april fools
+	in_pool = function(self)
+		local now = os.date("*t")
+		if now.month == 4 then
+			return true
+		end
+		return false
+	end,
+
+    can_use = function(self, card)
+        if card.ability and card.ability.extra then
+            local n = 0
+            n = n + #G.hand.highlighted
+            n = n + #G.jokers.highlighted
+            n = n + #G.consumeables.highlighted
+            n = n + (G.pack_cards and #G.pack_cards.highlighted or 0)
+
+            return n > 0 and n <= card.ability.extra.cards
+        end
+        return false
+    end,
+
+    use = function(self, card, area, copier)
+		G.GAME.ltms_spent = (G.GAME.ltms_spent or 0) + 3
+        local highlightedCards = {}
+
+        for _, category in ipairs({
+            G.hand.highlighted,
+            G.jokers.highlighted,
+            G.consumeables.highlighted,
+            G.pack_cards and G.pack_cards.highlighted or {}
+        }) do
+            for i = 1, #category do
+                table.insert(highlightedCards, category[i])
+            end
+        end
+
+        for i = 1, math.min(#highlightedCards, card.ability.extra.cards) do
+            local c = highlightedCards[i]
+			
+
+            c:juice_up(0.3, 0.5)
+            
+            -- Increase individual card scale
+            -- 1.2 is a 20% increase; adjust as desired
+            local scale_mod = 0.8
+            c.T.w = c.T.w * scale_mod
+            c.T.h = c.T.h * scale_mod
+			
+        end
+    end,
+}
+
+----------------------------------------------
+------------PROP GUN CODE END----------------------
+
+function joker_add3(jKey)
+
+    if type(jKey) == 'string' then
+        
+        local j = SMODS.create_card({
+            key = jKey,
+        })
+
+        j:add_to_deck()
+        G.jokers:emplace(j)
+
+    end
+end
+
+SMODS.Consumable{
+    key = 'LTMBrainrot',
+    set = 'LTMConsumableType',
+    atlas = 'Jokers',
+    pos = {x = 0, y = 68},
+    loc_txt = {
+        name = 'Grande Lucky Rot Secret',
+        text = {
+            'Summon a random {C:attention}Brainrot{} Joker',
+			'{C:inactive}(Must have Room)',
+			'Idea: {C:fn_eternal}Gavinia',
+        },
+    },
+	
+    loc_vars = function(self, info_queue, card)
+        return {vars = {}}
+    end,
+	
+	can_use = function(self, card)
+        -- Check if there is room in the Joker slot
+        if #G.jokers.cards < G.jokers.config.card_limit or next(SMODS.find_card('j_fn_TTTS')) then
+			return true
+		end
+    end,
+	
+    use = function(self, card, area, copier)
+        G.GAME.ltms_spent = (G.GAME.ltms_spent or 0) + 3
+        
+		local brainrots = {
+			'j_fn_Brainrot', 'j_fn_67', 'j_fn_Skibidi', 'j_fn_Hotspot', 'j_fn_Dragon',
+			'j_fn_Brainrot', 'j_fn_67', 'j_fn_Skibidi', 'j_fn_Hotspot', 'j_fn_Dragon',
+			'j_fn_Brainrot', 'j_fn_67', 'j_fn_Skibidi', 'j_fn_Hotspot', 'j_fn_Dragon', 
+			'j_fn_Ballerina', 'j_fn_Ballerina', 'j_fn_TTTS',
+		}
+
+        -- Randomly select a brainrot
+        local selected_brainrot = brainrots[math.random(#brainrots)]
+        
+		joker_add3(selected_brainrot)
+        
+    end,
+}
 
 
 ----------------------------------------------
@@ -24047,6 +26053,14 @@ SMODS.Voucher{
             'Idea: BoiRowan'
         }
     },
+	
+	--dont show up on fortnite deck cause its useless there
+	in_pool = function(self)
+		if G.GAME.selected_back.effect.center.key ~= 'b_fn_FortniteDeck' then
+			return true
+		end
+    end,
+	
     redeem = function(self, card)
 		G.GAME.used_fortlatro_vouchers = (G.GAME.used_fortlatro_vouchers or 0) + 1
         if config.sfx ~= false then
@@ -24257,6 +26271,7 @@ function Game:init_game_object(...)
     local ret = igo(self, ...)
     -- preserve values if loading a save; otherwise seed to 0
     ret.InfluxActive     = tonumber(ret.InfluxActive)     or 0
+	ret.OldHandsLimit    = tonumber(ret.OldHandsLimit)     or 0
     return ret
 end
 
@@ -24270,6 +26285,7 @@ function end_round()
     if G.GAME.OldHandsLimit and G.GAME.InfluxActive ~= 0 then
 		G.GAME.InfluxActive = 0
 		G.GAME.round_resets.hands = G.GAME.OldHandsLimit
+		G.GAME.OldHandsLimit = 0
 	end
 end
 
@@ -24314,7 +26330,9 @@ SMODS.Voucher{
         -- Save original hand limit before changing it
         G.GAME.InfluxActive = 1
 		
-        G.GAME.OldHandsLimit = G.GAME.round_resets.hands or G.GAME.hands
+		if G.GAME.OldHandsLimit == 0 then
+			G.GAME.OldHandsLimit = G.GAME.round_resets.hands
+		end
 
         -- Adjust hands for next round
         local target_hands = card.ability.extra.hands
@@ -24409,6 +26427,7 @@ SMODS.Voucher{
 
     redeem = function(self, card)
         G.GAME.used_fortlatro_vouchers = (G.GAME.used_fortlatro_vouchers or 0) + 1
+		G.GAME.starting_params.ante_scaling = G.GAME.starting_params.ante_scaling * 2
         if config.sfx ~= false then
             play_sound("fn_augment")
         end
@@ -24451,17 +26470,13 @@ SMODS.Voucher{
             end
         end
     end,
-
-    calculate = function(self, card, context)
-        if context.setting_blind and G.GAME and G.GAME.blind and G.GAME.blind.chips then
-            G.GAME.blind.chips = G.GAME.blind.chips * 2
-            G.GAME.blind.chip_text = number_format(G.GAME.blind.chips)
-        end
-    end
 }
 
 ----------------------------------------------
 ------------CURSED GLASS CANNON CODE END----------------------
+
+----------------------------------------------
+------------FAVORITES CODE BEGIN----------------------
 
 local old_card_update = Card.update
 function Card:update(dt)
@@ -24525,6 +26540,9 @@ SMODS.Voucher{
         end
     end,
 }
+
+----------------------------------------------
+------------FAVORITES CODE END----------------------
 
 ----------------------------------------------
 ------------MONSTER PART AVAILABILITY CODE BEGIN----------------------
@@ -25498,8 +27516,7 @@ SMODS.Tag{
 
 ----------------------------------------------
 ------------OVERSHIELD TAG CODE BEGIN----------------------
-
-if not ((SMODS.Mods["Cryptid"] or {}).can_load) then
+if not ((SMODS.Mods["Multiplayer"] or {}).can_load) then
 SMODS.Tag{
     key = 'OvershieldTag',
     atlas = 'Jokers',
@@ -25614,6 +27631,8 @@ SMODS.Tag{
 ----------------------------------------------
 ------------CELL TAG CODE END----------------------
 
+
+
 --[[
 SMODS.Tag{
     key = 'Ned',
@@ -25639,6 +27658,22 @@ SMODS.Tag{
 --]]
 ----------------------------------------------
 ------------FRACTURE CODE BEGIN----------------------
+
+local disable = Blind.disable
+function Blind:disable()
+	disable(self)
+	SMODS.calculate_context({ blind_disabled = true })
+	for _, area in pairs({G.hand, G.deck, G.jokers, G.consumeables, G.vouchers, G.discard, G.playing_cards}) do
+        if area and area.cards then
+            for _, card in ipairs(area.cards) do
+                -- Reset all flags that cause debuffing
+                card.wasdebuffed = false
+                card:set_debuff(false)
+            end
+        end
+    end
+end
+
 
 SMODS.Atlas({ key = "Blinds", atlas_table = "ANIMATION_ATLAS", path = "Blinds.png", px = 34, py = 34, frames = 21 })
 
@@ -25945,6 +27980,12 @@ if config.blinds ~= false then
                     card.debuffed_by_blind = nil
                 end
             end
+			
+			for _, card in ipairs(G.jokers.cards) do
+                card:set_debuff()
+                card.debuffed_by_blind = nil
+            end
+			
             for _, card in ipairs(G.consumeables.cards) do
                 card:set_debuff()
                 card.debuffed_by_blind = nil
@@ -26041,7 +28082,9 @@ if config.blinds ~= false then
         disable = function(self)
             -- Clear out Gros Michels
             for _, joker in ipairs(G.jokers.cards) do
-                joker:start_dissolve()
+				if joker.config.center.key == 'j_gros_michel' then
+					joker:start_dissolve()
+				end
             end
 
             -- Restore jokers from vouchers
@@ -26229,42 +28272,54 @@ if config.blinds ~= false then
     end
 end
 
--- =========================
--- Game over hook (UNCHANGED)
--- =========================
 local old_update_game_over = Game.update_game_over
 
 function Game:update_game_over(dt)
     G.FORT_LAVA_DRAW_ACTIVE = false
 
-    if G.GAME.Wafer_Score and to_big(G.GAME.Wafer_Score) > to_big(0) then
-        if to_big(G.GAME.chips) + to_big(G.GAME.Wafer_Score) >= to_big(G.GAME.blind.chips) then
-            if G.GAME.Wafer_Score_Applied == 0 then
-                G.GAME.Wafer_Score_Applied = 1
-                G.GAME.chips = G.GAME.chips + G.GAME.Wafer_Score
-                G.STATE = G.STATES.HAND_PLAYED
-                G.STATE_COMPLETE = true
-                end_round()
-                G.GAME.Wafer_Score = 0
-            end
+    --print("--- Game:update_game_over Hook ---")
+    local current_chips = to_big(G.GAME.chips)
+    local target_chips = to_big(G.GAME.blind.chips)
+    local wafer_score = to_big(G.GAME.Wafer_Score or 0)
+    
+    --print("Chips: " .. tostring(current_chips) .. " / Target: " .. tostring(target_chips))
+    --print("Wafer_Score: " .. tostring(wafer_score))
+
+    -- CHECK 1: Do we already have enough chips OR will Wafer_Score save us?
+    if current_chips >= target_chips or (wafer_score > to_big(0) and (current_chips + wafer_score) >= target_chips) then
+        --print("Save Condition Met: Player has (or will have) enough chips.")
+        
+        -- Apply the extra score if it exists and hasn't been applied
+        if G.GAME.Wafer_Score_Applied == 0 and wafer_score > to_big(0) then
+            G.GAME.Wafer_Score_Applied = 1
+            G.GAME.chips = G.GAME.chips + G.GAME.Wafer_Score
         end
 
+        -- Force the game out of the Game Over state and into the Win state
+        G.STATE = G.STATES.HAND_PLAYED
+        G.STATE_COMPLETE = true
+        end_round()
+        G.GAME.Wafer_Score = 0
+        return -- Exit here so we don't call old_update_game_over
+    
+    -- CHECK 2: BlankFailed logic
     elseif G.GAME.BlankFailed and G.GAME.current_round.hands_left > 0 then
+        --print("BlankFailed triggered.")
         if G.deck and #G.deck.cards > 0 then
             local draw_count = G.hand.config.card_limit - #G.hand.cards
             SMODS.draw_cards(draw_count)
         end
         G.STATE = G.STATES.SELECTING_HAND
+        return
 
     else
+        --print("No save conditions met. Proceeding to Game Over.")
         if love._speedrun_base_update then
             love.update = love._speedrun_base_update
         end
-
         old_update_game_over(self, dt)
     end
 end
-
 
 
 
@@ -26661,7 +28716,8 @@ if config.blinds ~= false then
         key = 'Insurance', --know that im the best in policy
         name = 'No Sweat Insurance',
         config = {},
-        boss = { min = 3, max = 10, hardcore = true },
+        boss = { showdown = true, min = 10, max = 10, hardcore = true},
+		showdown = true,
         boss_colour = HEX("065291"),
         atlas = "Blinds",
         pos = { x = 0, y = 12 },
@@ -26672,6 +28728,9 @@ end
 
 ----------------------------------------------
 ------------NO SWEAT INSURANCE CODE END----------------------
+
+----------------------------------------------
+------------NOTHING BURGER CODE BEGIN----------------------
 
 if config.blinds ~= false then
     SMODS.Blind {
@@ -26700,7 +28759,236 @@ if config.blinds ~= false then
     }
 end
 
+----------------------------------------------
+------------NOTHING BURGER CODE END----------------------
 
+----------------------------------------------
+------------DELULU CODE BEGIN----------------------
+
+--this shit was a nightmare to code but it works lol
+
+-- 1. Initialize Global Mod Table
+MicMod = MicMod or {}
+
+-- 2. Blind Definition (SMODS)
+if config.blinds ~= false then
+    SMODS.Blind {
+        loc_txt = {
+            name = 'Delulu',
+            text = { 'Keep talking or die' }
+        },
+        key = 'Delulu',
+        name = 'Delulu',
+        config = {},
+        boss = { min = 1, max = 10, hardcore = true },
+        boss_colour = HEX("f2266b"),
+        atlas = "Blinds",
+        pos = { x = 0, y = 14 },
+        dollars = 5,
+        
+        in_pool = function(self)
+            return G.GAME and G.GAME.MicEligible
+        end,
+
+        calculate = function(self, card, context)
+            if context.setting_blind and not G.GAME.blind.disabled then
+                MicMod.active = true
+                G.GAME.MicLevel = 50
+                G.GAME.InitialCooldown = 2.0
+                G.GAME.YapCount = 0
+                MicMod.devices = love.audio.getRecordingDevices()
+                for _, mic in ipairs(MicMod.devices) do
+                    mic:start(2048, 44100, 16)
+                end
+            end
+            if context.end_of_round then
+                MicMod.active = false
+                G.GAME.MicLevel = nil
+            end
+        end,
+        
+        disable = function(self)
+            MicMod.active = false
+            G.GAME.MicLevel = nil
+        end,
+    }
+end
+
+-- 3. Start Run Hook
+MicMod.start_run_ref = Game.start_run
+function Game:start_run(args)
+    MicMod.start_run_ref(self, args)
+    G.GAME.MicEligible = G.GAME.MicEligible or false
+    G.GAME.MicConfirmed = G.GAME.MicConfirmed or false
+
+    if G.GAME.blind and G.GAME.blind.name == 'Delulu' and not G.GAME.blind.disabled and G.STATE ~= 8 then
+        MicMod.active = true
+        G.GAME.MicLevel = 50
+        G.GAME.InitialCooldown = 2.0
+        G.GAME.YapCount = 0
+        MicMod.devices = love.audio.getRecordingDevices()
+        for _, mic in ipairs(MicMod.devices) do mic:start(1024, 44100, 16) end
+    else
+        MicMod.active = false
+        G.GAME.MicLevel = nil
+    end
+end
+
+-- 4. The Core Update Hook
+MicMod.upd_ref = Game.update
+function Game:update(dt)
+    MicMod.upd_ref(self, dt)
+    
+    if not G or not G.GAME then return end
+
+    -- PART A: MIC CONFIRMATION
+    if not G.GAME.MicConfirmed then
+        MicMod.temp_mics = love.audio.getRecordingDevices()
+        MicMod.max_rms_check = 0 
+        
+        for _, device in ipairs(MicMod.temp_mics) do
+            if not device:isRecording() then device:start(1024, 44100, 16) end
+            MicMod.temp_data = device:getData()
+            if MicMod.temp_data and MicMod.temp_data:getSampleCount() > 0 then
+                MicMod.sumSq = 0
+                MicMod.count = MicMod.temp_data:getSampleCount()
+                for i = 0, MicMod.count - 1 do
+                    MicMod.s = MicMod.temp_data:getSample(i)
+                    MicMod.sumSq = MicMod.sumSq + (MicMod.s * MicMod.s)
+                end
+                MicMod.rms = math.sqrt(MicMod.sumSq / MicMod.count)
+                if MicMod.rms > MicMod.max_rms_check then MicMod.max_rms_check = MicMod.rms end
+            end
+        end
+
+        G.GAME.MicVolume = math.floor(MicMod.max_rms_check * 1000)
+        if G.GAME.MicVolume >= 20 then
+			--print('mic found')
+            G.GAME.MicEligible = true
+            G.GAME.MicConfirmed = true 
+        end
+    end
+
+    -- PART B: DELULU BOSS MECHANIC
+    if MicMod.active and not (G.GAME.blind and G.GAME.blind.disabled) then
+        G.GAME.MicLevel = G.GAME.MicLevel or 50
+        MicMod.boss_max_rms = 0
+        
+        MicMod.devices = love.audio.getRecordingDevices()
+        for _, device in ipairs(MicMod.devices) do
+            if device:isRecording() then
+                MicMod.data = device:getData()
+                if MicMod.data and MicMod.data:getSampleCount() > 0 then
+                    MicMod.sumSq = 0
+                    MicMod.count = MicMod.data:getSampleCount()
+                    for i = 0, MicMod.count - 1, 4 do
+                        MicMod.s = MicMod.data:getSample(i)
+                        MicMod.sumSq = MicMod.sumSq + (MicMod.s * MicMod.s)
+                    end
+                    MicMod.rms = math.sqrt(MicMod.sumSq / (MicMod.count / 4))
+                    if MicMod.rms > MicMod.boss_max_rms then MicMod.boss_max_rms = MicMod.rms end
+                end
+            end
+        end
+
+        if G.GAME.InitialCooldown and G.GAME.InitialCooldown > 0 then
+            G.GAME.InitialCooldown = G.GAME.InitialCooldown - dt
+        else
+            G.GAME.MicLevel = G.GAME.MicLevel - (25 * dt)
+            if MicMod.boss_max_rms > 0 then
+                G.GAME.MicLevel = G.GAME.MicLevel + (MicMod.boss_max_rms * 3500 * dt)
+            end
+
+            if G.GAME.MicLevel <= 0 and G.STATE ~= G.STATES.GAME_OVER and G.STATE ~= 2 then
+                if G.GAME.chips >= G.GAME.blind.chips then G.GAME.chips = (G.GAME.blind.chips * 0.50) end
+                G.STATE = G.STATES.HAND_PLAYED
+                G.STATE_COMPLETE = true
+                end_round()
+                MicMod.active = false 
+            end
+        end
+
+        G.GAME.MicLevel = math.max(0, math.min(100, G.GAME.MicLevel))
+        if G.GAME.MicLevel >= 20 then G.GAME.YapCount = (G.GAME.YapCount or 0) + dt end
+    end
+end
+
+-- 5. Draw Logic
+MicMod.drw_ref = Game.draw
+function Game:draw()
+    MicMod.drw_ref(self)
+
+    if MicMod.active and G and G.GAME and G.GAME.MicLevel then
+        MicMod.sw = love.graphics.getWidth()
+        MicMod.sh = love.graphics.getHeight()
+        MicMod.w, MicMod.h = 25, 350
+        MicMod.dx = MicMod.sw - 100 
+        MicMod.dy = (MicMod.sh / 2) - (MicMod.h / 2)
+        
+        love.graphics.setColor(0, 0, 0, 0.7)
+        love.graphics.rectangle("fill", MicMod.dx, MicMod.dy, MicMod.w, MicMod.h)
+        
+        MicMod.displayLevel = G.GAME.MicLevel / 100
+        MicMod.fillH = MicMod.h * MicMod.displayLevel
+        love.graphics.setColor(1 - MicMod.displayLevel, MicMod.displayLevel, 0.3, 1)
+        love.graphics.rectangle("fill", MicMod.dx, MicMod.dy + (MicMod.h - MicMod.fillH), MicMod.w, MicMod.fillH)
+        
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.print("CATASTROPHIC", MicMod.dx - 35, MicMod.dy - 25)
+        love.graphics.print("LOW", MicMod.dx - 2, MicMod.dy + MicMod.h + 5)
+        
+        love.graphics.push()
+        love.graphics.translate(MicMod.dx - 35, MicMod.dy + MicMod.h - 70)
+        love.graphics.rotate(-math.pi / 2)
+        love.graphics.print("YAPPING LEVEL TODAY", 0, 0)
+        love.graphics.pop()
+
+        love.graphics.setColor(1, 1, 1, 0.5)
+        love.graphics.setLineWidth(1)
+        love.graphics.rectangle("line", MicMod.dx, MicMod.dy, MicMod.w, MicMod.h)
+    end
+end
+
+----------------------------------------------
+------------DELULU CODE END----------------------
+
+if config.blinds ~= false then
+    SMODS.Blind {
+        loc_txt = {
+            name = 'The Dark Presence',
+            text = { 'Jokers are debuffed until last hand', 'Idea: kxttyfrickfish', }
+        },
+        key = 'Presence', 
+        name = 'The Dark Presence',
+        config = {},
+        boss = { showdown = true, min = 10, max = 10, hardcore = true},
+		showdown = true,
+        boss_colour = HEX("45012c"),
+        atlas = "Blinds",
+        pos = { x = 0, y = 15 },
+        dollars = 10,
+		
+		calculate = function(self, card, context)
+			if context.first_hand_drawn and not G.GAME.blind.disabled then
+				for _, joker in ipairs(G.jokers.cards) do
+					joker:set_debuff(true)
+                end
+			end
+		
+            if G.STATE == 1 and G.GAME.current_round.hands_left == 1 and not G.GAME.blind.disabled then
+				G.GAME.blind:disable()
+            end
+        end,
+		
+		disable = function(self)
+            for _, joker in ipairs(G.jokers.cards) do
+				joker:set_debuff(false)
+				joker.wasdebuffed = false
+            end
+        end,
+		
+    }
+end
 
 ----------------------------------------------
 ------------STORM SEAL CODE BEGIN----------------------
@@ -28075,7 +30363,7 @@ SMODS.Back{
 local original_game_update = Game.update
 function Game:update(dt)
     original_game_update(self, dt)
-	if G.GAME and G.GAME.selected_back and G.GAME.selected_back.effect and G.GAME.selected_back.effect.center and G.GAME.selected_back.effect.center.key == 'b_fn_SiphonDeck' and not G.GAME.isnemesis then
+	if G.GAME and G.GAME.selected_back and G.GAME.selected_back.effect and G.GAME.selected_back.effect.center and G.GAME.selected_back.effect.center.key == 'b_fn_SiphonDeck' and not G.GAME.isnemesis and G.STATE ~= 8  then
 		G.GAME.round_resets.hands = G.GAME.current_round.hands_left
     end
 end
@@ -28723,6 +31011,31 @@ SMODS.JimboQuip({
     },
     filter = function(self, type)
         if next(SMODS.find_card('j_fn_Kxtty')) then
+            return true, { weight = 500 }
+        end
+        return false
+    end
+})
+
+-- Blank Loss 
+SMODS.JimboQuip({
+    key = 'blank_quip_1',
+    type = 'loss',
+	extra = {
+        center = 'j_fn_Eric',
+        particle_colours = { -- table of up to 3 colours for particles
+			G.C.GREEN,
+			G.C.PURPLE,
+			G.C.GOLD
+		},
+		materialize_colours = { -- table of up to 3 colours for materialize effect
+			G.C.GREEN,
+			G.C.PURPLE,
+			G.C.GOLD
+		},
+    },
+    filter = function(self, type)
+        if G.GAME and G.GAME.blind and G.GAME.blind.name == 'Blank' then
             return true, { weight = 500 }
         end
         return false
