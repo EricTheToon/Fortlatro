@@ -17,6 +17,9 @@ end
 
 if G.STAGE == G.STAGES.MAIN_MENU and not G.fort_splash then
 	G.FORT_LAVA_DRAW_ACTIVE = false
+	MicMod.active = false
+    G.GAME.MicLevel = nil
+	G.FIND_GAME.active = false
     if Fortlatro and Fortlatro.initialize_splashtext then
         Fortlatro.initialize_splashtext()
     end

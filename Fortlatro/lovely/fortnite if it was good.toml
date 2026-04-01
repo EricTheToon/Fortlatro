@@ -12,6 +12,11 @@ pattern = '''
 booster_obj = self.config.center
 '''
 payload = '''
+
+if self.discounted then
+	G.GAME.Discounted = (G.GAME.Discounted or 0) - 1
+end
+
 if self.config.center and self.config.center.key == 'p_fn_LTMBooster1' or self.config.center and self.config.center.key == 'p_fn_LTMBooster2' then
     self.ability.extra = self.ability.extra + G.GAME.ltm_choices
 	G.GAME.LTM_Pack = 1
