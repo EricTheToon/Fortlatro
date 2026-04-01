@@ -5,7 +5,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 148 Jokers
+# 158 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see) (can turn into GOOD or EVIL Crac)
@@ -302,6 +302,28 @@ Tung Tung Tung Sahur - Legendary - You can buy Brainrots past joker limit
 
 Jonesy The First - Uncommon - First played card of First Hand gives X4 Mult first hand discarded gives X-1 Mult
 
+Founders - Common - Earn $2 every round
+
+Sidekick - Common - Gain +1 Mult every this joker is obtained
+
+Ned - Uncommon - Gain X0.5 Mult for every consecutive round of Find Medkit
+
+Clipboard - Uncommon - +0.5 mult for every unique character on the clipboard
+
+Evan Kinnney - Uncommon - Every 2 hands upgrade played hand
+
+Wonkee - Uncommon - When blind selected play a round of Zip Zonk Bang score is converted to mult
+
+TV Cart - Uncommon - Gain X1 Mult whenever the DVD logo hits the corner
+
+Ballerina Capuccina - Rare - Earn $4 for every owned Brainrot at end of round
+
+Tim Sweeney - Common - Spend $1000 on UEFN after every round
+
+LLamatron - Common - Watch a random video after every round
+
+Fortnite Discord Bot - Common - 1/3 chance to lose all money and create a Grande Lucky Rot Secret (Must have room)
+
 # 9 Decks
 Eric Deck - Start with Eric
 
@@ -454,7 +476,7 @@ Stick Of Truth - Pick the next boss blind. Next shop contains no packs
 
 Thorne Ring - Make all Jokers Polychrome and Eternal
 
-# 59 LTM Cards
+# 63 LTM Cards
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -575,6 +597,14 @@ Refund Ticket - Refund half the money spent on LTMS
 
 Cheap Vbucks - Double money 1/4 chance to chargeback instead
 
+Gold Bar - Next shop purchase is free
+
+Ship In A Bottle - Make 1 selected thing BIGGER
+
+Prop Gun - Make 1 selected thing SMALLER
+
+Grande Lucky Rot Secret - Spawn a random Brainrot Joker (Must have room)
+
 # 15 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
 
@@ -661,7 +691,7 @@ Overshield Tag - Next base edition shop Joker is free and becomes Overshielded
 
 Cel Tag - Next base edition shop Joker is free and becomes Cel Shaded
 
-# 14 Blinds
+# 16 Blinds
 Fracture - All played cards are destroyed
 
 Zero Build - Wood, Brick and Metal are debuffed
@@ -693,6 +723,9 @@ No Sweat insurance - Mult cannot exceed $
    You immediately skip the shop after beating this blind
 </details>
 
+Delulu - Keep talking or die
+
+The Dark Presence - Jokers are debuffed until last hand
 
 # Be sure to check the config tab you can enable and disable sounds and blinds
 additional content with:
