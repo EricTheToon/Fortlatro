@@ -19,7 +19,7 @@ vec4 dissolve_mask(vec4 tex, vec2 texture_coords, vec2 uv)
         return vec4(shadow ? vec3(0.,0.,0.) : tex.xyz, shadow ? tex.a*0.3: tex.a);
     }
 
-    float adjusted_dissolve = (dissolve*dissolve*(3.-2.*dissolve))*1.02 - 0.01;
+    float adjusted_dissolve = (dissolve*dissolve*(3.-2.*dissolve))*1.02 - 0.01 + (shockwaved.x * 0.00001);
 
 	float t = time * 10.0 + 2003.;
 	vec2 floored_uv = (floor((uv*texture_details.ba)))/max(texture_details.b, texture_details.a);
@@ -94,27 +94,6 @@ vec4 HSL(vec4 c)
 	return hsl;
 }
 
-// GPU-optimized hash function for pseudo-random patterns
-float hash(vec2 p) {
-	vec3 p3 = fract(vec3(p.xyx) * 0.1031);
-	p3 += dot(p3, p3.yzx + 33.33);
-	return fract((p3.x + p3.y) * p3.z);
-}
-
-// GPU-optimized noise function
-float noise(vec2 p) {
-	vec2 i = floor(p);
-	vec2 f = fract(p);
-	f = f * f * (3.0 - 2.0 * f);
-	
-	float a = hash(i);
-	float b = hash(i + vec2(1.0, 0.0));
-	float c = hash(i + vec2(0.0, 1.0));
-	float d = hash(i + vec2(1.0, 1.0));
-	
-	return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
-}
-
 vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords )
 {
     vec4 tex = Texel(texture, texture_coords);
@@ -128,100 +107,138 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
 
 	vec4 hsl = HSL(vec4(tex.r*saturation_fac, tex.g*saturation_fac, tex.b, tex.a));
 
-	float t = shockwaved.y * 2.5 + mod(time, 1.);
+	// Animated lightning effect
+	float t = time * 3.0 + shockwaved.x * 3.0;
 	vec2 floored_uv = (floor((uv*texture_details.ba)))/texture_details.ba;
-    vec2 uv_scaled_centered = (floored_uv - 0.5) * 50.;
-
-	// Optimized field calculation
-	vec2 field_part1 = uv_scaled_centered + 50.*vec2(sin(-t / 143.6340), cos(-t / 99.4324));
-	vec2 field_part2 = uv_scaled_centered + 50.*vec2(cos( t / 53.1532),  cos( t / 61.4532));
-	vec2 field_part3 = uv_scaled_centered + 50.*vec2(sin(-t / 87.53218), sin(-t / 49.0000));
-
-    float field = (1.+ (
-        cos(length(field_part1) / 19.483) + sin(length(field_part2) / 33.155) * cos(field_part2.y / 15.73) +
-        cos(length(field_part3) / 27.193) * sin(field_part3.x / 21.92) ))/2.;
-
-    float base_wave = (.5 + .5* cos( (shockwaved.x) * 2.612 + ( field + -.5 ) *3.14));
+    vec2 uv_centered = floored_uv - 0.5;
 	
-	// GPU-optimized lightning using analytical functions instead of loops
-	vec2 lightning_uv = floored_uv * vec2(15., 12.);
+	// Distance and angle from center for radial explosion
+	float dist_from_center = length(uv_centered) * 2.0;
+	float angle = atan(uv_centered.y, uv_centered.x);
 	
-	// Multiple diagonal lightning bolts using noise-based approach
-	float lightning = 0.0;
-	float angle1 = -0.3 + sin(time * 0.8) * 0.4;
-	float angle2 = -0.3 + sin(time * 0.8 + 1.0) * 0.4;
-	float angle3 = -0.3 + sin(time * 0.8 + 2.0) * 0.4;
+	// Removed white core - just gentle glow now
+	float core_glow = smoothstep(0.25, 0.0, dist_from_center) * 2.5;
 	
-	// Bolt 1
-	vec2 rot1 = vec2(lightning_uv.x * cos(angle1) - lightning_uv.y * sin(angle1),
-	                  lightning_uv.x * sin(angle1) + lightning_uv.y * cos(angle1));
-	float noise1 = sin(rot1.x * 2.3 + time * 3.0) * 0.8 + sin(rot1.x * 4.7 - time * 2.0) * 0.4;
-	float dist1 = abs(rot1.y - noise1 + shockwaved.x * 2.5);
-	lightning += smoothstep(0.15, 0.0, dist1) + smoothstep(0.5, 0.0, dist1) * 0.6;
+	// Main animated lightning rays - moving and flowing
+	float lightning_rays = 0.0;
+	for(float i = 0.; i < 24.; i++) {
+		float ray_angle = i * 0.261799388 + time * 0.3; // Rotate rays over time
+		
+		// Animated jagged lightning pattern
+		float jagged_offset = 0.0;
+		jagged_offset += sin(dist_from_center * 8.0 + i * 2.3 + time * 2.5) * 0.25;
+		jagged_offset += sin(dist_from_center * 16.0 + i * 1.7 - time * 3.5) * 0.15;
+		jagged_offset += sin(dist_from_center * 32.0 + i * 3.1 + time * 5.0) * 0.08;
+		
+		float angle_diff = abs(mod(angle - ray_angle + jagged_offset + 3.14159265, 6.28318531) - 3.14159265);
+		
+		// Animated ray width
+		float ray_width = 0.03 + sin(dist_from_center * 4.0 + i * 1.5 + time * 2.0) * 0.015;
+		float ray_core = smoothstep(ray_width, 0.0, angle_diff);
+		float ray_glow = smoothstep(ray_width * 4.0, 0.0, angle_diff) * 0.5;
+		
+		// Animated distance fade
+		float ray_length = 0.9 + sin(i * 0.7 + time * 1.5) * 0.3;
+		float distance_fade = smoothstep(ray_length, 0.1, dist_from_center);
+		
+		// Pulsing intensity per ray
+		float ray_intensity = 0.8 + sin(i * 2.1 + time * 1.8) * 0.2;
+		
+		lightning_rays += (ray_core * 3.0 + ray_glow) * distance_fade * ray_intensity;
+	}
 	
-	// Bolt 2
-	vec2 rot2 = vec2(lightning_uv.x * cos(angle2) - lightning_uv.y * sin(angle2),
-	                  lightning_uv.x * sin(angle2) + lightning_uv.y * cos(angle2));
-	float noise2 = sin(rot2.x * 2.3 + time * 3.0 + 1.0) * 0.8 + sin(rot2.x * 4.7 - time * 2.0 + 1.3) * 0.4;
-	float dist2 = abs(rot2.y - noise2 + 0.7 + shockwaved.x * 2.5);
-	lightning += (smoothstep(0.15, 0.0, dist2) + smoothstep(0.5, 0.0, dist2) * 0.6) * 0.88;
+	// Animated lightning branches
+	float lightning_branches = 0.0;
+	for(float j = 0.; j < 18.; j++) {
+		float branch_angle = j * 0.349065850 + 0.174532925 + time * 0.5; // Move branches
+		
+		// Flowing jagged pattern
+		float branch_jagged = 0.0;
+		branch_jagged += sin(dist_from_center * 12.0 + j * 3.2 - time * 3.0) * 0.3;
+		branch_jagged += sin(dist_from_center * 24.0 + j * 2.1 + time * 4.5) * 0.2;
+		
+		float branch_angle_diff = abs(mod(angle - branch_angle + branch_jagged + 3.14159265, 6.28318531) - 3.14159265);
+		
+		float branch_width = 0.02;
+		float branch = smoothstep(branch_width * 2.0, 0.0, branch_angle_diff);
+		
+		// Animated fade
+		float branch_length = 0.6 + sin(j * 1.3 + time * 1.2) * 0.2;
+		float branch_fade = smoothstep(branch_length, 0.15, dist_from_center);
+		
+		lightning_branches += branch * branch_fade * 0.8;
+	}
 	
-	// Bolt 3
-	vec2 rot3 = vec2(lightning_uv.x * cos(angle3) - lightning_uv.y * sin(angle3),
-	                  lightning_uv.x * sin(angle3) + lightning_uv.y * cos(angle3));
-	float noise3 = sin(rot3.x * 2.3 + time * 3.0 + 2.0) * 0.8 + sin(rot3.x * 4.7 - time * 2.0 + 2.6) * 0.4;
-	float dist3 = abs(rot3.y - noise3 + 1.4 + shockwaved.x * 2.5);
-	lightning += (smoothstep(0.15, 0.0, dist3) + smoothstep(0.5, 0.0, dist3) * 0.6) * 0.76;
+	// Animated burst particles
+	float burst_particles = 0.0;
+	for(float k = 0.; k < 32.; k++) {
+		float particle_angle = k * 0.19634954 + time * 0.8; // Rotate particles
+		float particle_offset = sin(k * 4.5 + time * 3.5) * 0.4;
+		
+		float particle_angle_diff = abs(mod(angle - particle_angle + particle_offset + 3.14159265, 6.28318531) - 3.14159265);
+		
+		float particle = smoothstep(0.015, 0.0, particle_angle_diff);
+		
+		// Pulsing outer edge
+		float pulse = 0.5 + 0.5 * sin(time * 2.5 + k * 0.5);
+		float particle_range = smoothstep(0.4, 0.6, dist_from_center) * smoothstep(1.1, 0.8, dist_from_center) * pulse;
+		
+		burst_particles += particle * particle_range * 0.6;
+	}
 	
-	// GPU-optimized electrical crackles using noise
-	vec2 crackle_uv = floored_uv * 25.;
-	float crackle_t = time * 4.0 + shockwaved.x * 3.0;
+	// Combine all lightning effects
+	float total_energy = clamp(
+		lightning_rays * 2.0 + 
+		lightning_branches * 1.5 + 
+		burst_particles * 1.2 +
+		core_glow * 2.0,
+		0., 6.0
+	);
 	
-	// Multi-frequency crackle pattern
-	vec2 crackle_pos = crackle_uv + vec2(sin(crackle_t * 0.7), cos(crackle_t * 0.9)) * 3.;
-	float crackle_pattern1 = sin(crackle_pos.x * 1.5 + crackle_t) * cos(crackle_pos.y * 1.3 - crackle_t * 0.8);
-	crackle_pattern1 += sin(crackle_pos.x * 3.2 - crackle_t * 1.2) * cos(crackle_pos.y * 2.8 + crackle_t * 0.6);
-	
-	vec2 crackle_pos2 = crackle_uv + vec2(sin(crackle_t * 0.7 + 1.5), cos(crackle_t * 0.9 + 1.5)) * 3.;
-	float crackle_pattern2 = sin(crackle_pos2.x * 1.5 + crackle_t + 1.5) * cos(crackle_pos2.y * 1.3 - crackle_t * 0.8 + 1.5);
-	
-	float crackle = smoothstep(0.88, 0.95, (crackle_pattern1 + 1.) * 0.5) 
-	              + smoothstep(0.88, 0.95, (crackle_pattern2 + 1.) * 0.5) * 0.8;
-	
-	float total_lightning = clamp(lightning + crackle * 0.4, 0., 1.);
-	
-	// Edge glow
-	float edge_dist = min(min(floored_uv.x, 1. - floored_uv.x), min(floored_uv.y, 1. - floored_uv.y));
-	float edge_glow = smoothstep(0.15, 0.0, edge_dist) * (0.5 + sin(time * 2.0 + shockwaved.x * 4.0) * 0.3);
-	
-	// Purple base with white lightning
-	hsl.x = 0.78 + sin(time * 1.5) * 0.03;
-	hsl.y = 0.95;
-	hsl.z = hsl.z * 0.25 + 0.45 + base_wave * 0.1 + edge_glow * 0.25;
-	
-	// Apply white lightning
-	float lightning_strength = step(0.05, total_lightning);
-	hsl.y = mix(hsl.y, mix(0.95, 0.1, total_lightning), lightning_strength);
-	hsl.z = mix(hsl.z, mix(hsl.z, 0.98, total_lightning * 0.9), lightning_strength);
-	
-	// Pure white for strongest
-	float strong_lightning = step(0.7, total_lightning);
-	hsl.y = mix(hsl.y, 0.05, strong_lightning);
-	hsl.z = mix(hsl.z, 0.99, strong_lightning);
+	// Color scheme: Magenta-pink-purple gradient (no white)
+	if (total_energy > 0.1) {
+		// Bright pink-magenta energy (Highest energy core - made much lighter/closer to white-pink)
+		if (total_energy > 3.0) {
+			hsl.x = 0.88; 
+			hsl.y = 0.65; // Dropped saturation slightly to make it look brighter
+			hsl.z = 0.88 + (total_energy - 3.0) * 0.04; // Increased lightness base from 0.75 to 0.88
+		}
+		// Medium pink-magenta
+		else if (total_energy > 1.5) {
+			hsl.x = 0.85; 
+			hsl.y = 0.75;
+			hsl.z = 0.80 + (total_energy - 1.5) * 0.05; // Increased lightness base from 0.65 to 0.80
+		}
+		// Medium purple-magenta
+		else if (total_energy > 0.8) {
+			hsl.x = 0.82; 
+			hsl.y = 0.80;
+			hsl.z = 0.70 + total_energy * 0.08; // Increased lightness base from 0.55 to 0.70
+		}
+		// Outer purple glow
+		else {
+			hsl.x = 0.78; 
+			hsl.y = 0.75;
+			hsl.z = 0.58 + total_energy * 0.10; // Increased lightness base from 0.45 to 0.58
+		}
+	} else {
+		// Lighter purple background
+		hsl.x = 0.77;
+		hsl.y = 0.70;
+		hsl.z = 0.65; 
+	}
 
     tex.rgb = RGB(hsl).rgb;
 
-	// Alpha adjustments for glow - reduced for transparency
+	// Dynamic alpha based on energy
 	if (tex[3] < 0.7)
 		tex[3] = tex[3]/5.;
 	
-	// Boost alpha for lightning but keep it transparent
-	if (total_lightning > 0.1) {
-		tex.a = max(tex.a, 0.4 + total_lightning * 0.15);
+	if (total_energy > 0.15) {
+		tex.a = max(tex.a, 0.4 + total_energy * 0.22);
 	}
 	
-	// Reduce overall opacity to see cards behind
-	tex.a = tex.a * 0.5;
+	tex.a = tex.a * 0.72;
 	
 	return dissolve_mask(tex*colour, texture_coords, uv);
 }
