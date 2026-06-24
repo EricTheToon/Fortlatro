@@ -12,6 +12,21 @@ return {
             }
         },
 		--]]
+		Joker = {
+			j_perkeo={
+                name="Perkeo",
+                text={
+                    "Creates a {C:dark_edition}Negative{} copy of",
+                    "a random {C:attention}consumable{}",
+                    "card in your possession",
+                    "at the end of the {C:attention}shop",
+                },
+                unlock={
+                    "{E:1,s:1.3}?????",
+                },
+            }
+		},
+		
         Edition = {
             e_fn_Nitro = {
                 name = "Nitro",
@@ -151,9 +166,15 @@ return {
                 }
             },
 			
+			fn_sweaty_sticker = {
+				name = "Sweaty Stake",
+				text = {
+					"Used this Joker",
+					"to win on {C:attention}Sweaty",
+					"{C:attention}Stake{} difficulty",
+				}
+			},
         }
-		
-		
     },
 
     misc = {

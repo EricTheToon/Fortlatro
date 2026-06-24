@@ -20,6 +20,8 @@ if G.GAME.Burger and G.GAME.Burger > 0 then
 	G.GAME.Burger = G.GAME.Burger - 1
     G.STATE = G.STATES.BLIND_SELECT
 else
+	G.GAME.ForcedFail = false
+	G.GAME.ForcedFailTriggered = false
     G.STATE = G.STATES.SHOP
 end
 '''
