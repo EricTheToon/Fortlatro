@@ -525,6 +525,7 @@ if config.splashes then
 		"Counting or not counting Joker violence?",
 		"Type Gaster",
 		"The idea is simple...",
+		"Struggle with minigames? try lowering the gamespeed!"
 
     }
 
