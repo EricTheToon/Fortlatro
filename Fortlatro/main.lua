@@ -26319,7 +26319,7 @@ SMODS.Consumable{
         name = "Tracer's Pulse Pistols",
         text = {
             "{C:inactive}At this point just remove the pistols bro so buggy{}",
-            "Does {C:attention}something?{} to the {C:attention}score{}",
+            "Does {C:attention}something?{} to the current {C:attention}score{}",
         }
     },
 
