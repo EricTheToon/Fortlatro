@@ -5,7 +5,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 158 Jokers
+# 170 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see) (can turn into GOOD or EVIL Crac)
@@ -324,6 +324,30 @@ LLamatron - Common - Watch a random video after every round
 
 Fortnite Discord Bot - Common - 1/3 chance to lose all money and create a Grande Lucky Rot Secret (Must have room)
 
+Grappler - Rare - The 5 most recently added cards are shuffled to the top of the deck
+
+Dream Sprite - Rare - Sell this joker to create a Common Joker or Spectral card rarity increases in 2 rounds
+
+Water Sprite - Uncommon - Applies splash unscored cards have a 1/3 chance to gain a random enhancement or seal
+
+Punk Sprite - Common - Does... something?
+
+Earth Sprite - Uncommon - 1/3 chance to find an extra item in any pack
+
+Fire Sprite - Uncommon - Setting the score abalaze grants $5 disapears after 5 uses
+
+Zero Point Sprite - Rare - Discarded cards have a 1/5 chance to gain a Zero Point Seal
+
+King Sprite - Common - X1 Mult per owned sprite Sprites can appear multiple times
+
+Duck Sprite - Uncommon - Sell this Joker to reroll the boss blind
+
+Ghost Sprite - Uncommon - Selling sprites gives a random spectral card (must have room)
+
+Peanut Sprite - Uncommon - 1/2 chance to create a random sprite at end of round (must have room)
+
+Demon Sprite - Rare - Add 25% of current chips to mult
+
 # 9 Decks
 Eric Deck - Start with Eric
 
@@ -459,7 +483,7 @@ Mod Bench - Convert up to 2 selected cards to the last obtained enhancement
 
 Earth? - Level up Squad by +2 Mult and +15 Chips
 
-# 8 Spectrals
+# 9 Spectrals
 Double or Nothing - 1/2 chance to get 2 Spectral packs else give nothing
 
 Queue - Randomize the seals of all sealed cards in the deck
@@ -476,7 +500,9 @@ Stick Of Truth - Pick the next boss blind. Next shop contains no packs
 
 Thorne Ring - Make all Jokers Polychrome and Eternal
 
-# 63 LTM Cards
+Floppy Disk - Select any owned Joker to save it you can retrieve the saved joker in the future
+
+# 65 LTM Cards
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -605,6 +631,10 @@ Prop Gun - Make 1 selected thing SMALLER
 
 Grande Lucky Rot Secret - Spawn a random Brainrot Joker (Must have room)
 
+Tracers Pistols - does Something? to the current score
+
+Sprite Chest - Spawn a random Sprite Joker (Must have room)
+
 # 15 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
 
@@ -691,7 +721,7 @@ Overshield Tag - Next base edition shop Joker is free and becomes Overshielded
 
 Cel Tag - Next base edition shop Joker is free and becomes Cel Shaded
 
-# 16 Blinds
+# 19 Blinds
 Fracture - All played cards are destroyed
 
 Zero Build - Wood, Brick and Metal are debuffed
@@ -726,6 +756,15 @@ No Sweat insurance - Mult cannot exceed $
 Delulu - Keep talking or die
 
 The Dark Presence - Jokers are debuffed until last hand
+
+Dark Voyager - Avoid hitting lasers Hitting lasers will kill you
+
+Fight The Storm - Defend the atlas
+
+Impostors - Add 10 impostor cards to your deck hands containing impostor cards do not score
+
+# 1 Stake
+Sweaty Stake - Finish the run at Ante 16 Finisher blinds appear every attention 8 antes
 
 # Be sure to check the config tab you can enable and disable sounds and blinds
 additional content with:
