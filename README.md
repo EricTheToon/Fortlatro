@@ -721,7 +721,7 @@ Overshield Tag - Next base edition shop Joker is free and becomes Overshielded
 
 Cel Tag - Next base edition shop Joker is free and becomes Cel Shaded
 
-# 19 Blinds
+# 20 Blinds
 Fracture - All played cards are destroyed
 
 Zero Build - Wood, Brick and Metal are debuffed
@@ -762,6 +762,8 @@ Dark Voyager - Avoid hitting lasers Hitting lasers will kill you
 Fight The Storm - Defend the atlas
 
 Impostors - Add 10 impostor cards to your deck hands containing impostor cards do not score
+
+Deliver The Bomb - Connect the armory to the launcher
 
 # 1 Stake
 Sweaty Stake - Finish the run at Ante 16 Finisher blinds appear every attention 8 antes
