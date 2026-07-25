@@ -24,6 +24,8 @@ if G.STAGE == G.STAGES.MAIN_MENU and not G.fort_splash then
     G.DODGE_GAME.beams = {} 
 	G.DODGE_GAME.shake_timer = 0
 	G.DEFENSE_GAME.active = false
+	G.PIPE_GAME.active = false
+	G.GAME.Practice = true
     if Fortlatro and Fortlatro.initialize_splashtext then
         Fortlatro.initialize_splashtext()
     end

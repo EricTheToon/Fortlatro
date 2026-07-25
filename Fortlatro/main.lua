@@ -284,6 +284,8 @@ end
 SMODS.Sound({
     key = 'music_title',
     path = 'music_title.ogg',
+	pitch = 1,
+	speed = 1,
     select_music_track = function(self)
         -- If it's title play music
         if G.STAGE == G.STAGES.MAIN_MENU and not G.konamiActive then
@@ -525,7 +527,19 @@ if config.splashes then
 		"Counting or not counting Joker violence?",
 		"Type Gaster",
 		"The idea is simple...",
-		"Struggle with minigames? try lowering the gamespeed!"
+		"Struggle with minigames? try lowering the gamespeed!",
+		"We are legally obligated to inform you that this mod does not actually grant you a Victory Royale, nor does it improve your aim. It will, however, make you question your life choices at 3 AM.",
+		"Warning: Playing Fortlatro may cause spontaneous side effects including but not limited to: shouting 'he's one shot' at mathematical equations, attempting to build a wooden ramp when presented with a tax form, and mild to severe brainrot. Proceed at your own risk.",
+		"According to all known laws of game balance, there is no way a card should be able to score 100 million chips on Round 1. The player, of course, plays it anyway because the player doesn't care what developers think is impossible.",
+		"I am once again asking for your financial support to buy the Battle Pass.",
+		"V-Bucks are down, please use pink coins.",
+		"My yap level is currently catastrophic.",
+		"Attention all Fortlatro gamers: Eric is currently trapped in the loop and requires your assistance. All he needs is your credit card number and the three digits on the back!",
+		"Is that the guy from Fortnite?",
+		"To be fair, you have to have a very high IQ to understand Fortlatro. The humor is extremely subtle, and without a solid grasp of Fortnite, most of the jokes will go over a typical viewer's head...",
+		"abc for victory royale",
+		"Oh yeah... Flowery told me!",
+		
 
     }
 
@@ -1171,6 +1185,8 @@ end
 SMODS.Sound({
     key = 'music_konami',
     path = 'music_konami.ogg',
+	pitch = 1,
+	speed = 1,
     select_music_track = function(self)
         -- If it's konami time play music
         if G.konamiActive then
@@ -1237,22 +1253,27 @@ end
 -- =========================
 G.KONAMI_GAME = {
     active = false,
-    waitingToStart = true, -- NEW: Prevents enemies until input
+    waitingToStart = true, -- Prevents enemies until input
     gameOver = false,
     buffer = {},
     code = {"up","up","down","down","left","right","left","right","b","a","return"},
     
-    cube = {width=64, height=64, x=0, y=0, speed=300},
+    -- Virtual canvas boundaries (Standard Balatro canvas target size)
+    virtualWidth = 1280,
+    virtualHeight = 720,
+    
+    -- Speeds mathematically downscaled from 1920x1080 baseline to match original feel
+    cube = {width=64, height=64, x=0, y=0, speed=200}, -- 300 * (1280/1920)
     score = 0, lives = 3, maxLives = 3,
     
     isRespawning = false, respawnTimer = 0, invincibilityTimer = 0, flickerTimer = 0,
     powerups = {}, powerupSize = 40,
     turretTimer = 0, burstTimer = 0, turretShootCooldown = 0.3, turretLastShot = 0,
-    enemies = {}, enemySize = 64, enemySpeed = 120, enemySpawnTimer = 0, enemySpawnRate = 1.0,
-    bullets = {}, bulletSpeed = 500, bulletSize = 12, shootCooldown = 0.5, lastShotTimer = 0.5,
+    enemies = {}, enemySize = 64, enemySpeed = 80, enemySpawnTimer = 0, enemySpawnRate = 1.0, -- 120 * (1280/1920)
+    bullets = {}, bulletSpeed = 333, bulletSize = 12, shootCooldown = 0.5, lastShotTimer = 0.5, -- 500 * (1280/1920)
     
-    boss = nil, bossWidth = 128, bossHeight = 128, bossSpeed = 200, 
-    bossBulletSpeed = 300, bossCooldown = 0, bossCooldownRate = 1.0,
+    boss = nil, bossWidth = 128, bossHeight = 128, bossSpeed = 133, -- 200 * (1280/1920)
+    bossBulletSpeed = 200, bossCooldown = 0, bossCooldownRate = 1.0, -- 300 * (1280/1920)
     bossHitsRequired = 20, bossKills = 0, bossBullets = {},
     
     explosions = {}, floatingPoints = {}, explosionDuration = 0.3, floatingDuration = 0.8,
@@ -1272,16 +1293,17 @@ G.FUNCS.activatekonami = function()
     k.invincibilityTimer = 0
     k.score = 0
     k.lives = k.maxLives
-    k.enemySpeed = 120
+    k.enemySpeed = 80
     k.enemySpawnRate = 1.0
     k.bossKills = 0
-    k.bossBulletSpeed = 300
+    k.bossBulletSpeed = 200
     
     k.bullets, k.enemies, k.bossBullets, k.powerups, k.explosions, k.floatingPoints = {}, {}, {}, {}, {}, {}
     k.boss = nil
     
-    k.cube.x = (love.graphics.getWidth() - k.cube.width) / 2
-    k.cube.y = love.graphics.getHeight() - k.cube.height - 20
+    -- Position based on fixed virtual size
+    k.cube.x = (k.virtualWidth - k.cube.width) / 2
+    k.cube.y = k.virtualHeight - k.cube.height - 40
 
     local function loadImg(name) 
         local f = NFS.newFileData(SMODS.Mods["Fortlatro"].path .. "/customimages/" .. name) 
@@ -1316,7 +1338,7 @@ end
 local function spawnEnemy()
     local k = G.KONAMI_GAME
     table.insert(k.enemies,{
-        x = math.random(0, love.graphics.getWidth() - k.enemySize),
+        x = math.random(0, k.virtualWidth - k.enemySize),
         y = -k.enemySize,
         id = math.random(1, 1000000)
     })
@@ -1386,16 +1408,15 @@ function love.update(dt)
     old_update(dt)
     local k = G.KONAMI_GAME
     
-    -- Added waitingToStart check here
     if not G.konamiActive or k.gameOver or k.waitingToStart then return end
 
-    local w, h = love.graphics.getDimensions()
+    local w, h = k.virtualWidth, k.virtualHeight
 
     if k.isRespawning then
         k.respawnTimer = k.respawnTimer - dt
         if k.respawnTimer <= 0 then
             k.isRespawning = false
-            k.cube.x, k.cube.y = (w - k.cube.width) / 2, h - k.cube.height - 20
+            k.cube.x, k.cube.y = (w - k.cube.width) / 2, h - k.cube.height - 40
             k.invincibilityTimer = 2.0 
         end
         return 
@@ -1407,9 +1428,9 @@ function love.update(dt)
     if k.burstTimer > 0 then k.burstTimer = k.burstTimer - dt end
 
     if love.keyboard.isDown("left") then k.cube.x = k.cube.x - k.cube.speed*dt end
-	if love.keyboard.isDown("a") then k.cube.x = k.cube.x - k.cube.speed*dt end
+    if love.keyboard.isDown("a") then k.cube.x = k.cube.x - k.cube.speed*dt end
     if love.keyboard.isDown("right") then k.cube.x = k.cube.x + k.cube.speed*dt end
-	if love.keyboard.isDown("d") then k.cube.x = k.cube.x + k.cube.speed*dt end
+    if love.keyboard.isDown("d") then k.cube.x = k.cube.x + k.cube.speed*dt end
     k.cube.x = math.max(0, math.min(w - k.cube.width, k.cube.x))
 
     -- Target Acquisition
@@ -1489,6 +1510,7 @@ function love.update(dt)
         local e = k.enemies[i]
         for j=#k.bullets,1,-1 do
             local b = k.bullets[j]
+            -- FIXED: Changed '&&' to Lua 'and' keywords below
             if b.x < e.x + k.enemySize and b.x + k.bulletSize > e.x and b.y < e.y + k.enemySize and b.y + k.bulletSize > e.y then
                 spawnPowerup(e.x, e.y)
                 table.remove(k.enemies,i); table.remove(k.bullets,j)
@@ -1517,6 +1539,7 @@ function love.update(dt)
         end
         for i=#k.bullets,1,-1 do
             local b = k.bullets[i]
+            -- FIXED: Changed '&&' to Lua 'and' keywords below
             if b.x < k.boss.x + k.bossWidth and b.x + k.bulletSize > k.boss.x and b.y < k.boss.y + k.bossHeight and b.y + k.bulletSize > k.boss.y then
                 k.boss.hitsTaken = k.boss.hitsTaken + 1; table.remove(k.bullets,i)
                 if k.boss.hitsTaken >= k.bossHitsRequired then
@@ -1544,6 +1567,13 @@ function love.update(dt)
         fp.y, fp.timer = fp.y - 50 * dt, fp.timer - dt
         if fp.timer <= 0 then table.remove(k.floatingPoints,i) end
     end
+	
+	-- Achievement
+	if k.score then
+		if k.score >= 100000 then
+			check_for_unlock({ type = "ach_arcade" })
+		end
+	end
 end
 
 -- =========================
@@ -1554,7 +1584,19 @@ function love.draw()
     old_draw()
     local k = G.KONAMI_GAME
     if not G.konamiActive then return end
-    local gw, gh = love.graphics.getDimensions()
+    
+    -- Cache current graphics state
+    love.graphics.push("all")
+    
+    -- Calculate scale matrix dynamically to match the window size cleanly
+    local windowWidth, windowHeight = love.graphics.getDimensions()
+    local scaleX = windowWidth / k.virtualWidth
+    local scaleY = windowHeight / k.virtualHeight
+    
+    -- Apply the scaling to normalize coordinate spaces
+    love.graphics.scale(scaleX, scaleY)
+    
+    local gw, gh = k.virtualWidth, k.virtualHeight
     
     love.graphics.setColor(1,1,1,1)
     if k.images.bg then love.graphics.draw(k.images.bg, 0, 0, 0, gw/k.images.bg:getWidth(), gh/k.images.bg:getHeight()) end
@@ -1602,6 +1644,9 @@ function love.draw()
     if k.gameOver then 
         love.graphics.printf("GAME OVER",0,gh/2-20,gw,"center") 
     end
+    
+    -- Revert scaling context back safely for Balatro native UI
+    love.graphics.pop()
 end
 
 -- =========================
@@ -1621,7 +1666,7 @@ function love.keypressed(key)
         for i=1,#k.code do if k.buffer[i] ~= k.code[i] then match = false end end
         if match then
             G.FUNCS.activatekonami()
-			G.KONAMI_CODE_ACTIVATED  = true -- Unlock Durr Burger
+            G.KONAMI_CODE_ACTIVATED  = true -- Unlock Durr Burger
             k.waitingToStart = false -- If they typed the code, don't wait for input
         end
         return
@@ -1859,7 +1904,11 @@ function love.mousepressed(rx, ry, button)
             end
             f.won = true
             f.active = false
-            G.GAME.find_wins = (G.GAME.find_wins or 0) + 1
+			if not G.GAME.Practice then
+				G.GAME.find_wins = (G.GAME.find_wins or 0) + 1
+			else
+				G.GAME.Practice = false
+			end
         end
     end
 end
@@ -2003,9 +2052,13 @@ function love.update(dt)
     if c.timer <= 0 then
         c.timer = 0
         c.active = false
-        G.GAME.WonkeeScore = c.score
         c.targets = {}   
         c.blockers = {}  
+		if not G.GAME.Practice then
+			G.GAME.WonkeeScore = c.score
+		else
+			G.GAME.WonkeeScore = 0
+		end
         return 
     end
 
@@ -2134,7 +2187,11 @@ function love.mousepressed(rx, ry, button)
             for _, b in ipairs(c.blockers) do
                 if b.row == r and x >= b.x and x <= b.x + b.size and y >= b.y and y <= b.y + b.size then
                     c.score = c.score - 1
-                    G.GAME.WonkeeScore = c.score
+					if not G.GAME.Practice then
+						G.GAME.WonkeeScore = c.score
+					else 
+						G.GAME.WonkeeScore = 0
+					end
                     play_sound("fn_wonkee") 
                     return -- Exit loop so we don't hit things behind it
                 end
@@ -2146,10 +2203,14 @@ function love.mousepressed(rx, ry, button)
                     if t.state == "up" or t.state == "popping" then
                         c.score = c.score + 1
                         c.hits = c.hits + 1 -- Register a successful hit
-                        G.GAME.WonkeeScore = c.score
                         play_sound("fn_hit") 
                         t.state = "hiding"
                         t.timer = 1.5
+						if not G.GAME.Practice then
+							G.GAME.WonkeeScore = c.score
+						else
+							G.GAME.WonkeeScore = 0
+						end
                         return -- Exit loop
                     end
                 end
@@ -2443,7 +2504,9 @@ function love.update(dt)
                 if d.hp <= 0 then
                     d.active = false
                     d.shake_timer = 0
-                    G.GAME.ForcedFail = true
+					if not G.GAME.Practice then
+						G.GAME.ForcedFail = true
+					end
                     return
                 end
             end
@@ -2731,7 +2794,9 @@ function Game:update(dt)
 
             if dg.hp <= 0 then
                 dg.active = false
-                G.GAME.ForcedFail = true
+				if not G.GAME.Practice then
+					G.GAME.ForcedFail = true
+				end
             end
         end
     end
@@ -2939,8 +3004,1152 @@ function love.draw()
         love.graphics.setColor(1, 1, 1, 1)
         love.graphics.print(t.text, t.x + 10, t.y + 6, 0, 1, 1)
     end
-
 end
+
+-- =========================
+-- Pipe Game Container
+-- =========================
+G.PIPE_GAME = {
+    active = false,
+    waiting_to_start = false, -- Instruction screen flag
+    won = false,
+    lost = false,
+    is_finishing = false,  -- Flag for the rapid end-of-game flow sequence
+    
+    -- Grid Settings
+    cols = 8,
+    rows = 5,
+    grid = {},
+    
+    -- Start and End definitions
+    start_cell = {x = 1, y = 3}, 
+    end_cell = {x = 8, y = 3},   
+    
+    -- Real-time liquid progression state
+    water_path = {},       
+    water_progress = 0,    
+    flow_speed = 0.25,     -- Standard speed (4 seconds per tile block)
+    start_delay = 3.0,     -- Wait 3 seconds before water begins moving (starts after clicking play)
+    leak_location = nil,   
+    
+    -- Debug Solution Path Mapping
+    solution_path_list = {}, 
+    solution_path_map = {},  
+    
+    -- Virtual Canvas Dimensions
+    virtualW = 1280,
+    virtualH = 720,
+    tileSize = 90,
+    offsetX = 280, 
+    offsetY = 150,
+    
+    -- Image cache
+    bomb_img = nil,
+    font = nil
+}
+
+local PIPE_TYPES = {
+    I = {1, 3}, 
+    L = {1, 2}
+}
+
+local function rotate_connections(connections, rotation)
+    local new_conn = {}
+    for _, dir in ipairs(connections) do
+        local nd = (dir - 1 + rotation) % 4 + 1
+        table.insert(new_conn, nd)
+    end
+    return new_conn
+end
+
+-- =========================
+-- Real-time Path Tracker
+-- =========================
+local function update_water_flow_path()
+    local p = G.PIPE_GAME
+    p.water_path = {}
+    
+    local cx, cy = p.start_cell.x, p.start_cell.y
+    local coming_from = 4 
+
+    while true do
+        local cell = p.grid[cx][cy]
+        
+        local has_entry = false
+        for _, dir in ipairs(cell.connections) do
+            if dir == coming_from then has_entry = true break end
+        end
+        
+        if not has_entry then 
+            p.leak_location = {x = cx, y = cy, dir = coming_from}
+            return false 
+        end
+
+        local out_dir = nil
+        for _, dir in ipairs(cell.connections) do
+            if dir ~= coming_from then out_dir = dir break end
+        end
+        
+        table.insert(p.water_path, {
+            x = cx, 
+            y = cy, 
+            entry = coming_from, 
+            exit = out_dir, 
+            type = cell.type
+        })
+
+        if not out_dir then 
+            p.leak_location = {x = cx, y = cy, dir = nil}
+            return false 
+        end
+
+        local nx, ny = cx, cy
+        local expected_entry = 0
+        if out_dir == 1 then ny = cy - 1; expected_entry = 3 end 
+        if out_dir == 2 then nx = cx + 1; expected_entry = 4 end 
+        if out_dir == 3 then ny = cy + 1; expected_entry = 1 end 
+        if out_dir == 4 then nx = cx - 1; expected_entry = 2 end 
+
+        if cx == p.end_cell.x and cy == p.end_cell.y and out_dir == 2 then
+            p.leak_location = nil
+            return true 
+        end
+
+        if nx < 1 or nx > p.cols or ny < 1 or ny > p.rows then 
+            p.leak_location = {x = cx, y = cy, dir = out_dir}
+            return false 
+        end
+
+        cx, cy = nx, ny
+        coming_from = expected_entry
+    end
+end
+
+-- =========================
+-- Initialization (Guaranteed Solvable)
+-- =========================
+G.FUNCS = G.FUNCS or {}
+G.FUNCS.start_pipe_game = function()
+    local p = G.PIPE_GAME
+    p.waiting_to_start = true -- Show instructions first
+    p.active = false
+    p.won = false
+    p.lost = false
+    p.is_finishing = false
+    p.water_progress = 0
+    p.flow_speed = 0.25 
+    p.start_delay = 3.0 
+    p.grid = {}
+    p.solution_path_map = {}
+    p.solution_path_list = {}
+
+    if not p.font then
+        p.font = love.graphics.newFont(32)
+    end
+
+    for x = 1, p.cols do
+        p.grid[x] = {}
+        for y = 1, p.rows do
+            local r_type = math.random() > 0.5 and "I" or "L"
+            local r_rot = math.random(0, 3)
+            p.grid[x][y] = { 
+                type = r_type, 
+                rotation = r_rot, 
+                connections = rotate_connections(PIPE_TYPES[r_type], r_rot) 
+            }
+        end
+    end
+
+    local current = {x = p.start_cell.x, y = p.start_cell.y}
+    local visited = {}
+    visited[current.x .. "_" .. current.y] = true
+    local path = { {x = current.x, y = current.y} }
+
+    while current.x ~= p.end_cell.x or current.y ~= p.end_cell.y do
+        local neighbors = {}
+        local moves = {{x=1, y=0}, {x=0, y=1}, {x=0, y=-1}, {x=-1, y=0}}
+        for _, m in ipairs(moves) do
+            local nx, ny = current.x + m.x, current.y + m.y
+            if nx >= 1 and nx <= p.cols and ny >= 1 and ny <= p.rows and not visited[nx .. "_" .. ny] then
+                table.insert(neighbors, {x = nx, y = ny})
+            end
+        end
+
+        if #neighbors == 0 then
+            return G.FUNCS.start_pipe_game()
+        else
+            local next_cell = neighbors[math.random(#neighbors)]
+            visited[next_cell.x .. "_" .. next_cell.y] = true
+            table.insert(path, next_cell)
+            current = next_cell
+        end
+    end
+
+    p.solution_path_list = path 
+
+    for i = 1, #path do
+        local curr = path[i]
+        p.solution_path_map[curr.x .. "_" .. curr.y] = true 
+        
+        local prev = path[i-1] or {x = curr.x - 1, y = curr.y} 
+        local nxt = path[i+1] or {x = curr.x + 1, y = curr.y}  
+        
+        local function get_dir(from, to)
+            if to.x > from.x then return 2 end 
+            if to.x < from.x then return 4 end 
+            if to.y > from.y then return 3 end 
+            if to.y < from.y then return 1 end 
+        end
+
+        local d1 = get_dir(curr, prev)
+        local d2 = get_dir(curr, nxt)
+        local correct_rot = 0
+        local p_type = "I"
+
+        if (d1 == 1 and d2 == 3) or (d1 == 3 and d2 == 1) or (d1 == 2 and d2 == 4) or (d1 == 4 and d2 == 2) then
+            p_type = "I"
+            correct_rot = (d1 == 2 or d2 == 2) and 1 or 0 
+        else
+            p_type = "L"
+            if (d1 == 1 and d2 == 2) or (d1 == 2 and d2 == 1) then correct_rot = 0 end
+            if (d1 == 2 and d2 == 3) or (d1 == 3 and d2 == 2) then correct_rot = 1 end
+            if (d1 == 3 and d2 == 4) or (d1 == 4 and d2 == 3) then correct_rot = 2 end
+            if (d1 == 4 and d2 == 1) or (d1 == 1 and d2 == 4) then correct_rot = 3 end
+        end
+
+        local scrambled_rot = (correct_rot + math.random(1, 3)) % 4
+
+        p.grid[curr.x][curr.y].type = p_type
+        p.grid[curr.x][curr.y].rotation = scrambled_rot
+        p.grid[curr.x][curr.y].connections = rotate_connections(PIPE_TYPES[p_type], scrambled_rot)
+    end
+    
+    update_water_flow_path()
+end
+
+-- =========================
+-- Update Loop
+-- =========================
+local old_update = love.update or function() end
+function love.update(dt)
+    old_update(dt)
+    local p = G.PIPE_GAME
+    if p.waiting_to_start or not p.active or p.won or p.lost then return end
+
+    local is_paused = G.SETTINGS and G.SETTINGS.paused
+    if not is_paused then
+        -- Skip delay completely if we are already running the final fast animation sequence
+        if p.start_delay > 0 and not p.is_finishing then
+            p.start_delay = p.start_delay - dt
+            update_water_flow_path()
+            return
+        end
+
+        p.water_progress = p.water_progress + (p.flow_speed * dt)
+        
+        local path_is_fully_solved = update_water_flow_path()
+        local max_attainable_index = #p.water_path
+
+        if p.water_progress >= max_attainable_index then
+            if path_is_fully_solved then
+                -- SUCCESS STATE
+                p.won = true
+                p.active = false                     
+            else
+                -- FAILURE STATE
+                p.lost = true
+                p.active = false                     
+                p.water_progress = max_attainable_index 
+				if not G.GAME.Practice then
+					G.GAME.ForcedFail = true 
+				end
+            end
+        end
+    end
+end
+
+-- =========================
+-- Advanced Vector Rendering
+-- =========================
+local function get_direction_vector(dir, size)
+    local h = size / 2
+    if dir == 1 then return 0, -h end
+    if dir == 2 then return h, 0 end
+    if dir == 3 then return 0, h end
+    if dir == 4 then return -h, 0 end
+    return 0, 0
+end
+
+local function draw_flowing_pipe(entry_dir, exit_dir, size, percent)
+    local x1, y1 = get_direction_vector(entry_dir, size)
+    local x2, y2 = get_direction_vector(exit_dir, size)
+    
+    if percent >= 1 then
+        love.graphics.line(x1, y1, 0, 0)
+        love.graphics.line(0, 0, x2, y2)
+    elseif percent > 0 then
+        if percent <= 0.5 then
+            local p1 = percent / 0.5
+            love.graphics.line(x1, y1, x1 + (0 - x1) * p1, y1 + (0 - y1) * p1)
+        else
+            local p2 = (percent - 0.5) / 0.5
+            love.graphics.line(x1, y1, 0, 0)
+            love.graphics.line(0, 0, 0 + (x2 - 0) * p2, 0 + (y2 - 0) * p2)
+        end
+    end
+end
+
+-- =========================
+-- Drawing Loop
+-- =========================
+local old_draw = love.draw or function() end
+function love.draw()
+    old_draw()
+    local p = G.PIPE_GAME
+    if not p.active and not p.waiting_to_start then return end
+
+    -- Lazy-load the bomb asset for the pipe game
+    if not p.bomb_img then
+        local path = SMODS.Mods["Fortlatro"].path .. "/customimages/bomb.png"
+        local fileData = NFS.newFileData(path) 
+        p.bomb_img = love.graphics.newImage(love.image.newImageData(fileData))
+    end
+
+    local realW, realH = love.graphics.getDimensions()
+    local scaleX = realW / p.virtualW
+    local scaleY = realH / p.virtualH
+    local old_font = love.graphics.getFont()
+
+    love.graphics.push()
+    love.graphics.scale(scaleX, scaleY)
+    
+    -- INSTRUCTIONS SCREEN OVERLAY
+    if p.waiting_to_start then
+        love.graphics.setColor(0, 0, 0, 0.85)
+        love.graphics.rectangle("fill", 0, 0, p.virtualW, p.virtualH)
+        
+        love.graphics.setColor(1, 1, 1, 1)
+        if p.font then love.graphics.setFont(p.font) end
+        
+        local instruct = "DELIVER THE BOMB\n\n" ..
+                         "Click on the track segments to rotate them.\n" ..
+                         "Create a path from the Armory to the Launcher!\n\n" ..
+                         "Bomb deploys soon after starting.\n\n" ..
+                         "CLICK ANYWHERE TO BEGIN"
+                         
+        love.graphics.printf(instruct, 0, p.virtualH / 2 - 140, p.virtualW, "center")
+        
+        love.graphics.pop()
+        love.graphics.setFont(old_font)
+        return
+    end
+
+    -- Panel Board Background
+    love.graphics.setColor(0.05, 0.06, 0.08, 0.96)
+    love.graphics.rectangle("fill", p.offsetX - 40, p.offsetY - 40, (p.cols * p.tileSize) + 80, (p.rows * p.tileSize) + 110, 15, 15)
+
+    -- IN (A) and OUT (B) pads styled like deployment junctions
+    love.graphics.setColor(0.1, 0.65, 0.9, 1) -- Armory/Launcher Cyan
+    love.graphics.rectangle("fill", p.offsetX - p.tileSize + 5, p.offsetY + (3 - 1) * p.tileSize + 5, p.tileSize - 10, p.tileSize - 10, 5, 5)
+    
+    -- Draw the launcher pad base (crimson)
+    local launcher_x = p.offsetX + (p.cols * p.tileSize) + 5
+    local launcher_y = p.offsetY + (3 - 1) * p.tileSize + 5
+    local pad_size = p.tileSize - 10
+    
+    love.graphics.setColor(0.85, 0.3, 0.2, 1) -- Rift/Target Crimson Red
+    love.graphics.rectangle("fill", launcher_x, launcher_y, pad_size, pad_size, 5, 5)
+    
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.printf("ARMORY", p.offsetX - p.tileSize, p.offsetY + (3 - 1) * p.tileSize + p.tileSize/3, p.tileSize, "center")
+    love.graphics.printf("LAUNCHER", p.offsetX + (p.cols * p.tileSize), p.offsetY + (3 - 1) * p.tileSize + p.tileSize/3, p.tileSize, "center")
+
+    -- Clean backing tiles to provide high contrast separation 
+    for x = 1, p.cols do
+        for y = 1, p.rows do
+            love.graphics.setColor(0.09, 0.11, 0.15, 1)
+            love.graphics.rectangle("fill", p.offsetX + (x - 1) * p.tileSize + 2, p.offsetY + (y - 1) * p.tileSize + 2, p.tileSize - 4, p.tileSize - 4, 4, 4)
+            
+            -- Light gray thin grid lines to break up blocks cleanly
+            love.graphics.setLineWidth(1)
+            love.graphics.setColor(0.2, 0.25, 0.35, 0.4)
+            love.graphics.rectangle("line", p.offsetX + (x - 1) * p.tileSize + 2, p.offsetY + (y - 1) * p.tileSize + 2, p.tileSize - 4, p.tileSize - 4, 4, 4)
+        end
+    end
+
+    for x = 1, p.cols do
+        for y = 1, p.rows do
+            local cell = p.grid[x][y]
+            local tx = p.offsetX + (x - 1) * p.tileSize + p.tileSize / 2
+            local ty = p.offsetY + (y - 1) * p.tileSize + p.tileSize / 2
+
+            -- DRAW THE DEFINED TRACK ASSET
+            love.graphics.push()
+            love.graphics.translate(tx, ty)
+            love.graphics.rotate(cell.rotation * math.pi / 2)
+            
+            -- Size constants for cleaner geometry sizing
+            local rw = 28  -- Width of steel plates
+            local ext = p.tileSize / 2
+
+            -- 1. Outer Dark Metallic Structural Plates (Deep Indigo Steel)
+            love.graphics.setColor(0.14, 0.18, 0.28, 1) -- Clear `#232E47` Indigo Blue
+            if cell.type == "I" then
+                love.graphics.rectangle("fill", -rw, -ext, rw * 2, p.tileSize)
+            else
+                love.graphics.rectangle("fill", -rw, -ext, rw * 2, ext + rw)
+                love.graphics.rectangle("fill", -rw, -rw, ext + rw, rw * 2)
+            end
+
+            -- 2. Fine High-Contrast Light Blue Accent Borders
+            love.graphics.setLineWidth(2)
+            love.graphics.setColor(0.4, 0.75, 1.0, 0.85) -- Light Blue Trim Line
+            if cell.type == "I" then
+                love.graphics.line(-rw, -ext, -rw, ext)
+                love.graphics.line(rw, -ext, rw, ext)
+            else
+                love.graphics.line(-rw, -ext, -rw, rw)
+                love.graphics.line(-rw, rw, ext, rw)
+                love.graphics.line(rw, -ext, rw, -rw)
+                love.graphics.line(rw, -rw, ext, -rw)
+            end
+
+            -- 3. Transparent Light-Blue Outer Shields/Wings
+            love.graphics.setColor(0.15, 0.55, 0.8, 0.4) 
+            if cell.type == "I" then
+                love.graphics.rectangle("fill", -rw - 8, -ext, 8, p.tileSize)
+                love.graphics.rectangle("fill", rw, -ext, 8, p.tileSize)
+            else
+                love.graphics.rectangle("fill", -rw - 8, -ext, 8, ext + rw + 8)
+                love.graphics.rectangle("fill", -rw, rw, ext + rw, 8)
+            end
+
+            -- 4. Central Copper Power Rails
+            love.graphics.setLineWidth(10)
+            love.graphics.setColor(0.72, 0.45, 0.32, 1) -- Distinct copper finish core
+            if cell.type == "I" then 
+                love.graphics.line(0, -ext, 0, ext)
+            else 
+                love.graphics.line(0, -ext, 0, 0)
+                love.graphics.line(0, 0, ext, 0) 
+            end
+            
+            love.graphics.pop()
+        end
+    end
+
+    -- Bright Luminous Bluglo Energy Current
+    love.graphics.setLineWidth(14)
+    for i, w_node in ipairs(p.water_path) do
+        local tx = p.offsetX + (w_node.x - 1) * p.tileSize + p.tileSize / 2
+        local ty = p.offsetY + (w_node.y - 1) * p.tileSize + p.tileSize / 2
+        
+        local fill_pct = math.min(1.0, math.max(0.0, p.water_progress - (i - 1)))
+
+        love.graphics.push()
+        love.graphics.translate(tx, ty)
+        love.graphics.setColor(0.15, 0.88, 1.0, 0.95) -- Radiant Bluglo Cyan
+        draw_flowing_pipe(w_node.entry, w_node.exit, p.tileSize, fill_pct)
+        love.graphics.pop()
+    end
+
+    -- Real-time tracking of the fluid's "tip" coordinate to position the bomb
+    local bomb_x, bomb_y
+    local tip_idx = math.floor(p.water_progress) + 1
+    local w_node = p.water_path[tip_idx]
+
+    if w_node then
+        -- Find absolute tile center coordinates
+        local tx = p.offsetX + (w_node.x - 1) * p.tileSize + p.tileSize / 2
+        local ty = p.offsetY + (w_node.y - 1) * p.tileSize + p.tileSize / 2
+        
+        -- Interpolate front tip offset inside the active pipe
+        local fill_pct = math.min(1.0, math.max(0.0, p.water_progress - (tip_idx - 1)))
+        local x1, y1 = get_direction_vector(w_node.entry, p.tileSize)
+        local x2, y2 = 0, 0
+        if w_node.exit then
+            x2, y2 = get_direction_vector(w_node.exit, p.tileSize)
+        end
+        
+        local rx, ry = 0, 0
+        if fill_pct <= 0.5 then
+            local p1 = fill_pct / 0.5
+            rx = x1 + (0 - x1) * p1
+            ry = y1 + (0 - y1) * p1
+        else
+            local p2 = (fill_pct - 0.5) / 0.5
+            rx = 0 + (x2 - 0) * p2
+            ry = 0 + (y2 - 0) * p2
+        end
+        
+        bomb_x = tx + rx
+        bomb_y = ty + ry
+    else
+        -- If we are at the very beginning (no progress) or at the absolute end (completed)
+        if p.water_progress <= 0 then
+            -- Position at the Armory start pad
+            bomb_x = p.offsetX - p.tileSize / 2
+            bomb_y = p.offsetY + (3 - 1) * p.tileSize + p.tileSize / 2
+        else
+            -- Check if we finished the path and successfully reached the end
+            local finished_successfully = false
+            if #p.water_path > 0 then
+                local last_node = p.water_path[#p.water_path]
+                if last_node.x == p.end_cell.x and last_node.y == p.end_cell.y and last_node.exit == 2 then
+                    finished_successfully = true
+                end
+            end
+            
+            if finished_successfully then
+                -- Position centered on the Launcher pad
+                bomb_x = launcher_x + pad_size / 2
+                bomb_y = launcher_y + pad_size / 2
+            else
+                -- Just drop the bomb at the last recorded water segment center
+                local last_node = p.water_path[#p.water_path]
+                if last_node then
+                    bomb_x = p.offsetX + (last_node.x - 1) * p.tileSize + p.tileSize / 2
+                    bomb_y = p.offsetY + (last_node.y - 1) * p.tileSize + p.tileSize / 2
+                else
+                    bomb_x = p.offsetX - p.tileSize / 2
+                    bomb_y = p.offsetY + (3 - 1) * p.tileSize + p.tileSize / 2
+                end
+            end
+        end
+    end
+
+    -- Draw the bomb actively moving along the energy current line
+    if p.bomb_img and bomb_x and bomb_y then
+        -- Scaled to look cleanly proportional to the path width
+        local bomb_draw_size = 48
+        local bomb_scale = bomb_draw_size / p.bomb_img:getWidth()
+        
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.draw(p.bomb_img, bomb_x - (p.bomb_img:getWidth() * bomb_scale) / 2, bomb_y - (p.bomb_img:getHeight() * bomb_scale) / 2, 0, bomb_scale, bomb_scale)
+    end
+
+    if p.start_delay > 0 and not p.is_finishing then
+        love.graphics.setColor(1, 0.4, 0, 1)
+        love.graphics.printf(string.format("BOMB DEPLOYING IN: %.1f", p.start_delay), p.offsetX, p.offsetY + (p.rows * p.tileSize) + 15, p.cols * p.tileSize, "center")
+    end
+
+    love.graphics.pop()
+    love.graphics.setFont(old_font)
+end
+
+-- =========================
+-- Mouse Interaction
+-- =========================
+local old_mouse = love.mousepressed or function() end
+function love.mousepressed(rx, ry, button)
+    local p = G.PIPE_GAME
+    
+    -- Handle Click-to-Start Instructions Screen
+    if p.waiting_to_start then
+        p.waiting_to_start = false
+        p.active = true
+        return
+    end
+
+    -- Block inputs if game is already resolved or running the fast-finish sequence
+    if not p.active or p.won or p.lost or p.is_finishing or (G.SETTINGS and G.SETTINGS.paused) then 
+        old_mouse(rx, ry, button)
+        return 
+    end
+
+    local realW, realH = love.graphics.getDimensions()
+    local mx = rx * (p.virtualW / realW)
+    local my = ry * (p.virtualH / realH)
+
+    if button == 1 then
+        local gx = math.floor((mx - p.offsetX) / p.tileSize) + 1
+        local gy = math.floor((my - p.offsetY) / p.tileSize) + 1
+
+        if gx >= 1 and gx <= p.cols and gy >= 1 and gy <= p.rows then
+            for i, w_node in ipairs(p.water_path) do
+                if w_node.x == gx and w_node.y == gy then
+                    local fill_pct = p.water_progress - (i - 1)
+                    if fill_pct > 0 then
+                        return 
+                    end
+                end
+            end
+
+            local cell = p.grid[gx][gy]
+            cell.rotation = (cell.rotation + 1) % 4
+            cell.connections = rotate_connections(PIPE_TYPES[cell.type], cell.rotation)
+
+            -- Kick off rapid completion sequence instead of breaking out instantly
+            local path_is_fully_solved = update_water_flow_path()
+            if path_is_fully_solved then
+                p.is_finishing = true
+                p.flow_speed = 15.0  -- Speed up water aggressively (15 tiles per second)
+                return
+            end
+        end
+    end
+end
+
+local start_run_ref = Game.start_run
+function Game:start_run(args)
+    start_run_ref(self, args)
+    if G.GAME.blind and G.GAME.blind.name == 'Deliver The Bomb' and not G.GAME.blind.disabled and G.STATE ~= 8 then
+        G.FUNCS.start_pipe_game()
+    end
+end
+
+
+-- ============================================================================
+-- FORTLATRO MINIGAMES TAB SETUP
+-- ============================================================================
+
+-- Register the atlas. SMODS handles the scaling and texture loading safely.
+SMODS.Atlas {
+	key = 'fn_minigames',
+	path = 'minigames.png',
+	px = 71,
+	py = 95,
+}
+
+-- Store game configurations safely with description lines
+Fortlatro.minigames = {
+	{
+		key = "pizza_vs_burgers",
+		name = "Pizzas vs Burgers",
+		desc = {
+			"Fight the Durr Burger army"
+		},
+		pos = { x = 0, y = 0 }, -- Column 0, Row 0 on minigames.png
+		colour = G.C.GOLD,
+		action = function()
+			G.FUNCS.activatekonami()
+		end
+	},
+	{
+		key = "find_medkit",
+		name = "Find Medkit",
+		desc = {
+			"Find the Medkit",
+			"before it is too late!"
+		},
+		pos = { x = 1, y = 0 }, -- Column 1, Row 0 on minigames.png
+		colour = G.C.RED,
+		action = function()
+			G.FUNCS.start_find_game()
+		end
+	},
+	{
+		key = "zip_zonk_bang",
+		name = "Zip Zonk Bang",
+		desc = {
+			"Shoot the outlaws!",
+			"Avoid shooting Wonkee!",
+		},
+		pos = { x = 0, y = 1 }, -- Column 0, Row 1 on minigames.png
+		colour = G.C.ORANGE,
+		action = function()
+			G.FUNCS.start_carnival_game()
+		end
+	},
+	{
+		key = "delulu",
+		name = "Delulu",
+		desc = {
+			"Keep the bar full by talking",
+		},
+		pos = { x = 2, y = 0 }, -- Column 2, Row 0 on minigames.png
+		colour = G.C.PURPLE,
+		action = function()
+			MicMod.active = true
+			G.GAME.MicLevel = 50
+			G.GAME.InitialCooldown = 2.0
+			G.GAME.YapCount = 0
+			MicMod.devices = love.audio.getRecordingDevices()
+			for _, mic in ipairs(MicMod.devices) do
+				mic:start(2048, 44100, 16)
+			end
+		end
+	},
+	{
+		key = "dark_voyager",
+		name = "Dark Voyager",
+		desc = {
+			"Avoid the Lasers"
+		},
+		pos = { x = 3, y = 0 }, -- Column 3, Row 0 on minigames.png
+		colour = G.C.ORANGE,
+		action = function()
+			G.FUNCS.start_dodge_game()
+		end
+	},
+	{
+		key = "fight_the_storm",
+		name = "Fight The Storm",
+		desc = {
+			"Defend the atlas",
+			"From incoming Husks",
+		},
+		pos = { x = 4, y = 0 }, -- Column 4, Row 0 on minigames.png
+		colour = G.C.BLUE,
+		action = function()
+			G.FUNCS.start_defense_game()
+		end
+	},
+	{
+		key = "deliver_the_bomb",
+		name = "Deliver The Bomb",
+		desc = {
+			"Connect the Armory",
+			"to the Launcher",
+		},
+		pos = { x = 5, y = 0 }, -- Column 5, Row 0 on minigames.png
+		colour = G.C.GREY,
+		action = function()
+			G.FUNCS.start_pipe_game()
+		end
+	}
+}
+
+-- Helper function to check if a minigame boss is currently active
+local function is_minigame_boss_active()
+	return G.GAME and G.GAME.blind and (
+		G.GAME.blind.name == 'Delulu' or
+		G.GAME.blind.name == 'Dark Voyager' or 
+		G.GAME.blind.name == 'Fight The Storm' or 
+		G.GAME.blind.name == 'Deliver The Bomb' or
+		G.GAME.blind.name == 'Zip Zonk Bang'
+	)
+end
+
+-- Registry of click actions for the UI buttons using "fn" (Sets Practice, closes UI, starts game)
+G.FUNCS.play_minigame_pizza_vs_burgers = function(e)
+	if is_minigame_boss_active() then
+		play_sound('cancel', 1, 0.4)
+		return
+	end
+	if G.GAME then G.GAME.Practice = true end
+	G.FUNCS.exit_overlay_menu()
+	G.FUNCS.activatekonami()
+end
+
+G.FUNCS.play_minigame_find_medkit = function(e)
+	if is_minigame_boss_active() then
+		play_sound('cancel', 1, 0.4)
+		return
+	end
+	if G.GAME then G.GAME.Practice = true end
+	G.FUNCS.exit_overlay_menu()
+	G.FUNCS.start_find_game()
+end
+
+G.FUNCS.play_minigame_delulu = function(e)
+	if is_minigame_boss_active() then
+		play_sound('cancel', 1, 0.4)
+		return
+	end
+	if G.GAME then G.GAME.Practice = true end
+	G.FUNCS.exit_overlay_menu()
+	
+	-- Initialize Mic Mod variables and recording devices
+	MicMod.active = true
+	G.GAME.MicLevel = 50
+	G.GAME.InitialCooldown = 2.0
+	G.GAME.YapCount = 0
+	MicMod.devices = love.audio.getRecordingDevices()
+	for _, mic in ipairs(MicMod.devices) do
+		mic:start(2048, 44100, 16)
+	end
+end
+
+G.FUNCS.play_minigame_dark_voyager = function(e)
+	if is_minigame_boss_active() then
+		play_sound('cancel', 1, 0.4)
+		return
+	end
+	if G.GAME then G.GAME.Practice = true end
+	G.FUNCS.exit_overlay_menu()
+	G.FUNCS.start_dodge_game()
+end
+
+G.FUNCS.play_minigame_fight_the_storm = function(e)
+	if is_minigame_boss_active() then
+		play_sound('cancel', 1, 0.4)
+		return
+	end
+	if G.GAME then G.GAME.Practice = true end
+	G.FUNCS.exit_overlay_menu()
+	G.FUNCS.start_defense_game()
+end
+
+G.FUNCS.play_minigame_deliver_the_bomb = function(e)
+	if is_minigame_boss_active() then
+		play_sound('cancel', 1, 0.4)
+		return
+	end
+	if G.GAME then G.GAME.Practice = true end
+	G.FUNCS.exit_overlay_menu()
+	G.FUNCS.start_pipe_game()
+end
+
+G.FUNCS.play_minigame_zip_zonk_bang = function(e)
+	if is_minigame_boss_active() then
+		play_sound('cancel', 1, 0.4)
+		return
+	end
+	if G.GAME then G.GAME.Practice = true end
+	G.FUNCS.exit_overlay_menu()
+	G.FUNCS.start_carnival_game()
+end
+
+-- Generates the UI block for a single minigame
+function Fortlatro.generate_minigame_card(game)
+	
+	-- Build a crash-proof static UI Sprite using our registered atlas
+	local game_sprite = Sprite(
+		0, 0, 
+		0.85 * G.CARD_W, 
+		0.85 * G.CARD_H, 
+		G.ASSET_ATLAS["fn_minigames"], 
+		game.pos or {x = 0, y = 0}
+	)
+
+	-- Build description rows dynamically from the game's description array
+	local desc_nodes = {}
+	if game.desc then
+		for _, line in ipairs(game.desc) do
+			desc_nodes[#desc_nodes + 1] = {
+				n = G.UIT.R,
+				config = { align = "lm" },
+				nodes = {
+					{ 
+						n = G.UIT.T, 
+						config = { 
+							text = line, 
+							scale = 0.32, -- Smaller scale so it fits nicely under the title
+							colour = G.C.UI.TEXT_LIGHT, 
+							shadow = true 
+						} 
+					}
+				}
+			}
+		end
+	end
+
+	-- Return block formatted as G.UIT.C (Column)
+	return {
+		n = G.UIT.C,
+		config = { align = "cm", padding = 0.1, colour = G.C.DARK_EDITION, r = 0.1, minw = 3.8, minh = 1.8 },
+		nodes = {
+			{
+				n = G.UIT.C,
+				config = { align = "cm", padding = 0.05 },
+				nodes = {
+					-- Left Column: Container holding the static Sprite
+					{
+						n = G.UIT.C,
+						config = {
+							align = "cm",
+							colour = G.C.CLEAR,
+						},
+						nodes = {
+							{ n = G.UIT.O, config = { object = game_sprite } }
+						}
+					},
+					-- Right Column: Title, Description, and Play Button
+					{
+						n = G.UIT.C,
+						config = { align = "lm", padding = 0.1 },
+						nodes = {
+							-- 1. Minigame Title
+							{
+								n = G.UIT.R,
+								config = { align = "lm" },
+								nodes = {
+									{ n = G.UIT.T, config = { text = game.name, scale = 0.45, colour = game.colour or G.C.WHITE, shadow = true } }
+								}
+							},
+							-- 2. Minigame Description Lines
+							{
+								n = G.UIT.R,
+								config = { align = "lm", padding = 0.03 },
+								nodes = desc_nodes
+							},
+							-- 3. Play Button
+							{
+								n = G.UIT.R,
+								config = { align = "lm", padding = 0.03 },
+								nodes = {
+									UIBox_button({
+										label = { "PLAY" },
+										button = "play_minigame_" .. game.key,
+										colour = G.C.GREEN,
+										minw = 1.2,
+										minh = 0.5,
+										scale = 0.35
+									})
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+end
+
+-- Register the extra tab with SMODS on the mod object
+Fortlatro.extra_tabs = function()
+	return {
+		{
+			label = "Minigames",
+			tab_definition_function = function()
+				local grid_rows = {}
+				local current_row_nodes = {}
+				
+				for i, game in ipairs(Fortlatro.minigames) do
+					-- Create the card (now safely a Column element)
+					current_row_nodes[#current_row_nodes + 1] = Fortlatro.generate_minigame_card(game)
+					
+					-- Group into rows of 2
+					if i % 2 == 0 or i == #Fortlatro.minigames then
+						-- UI FIX: If there is an odd number of games, this row only has 1 card.
+						-- We insert an invisible dummy column with matching width to prevent Balatro from centering it.
+						if #current_row_nodes == 1 and i == #Fortlatro.minigames then
+							current_row_nodes[#current_row_nodes + 1] = {
+								n = G.UIT.C,
+								config = { align = "cm", padding = 0.1, colour = G.C.CLEAR, minw = 3.8, minh = 1.8 },
+								nodes = {}
+							}
+						end
+
+						grid_rows[#grid_rows + 1] = {
+							n = G.UIT.R,
+							config = { align = "cm", padding = 0.05 },
+							nodes = current_row_nodes
+						}
+						current_row_nodes = {} -- Reset for the next row
+					end
+				end
+				
+				-- Instantiate Steamodded's custom ScrollBox wrapper component
+				local scrollbox = SMODS.UIScrollBox({
+					content = {
+						definition = {
+							n = G.UIT.ROOT,
+							config = { colour = G.C.CLEAR },
+							nodes = {
+								{
+									n = G.UIT.C,
+									config = { align = "cm" },
+									nodes = grid_rows,
+								}
+							}
+						},
+						config = { align = "cm" },
+					},
+					overflow = {
+						node_config = {
+							maxh = 4.5, -- Fit cleanly inside our tab box limits
+							r = 0.1,
+						},
+					},
+				})
+
+				-- Outer standard tab node return, featuring the scrollbox object and a scrollbar
+				return {
+					n = G.UIT.ROOT,
+					config = {
+						emboss = 0.05,
+						r = 0.1,
+						align = "tm",
+						padding = 0.1,
+						colour = G.C.CLEAR
+					},
+					nodes = {
+						{
+							n = G.UIT.R,
+							config = {
+								r = 0.1,
+								minw = 8.2,
+								minh = 4.7,
+								align = "tm",
+								padding = 0.1,
+								colour = G.C.BLACK
+							},
+							nodes = {
+								{
+									n = G.UIT.C,
+									config = {
+										align = "cm",
+										padding = 0.1,
+										colour = darken(G.C.BLACK, 0.2),
+										emboss = 0.05,
+										r = 0.1
+									},
+									nodes = {
+										{
+											n = G.UIT.O,
+											config = {
+												align = "cm",
+												object = scrollbox,
+											},
+										},
+										{
+											n = G.UIT.C,
+											config = { align = "cm" },
+											nodes = {
+												SMODS.GUI.scrollbar({
+													h = 4.3,
+													w = 0.15,
+													scroll_mult = 1.5,
+													colour = G.C.GREEN,
+													bg_colour = G.C.BLACK,
+													scroll_collision_obj = scrollbox,
+												}),
+											},
+										},
+									}
+								},
+							}
+						},
+					}
+				}
+			end
+		}
+	}
+end
+
+-------------------------------------------------------------------
+-- 1. UI INJECTION & BOSS MAPPING
+-------------------------------------------------------------------
+Fortlatro_Practice = Fortlatro_Practice or {}
+
+-- Lookup table linking Boss Blind keys to their corresponding functions
+Fortlatro_Practice.boss_actions = {
+    ['bl_fn_DarkVoyager'] = function() G.FUNCS.start_dodge_game() end,
+    ['bl_fn_Atlas']       = function() G.FUNCS.start_defense_game() end,
+    ['bl_fn_Bomb']        = function() G.FUNCS.start_pipe_game() end,
+    ['bl_fn_Delulu']      = function()
+        MicMod.active = true
+        G.GAME.MicLevel = 50
+        G.GAME.InitialCooldown = 2.0
+        G.GAME.YapCount = 0
+        MicMod.devices = love.audio.getRecordingDevices()
+        for _, mic in ipairs(MicMod.devices) do
+            mic:start(2048, 44100, 16)
+        end
+    end
+}
+
+Fortlatro_Practice.create_UIBox_blind_choice_ref = create_UIBox_blind_choice
+
+function create_UIBox_blind_choice(type, run_info)
+    -- Build default UI table
+    local t = Fortlatro_Practice.create_UIBox_blind_choice_ref(type, run_info)
+
+    -- Fetch active boss choice key
+    local current_boss = G.GAME and G.GAME.round_resets and G.GAME.round_resets.blind_choices and G.GAME.round_resets.blind_choices.Boss
+
+    -- Target all valid Fortlatro Bosses dynamically
+    if type == 'Boss' and current_boss and Fortlatro_Practice.boss_actions[current_boss] then
+
+        -- Construct Blue "PRACTICE" Button
+        local custom_button = {
+            n = G.UIT.R,
+            config = { align = "cm", padding = 0.05 },
+            nodes = {
+                {
+                    n = G.UIT.C,
+                    config = {
+                        align = "cm",
+                        padding = 0.05,
+                        button = "custom_boss_practice",
+                        colour = G.C.BLUE,
+                        hover = true,
+                        shadow = true,
+                        r = 0.1,
+                        minw = 2.4,
+                        minh = 0.8,
+                    },
+                    nodes = {
+                        {
+                            n = G.UIT.R,
+                            config = { align = "cm" },
+                            nodes = {
+                                {
+                                    n = G.UIT.T,
+                                    config = {
+                                        text = "PRACTICE",
+                                        scale = 0.35,
+                                        colour = G.C.WHITE,
+                                        shadow = true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        -- Break out of column container and place under 'Up the Ante'
+        if t and t.nodes then
+            local old_nodes = t.nodes
+            t.nodes = {
+                {
+                    n = G.UIT.C,
+                    config = { align = "cm" },
+                    nodes = {
+                        { n = G.UIT.R, config = { align = "cm" }, nodes = old_nodes },
+                        custom_button
+                    }
+                }
+            }
+        end
+    end
+
+    return t
+end
+
+
+-------------------------------------------------------------------
+-- 2. DYNAMIC BUTTON ACTION HANDLER
+-------------------------------------------------------------------
+G.FUNCS.custom_boss_practice = function(e)
+    stop_use()
+    G.CONTROLLER.locks.custom_boss_practice = true
+
+    G.E_MANAGER:add_event(Event({
+        no_delete = true,
+        trigger = 'after',
+        blocking = false,
+        blockable = false,
+        delay = 0.5,
+        timer = 'TOTAL',
+        func = function()
+            G.CONTROLLER.locks.custom_boss_practice = nil
+            return true
+        end
+    }))
+
+    play_sound('button')
+
+    -- Fetch current Boss and execute mapped practice action
+    G.E_MANAGER:add_event(Event({
+        trigger = 'immediate',
+        func = function()
+            G.GAME.Practice = true
+            
+            local current_boss = G.GAME and G.GAME.round_resets and G.GAME.round_resets.blind_choices and G.GAME.round_resets.blind_choices.Boss
+            if current_boss and Fortlatro_Practice.boss_actions[current_boss] then
+                Fortlatro_Practice.boss_actions[current_boss]()
+            end
+
+            return true
+        end
+    }))
+end
+
 ------------IMPLEMENT ACHIEVEMENTS------------------------
 
 SMODS.Atlas({
@@ -3684,6 +4893,7 @@ SMODS.Achievement({
 	pos = { x = 1, y = 27},
 	hidden_pos = { x = 0, y = 27 },
     atlas = "fnawards",
+	reset_on_startup = true,
     unlock_condition = function(self, args)
 		if args.type == "ach_arcade" then return true end
 	end,
@@ -16058,14 +17268,14 @@ function Game:update(dt)
 
 
     --Ned Game Cleanup
-    if G.STATE == 8 or G.STATE == 6 or G.STATE == G.STATES.SELECTING_HAND or G.STATE == G.STATES.BLIND_SELECT then
+    if G.STATE == 8 or G.STATE == 6 or G.STATE == G.STATES.SELECTING_HAND or G.STATE == G.STATES.BLIND_SELECT and not G.GAME.Practice then
         if G.FIND_GAME.active then
 			G.FIND_GAME.active = false
 		end
     end
 	
 	--Dodge Game Cleanup
-	if G.STATE == 8 or G.STATE == 6 or G.STATE == G.STATES.BLIND_SELECT then
+	if G.STATE == 8 or G.STATE == G.STATES.BLIND_SELECT and not G.GAME.Practice then
 		if G.DODGE_GAME.active then
 			G.DODGE_GAME.active = false
 			G.DODGE_GAME.beams = {} 
@@ -16074,9 +17284,16 @@ function Game:update(dt)
 	end
 	
 	--Find Game Cleanup
-	if G.STATE == 8 or G.STATE == 6 or G.STATE == G.STATES.BLIND_SELECT then
+	if G.STATE == 8 or G.STATE == G.STATES.BLIND_SELECT and not G.GAME.Practice then
 		if G.DEFENSE_GAME.active then
 			G.DEFENSE_GAME.active = false
+		end
+	end
+	
+	--Pipe Game Cleanup
+	if G.STATE == 8 or G.STATE == G.STATES.BLIND_SELECT and not G.GAME.Practice then
+		if G.PIPE_GAME.active then
+			G.PIPE_GAME.active = false
 		end
 	end
 end
@@ -16354,6 +17571,7 @@ SMODS.Joker{
 		--start the minigame
 		if context.setting_blind then
             G.FUNCS.start_carnival_game()
+			G.GAME.Practice = false
         end
 		
 		--reset score so they have to play again
@@ -30074,18 +31292,36 @@ if config.blinds ~= false then
     SMODS.Blind {
         loc_txt = {
             name = 'No Sweat Insurance',
-            text = { 'Mult cannot go above $', }
+            text = { 'Mult cannot go above current $' }
         },
-        key = 'Insurance', --know that im the best in policy
+        key = 'Insurance', -- know that im the best in policy
         name = 'No Sweat Insurance',
         config = {},
-        boss = { showdown = true, min = 10, max = 10, hardcore = true},
-		showdown = true,
+        boss = { showdown = true, min = 10, max = 10, hardcore = true },
+        showdown = true,
         boss_colour = HEX("065291"),
         atlas = "Blinds",
         pos = { x = 0, y = 12 },
         dollars = 10,
-		
+        
+        -- Dynamically inject the player's current dollars into the description
+        loc_vars = function(self, info_queue, card)
+            local limit = G.GAME and G.GAME.dollars or 0
+            return { vars = { limit } }
+        end,
+        
+        -- The logic is now entirely handled right here
+        calculate = function(self, card, context)
+            if context.final_scoring_step then
+                local limit = to_big(G.GAME.dollars)
+                if limit < to_big(mult) then
+                    mult = limit
+                    -- Trigger a neat visual effect so the player knows the blind activated
+                    update_hand_text({delay = 0}, {mult = mult})
+                    G.GAME.blind:wiggle()
+                end
+            end
+        end,
     }
 end
 
@@ -30155,6 +31391,7 @@ if config.blinds ~= false then
 
         calculate = function(self, card, context)
             if context.setting_blind and not G.GAME.blind.disabled then
+				G.GAME.Practice = false
                 MicMod.active = true
                 G.GAME.MicLevel = 50
                 G.GAME.InitialCooldown = 2.0
@@ -30185,6 +31422,7 @@ function Game:start_run(args)
     G.GAME.MicConfirmed = G.GAME.MicConfirmed or false
 
     if G.GAME.blind and G.GAME.blind.name == 'Delulu' and not G.GAME.blind.disabled and G.STATE ~= 8 then
+		G.GAME.Practice = false
         MicMod.active = true
         G.GAME.MicLevel = 50
         G.GAME.InitialCooldown = 2.0
@@ -30263,11 +31501,10 @@ function Game:update(dt)
             end
 
             if G.GAME.MicLevel <= 0 and G.STATE ~= G.STATES.GAME_OVER and G.STATE ~= 2 then
-                if G.GAME.chips >= G.GAME.blind.chips then G.GAME.chips = (G.GAME.blind.chips * 0.50) end
-                G.STATE = G.STATES.HAND_PLAYED
-                G.STATE_COMPLETE = true
-                end_round()
                 MicMod.active = false 
+				if not G.GAME.Practice then
+					G.GAME.ForcedFail = true
+				end
             end
         end
 
@@ -30315,6 +31552,9 @@ end
 ----------------------------------------------
 ------------DELULU CODE END----------------------
 
+----------------------------------------------
+------------DARK PRESCENSE CODE BEGIN----------------------
+
 if config.blinds ~= false then
     SMODS.Blind {
         loc_txt = {
@@ -30356,6 +31596,12 @@ if config.blinds ~= false then
     }
 end
 
+----------------------------------------------
+------------DARK PRESCENSE CODE END----------------------
+
+----------------------------------------------
+------------DARK VOYAGER CODE BEGIN----------------------
+
 if config.blinds ~= false then
     SMODS.Blind {
         loc_txt = {
@@ -30374,6 +31620,7 @@ if config.blinds ~= false then
 		
 		calculate = function(self, card, context)
 			if context.first_hand_drawn and not G.GAME.blind.disabled then
+				G.GAME.Practice = false
 				G.FUNCS.start_dodge_game()
 			end
         end,
@@ -30386,6 +31633,12 @@ if config.blinds ~= false then
 		
     }
 end
+
+----------------------------------------------
+------------DARK VOYAGER CODE END----------------------
+
+----------------------------------------------
+------------FIGHT THE STORM CODE BEGIN----------------------
 
 if config.blinds ~= false then
     SMODS.Blind {
@@ -30405,6 +31658,7 @@ if config.blinds ~= false then
 		
 		calculate = function(self, card, context)
 			if context.first_hand_drawn and not G.GAME.blind.disabled then
+				G.GAME.Practice = false
 				G.FUNCS.start_defense_game()
 			end
         end,
@@ -30414,6 +31668,12 @@ if config.blinds ~= false then
         end,
     }
 end
+
+----------------------------------------------
+------------FIGHT THE STORM CODE END----------------------
+
+----------------------------------------------
+------------IMPOSTORS CODE BEGIN----------------------
 
 -- ==========================================
 -- Impostors Failure Popup Helper
@@ -30661,6 +31921,45 @@ function Game:update_game_over(dt)
         old_update_game_over(self, dt)
     end
 end
+
+----------------------------------------------
+------------IMPOSTORS CODE END----------------------
+
+----------------------------------------------
+------------DELIVER THE BOMB CODE BEGIN----------------------
+
+if config.blinds ~= false then
+    SMODS.Blind {
+        loc_txt = {
+            name = 'Deliver The Bomb',
+            text = { 'Connect the Armory', 'to the Launcher' }
+        },
+        key = 'Bomb', 
+        name = 'Deliver The Bomb',
+        config = {},
+        boss = { min = 1, max = 10, hardcore = true },
+		showdown = true,
+        boss_colour = HEX("a5a19c"),
+        atlas = "Blinds",
+        pos = { x = 0, y = 19 },
+        dollars = 10,
+		
+		calculate = function(self, card, context)
+			if context.first_hand_drawn and not G.GAME.blind.disabled then
+				G.GAME.Practice = false
+				G.FUNCS.start_pipe_game()
+			end
+        end,
+		
+		disable = function(self)
+            G.PIPE_GAME.active = false
+        end,
+    }
+end
+
+----------------------------------------------
+------------DELIVER THE BOMB CODE END----------------------
+
 ----------------------------------------------
 ------------STORM SEAL CODE BEGIN----------------------
 
@@ -32549,35 +33848,47 @@ SMODS.Sticker {
     if not card.ability.based_aura_extra then 
       card.ability.based_aura_extra = { chips = 5, mult = 1 } 
     end
-    local extra = card.ability.based_aura_extra
 
-    if context.before and context.cardarea == G.play and not context.individual then
-        
-      context.other_card.ability.perma_bonus = (context.other_card.ability.perma_bonus or 0) + extra.chips
-      context.other_card.ability.perma_mult = (context.other_card.ability.perma_mult or 0) + extra.mult
-      
-      -- Find this card's index inside the scoring hand
+    -- Fire during individual scoring of cards played in G.play
+    if context.cardarea == G.play and context.main_scoring then
+      local extra = card.ability.based_aura_extra
+
+      -- Find this card's index in the scoring hand
       local idx
-      for i, v in ipairs(context.scoring_hand) do
-        if v == card then
-          idx = i
-          break
+      if context.scoring_hand then
+        for i, v in ipairs(context.scoring_hand) do
+          if v == card then
+            idx = i
+            break
+          end
         end
       end
-      if not idx then return end
 
-      -- Adjacent card indices
-      local adj = {
-        context.scoring_hand[idx - 1],
-        context.scoring_hand[idx + 1]
+      -- 1. Permastat self
+      card.ability.perma_bonus = (card.ability.perma_bonus or 0) + extra.chips
+      card.ability.perma_mult = (card.ability.perma_mult or 0) + extra.mult
+
+      -- 2. Permastat adjacent cards in scoring hand
+      if idx and context.scoring_hand then
+        local left_card = context.scoring_hand[idx - 1]
+        if left_card then
+          left_card.ability.perma_bonus = (left_card.ability.perma_bonus or 0) + extra.chips
+          left_card.ability.perma_mult = (left_card.ability.perma_mult or 0) + extra.mult
+        end
+
+        local right_card = context.scoring_hand[idx + 1]
+        if right_card then
+          right_card.ability.perma_bonus = (right_card.ability.perma_bonus or 0) + extra.chips
+          right_card.ability.perma_mult = (right_card.ability.perma_mult or 0) + extra.mult
+        end
+      end
+
+      -- 3. Return the score calculation table so Balatro displays the immediate score popup
+      return {
+        chips = extra.chips,
+        mult = extra.mult,
+        card = card
       }
-
-      for _, adj_card in ipairs(adj) do
-        if adj_card then
-          adj_card.ability.perma_bonus = (adj_card.ability.perma_bonus or 0) + extra.chips
-          adj_card.ability.perma_mult = (adj_card.ability.perma_mult or 0) + extra.mult
-        end
-      end
     end
   end
 }
