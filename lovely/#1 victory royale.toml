@@ -1,0 +1,45 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 9
+
+[[patches]]
+[patches.pattern]
+target = "functions/misc_functions.lua"
+pattern = "if sound_code and G.SETTINGS.SOUND.volume > 0.001 then"
+position = "after"
+payload = '''
+-- This handles the random victory sound selection for Fortlatro
+if sound_code == "win" then
+    local victory_sounds = {"victory", "victory2", "victory3", "victory4", "boogie"}
+    sound_code = victory_sounds[math.random(#victory_sounds)]
+    
+    per = per or 1
+    vol = vol or 1
+    SOURCES[sound_code] = SOURCES[sound_code] or {}
+    local should_stream = (string.find(sound_code,'music') or string.find(sound_code,'ambient'))
+    local s = {sound = love.audio.newSource("Mods/Fortlatro/assets/sounds/"..sound_code..'.ogg', should_stream and "stream" or 'static')}
+    table.insert(SOURCES[sound_code], s)
+    s.sound_code = sound_code
+    s.original_pitch = per or 1
+    s.original_volume = vol or 1
+    s.created_on_pause = (G.ARGS.play_sound.overlay_menu and true or false)
+    s.created_on_state = G.ARGS.play_sound.state
+    s.sfx_handled = 0
+    s.transition_timer = 0
+    SET_SFX(s, G.ARGS.play_sound)
+    love.audio.play(s.sound)
+    return s
+end
+'''
+match_indent = true
+overwrite = false
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = '''init_localization()'''
+position = "before"
+payload = '''self.localization.misc.dictionary.ph_you_win = "#1 VICTORY ROYALE!"'''
+match_indent = true
+overwrite = false

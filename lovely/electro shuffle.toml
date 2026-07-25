@@ -1,0 +1,53 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 214748364
+
+# Grappler
+# Move most recently added cards to top of deck after shuffling
+# CardArea:shuffle()
+[[patches]]
+[patches.pattern]
+target = "cardarea.lua"
+pattern = "pseudoshuffle(self.cards, pseudoseed(_seed or 'shuffle'))"
+position = "after"
+payload = '''
+if self == G.deck then
+    local grapplers = SMODS.find_card("j_fn_Grappler")
+    if #grapplers > 0 then
+        -- Determine how many cards to move (handling potential blueprints/buffs)
+        local count = 0
+        for _, v in ipairs(grapplers) do
+            count = count + (v.ability.extra.cards or 5)
+        end
+
+        -- Create a temporary list of cards that have IDs
+        local tagged_cards = {}
+        for i = #self.cards, 1, -1 do
+            if self.cards[i].ability.grappler_id then
+                table.insert(tagged_cards, self.cards[i])
+            end
+        end
+
+        -- Sort tagged cards by ID (descending: highest/newest first)
+        table.sort(tagged_cards, function(a, b) 
+            return (a.ability.grappler_id or 0) > (b.ability.grappler_id or 0) 
+        end)
+
+        -- Take the top X cards from our sorted list
+        local targets = {}
+        for i = 1, math.min(count, #tagged_cards) do
+            targets[tagged_cards[i]] = true
+        end
+
+        -- Pull them out of the deck and re-insert them at the end (the top)
+        for i = #self.cards, 1, -1 do
+            if targets[self.cards[i]] then
+                local card = table.remove(self.cards, i)
+                table.insert(self.cards, card)
+            end
+        end
+    end
+end
+'''
+match_indent = true

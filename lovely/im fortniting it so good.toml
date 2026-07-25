@@ -1,0 +1,128 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 1
+
+########################################
+# Pool Modifications – Fortlatro Only
+########################################
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if add and not G.GAME.banned_keys[v.key] then'''
+position = "before"
+match_indent = true
+payload = '''
+if G.GAME.selected_back
+and G.GAME.selected_back.effect
+and G.GAME.selected_back.effect.center.key == "b_fn_FortniteDeck" then
+    if not v.mod or v.mod.id ~= "Fortlatro" then
+        add = false
+    end
+end
+'''
+
+########################################
+# Boss Pool Filtering – Fortlatro Only
+########################################
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''local min_use = 100'''
+position = "before"
+match_indent = true
+payload = '''
+if G.GAME.selected_back
+and G.GAME.selected_back.effect
+and G.GAME.selected_back.effect.center.key == "b_fn_FortniteDeck" then
+    for k, v in pairs(eligible_bosses) do
+        if eligible_bosses[k]
+        and (not G.P_BLINDS[k].mod or G.P_BLINDS[k].mod.id ~= "Fortlatro") then
+            eligible_bosses[k] = nil
+        end
+    end
+end
+'''
+
+########################################
+# Empty Pool Fallback – Random Fortlatro Joker (No Repeats)
+########################################
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if _pool_size == 0 then'''
+position = "before"
+match_indent = true
+payload = '''
+if _pool_size == 0
+and G.GAME.selected_back
+and G.GAME.selected_back.effect
+and G.GAME.selected_back.effect.center.key == "b_fn_FortniteDeck" then
+
+    -- Initialize used defaults table if needed
+    G.GAME.used_defaults = G.GAME.used_defaults or {}
+
+    local Fortlatro_joker_pool = {}
+    local all_possible = {}
+
+    -- Collect all valid Fortlatro jokers
+    for k, v in pairs(G.P_CENTERS) do
+        if v.set == "Joker"
+        and v.rarity
+        and v.rarity ~= 4
+        and v.rarity ~= 3
+        and v.mod
+        and v.mod.id == "Fortlatro" then
+            all_possible[#all_possible + 1] = k
+
+            -- Only include unused jokers
+            if not G.GAME.used_defaults[k] then
+                Fortlatro_joker_pool[#Fortlatro_joker_pool + 1] = k
+            end
+        end
+    end
+
+    -- If all possible defaults have been used, reset tracking
+    if #Fortlatro_joker_pool == 0 and #all_possible > 0 then
+        G.GAME.used_defaults = {}
+        Fortlatro_joker_pool = all_possible
+    end
+
+    -- Pick a random unused (or reset) joker
+    if #Fortlatro_joker_pool > 0 then
+        local choice = Fortlatro_joker_pool[math.random(#Fortlatro_joker_pool)]
+
+        -- Mark as used
+        G.GAME.used_defaults[choice] = true
+
+        _pool = { choice }
+        _pool_size = 1
+    end
+end
+'''
+
+
+########################################
+# Booster Pack Filtering – Fortlatro Only
+########################################
+
+[[patches]]
+[patches.pattern]
+target = '=[SMODS _ "src/overrides.lua"]'
+pattern = '''
+if add and not G.GAME.banned_keys[v.key] then cume = cume + (v.current_weight or 1); temp_in_pool[v.key] = true end
+'''
+position = "before"
+match_indent = true
+payload = '''
+if G.GAME.selected_back
+and G.GAME.selected_back.effect
+and G.GAME.selected_back.effect.center.key == "b_fn_FortniteDeck" then
+    if not v.mod or v.mod.id ~= "Fortlatro" then
+        add = false
+    end
+end
+'''
