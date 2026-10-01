@@ -166,6 +166,13 @@ return {
                 }
             },
 			
+			fn_Fortnitemares = {
+                name = "Fortnitemares",
+                text = {
+                    "This content is limited time for Fortnitemares",
+                }
+            },
+			
 			fn_sweaty_sticker = {
 				name = "Sweaty Stake",
 				text = {
