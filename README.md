@@ -5,7 +5,7 @@
 # Fortlatro
 a terrible Fortnite themed Balatro mod
 featuring as of right now 
-# 170 Jokers
+# 183 Jokers
 Eric - Legendary - Create 3 random Jokers no need to have room lose $5 at the end of round
 
 Crac - Rare - 1/13 chance to do something random (he has ALOT of abilities check the horrible code yourself if you wanna see) (can turn into GOOD or EVIL Crac)
@@ -20,9 +20,9 @@ Zorlodo Blue - Legendary - Gain +1 joker slots every ante
 
 Zorlodo Red - Rare - Destroy the joker on the right and replace it with another random joker every round
 
-Dr.AV - Rare - When an LTM Card is used 1/2 chance to create a copy (Copies cannot be copied)
-
 Kxtty - Legendary - Adjacent Jokers become negative when blind is selected
+
+Gavinia - Rare - Play KovaaKs for Xmult
 
 Toilet Gang - Uncommon - Gains x0.2 mult every time played hand contains a Flush
 
@@ -348,6 +348,32 @@ Peanut Sprite - Uncommon - 1/2 chance to create a random sprite at end of round 
 
 Demon Sprite - Rare - Add 25% of current chips to mult
 
+Boss Sprite - Uncommon - +1 Hands +1 Discards
+
+Air Sprite - Uncommon - +2 handsize X1.2 blind requirement
+
+Gloss Goblin - Uncommon - Played Queens have a 1/4 chance to gain a random enhancement enhanced queens give +10 Mult
+
+Nuka-Cola - Common - +1 Mult per year since a fallout game featuring Nuka-Cola
+
+Jonesy Sprite - Uncommon - Every 2 discards gain +1 hand
+
+Adventure Sprite - Uncommon - 3 random cards in hand gain +10 Chips at end of round
+
+Sonic Sprite - Uncommon - +20 Mult -1 Mult every second until 0 playing a hand resets this
+
+8 Bit Shotgun - Uncommon - Gain Chips equal to 25% of your hand's score reset at end of ante
+
+Lootin' Llama - Uncommon - Card editions appear 50% more often
+
+Relevancy Test Joker - Common - +100 Chips You cannot add any more Jokers or Consumables
+
+Arcade Machine - Rare - All bosses are replaced with Minigame Bosses gain X1 Mult per Boss Minigame beaten
+
+Seven Sprite - Uncommon - Hovering over a booster pack reveals its contents BEFORE you open it
+
+Pumpkin Launcher - Uncommon - +2 Mult per card destroyed this run
+
 # 9 Decks
 Eric Deck - Start with Eric
 
@@ -502,7 +528,7 @@ Thorne Ring - Make all Jokers Polychrome and Eternal
 
 Floppy Disk - Select any owned Joker to save it you can retrieve the saved joker in the future
 
-# 65 LTM Cards
+# 73 LTM Cards
 Eric's Sword - Apply a random edition to up to 5 selected Cards
 
 Eric's 3D Glasses - Apply Anaglyphic to up to 3 selected Cards
@@ -635,6 +661,22 @@ Tracers Pistols - does Something? to the current score
 
 Sprite Chest - Spawn a random Sprite Joker (Must have room)
 
+Zero Point Pretzel - All cards in hand gain Zero Point Seal
+
+Hop Drop - All cards in hand gain Hop Seal
+
+Peppermint - +1 Gamespeed
+
+Jellybean - All held cards gain +10 Chips
+
+Thermal Taffy - You can see +2 more cards from the top of your deck
+
+Candy Corn - Next played hand gives X10 Mult -X1 Mult every second once used 
+
+Candy Bucket - Create 2 random candy consumables
+
+Witch's Broom - Discard your entire hand then draw a new hand
+
 # 15 Enhancements
 Crystal - 1.5X Mult +50 Chips no rank or suit 1/6 chance to break
 
@@ -721,7 +763,7 @@ Overshield Tag - Next base edition shop Joker is free and becomes Overshielded
 
 Cel Tag - Next base edition shop Joker is free and becomes Cel Shaded
 
-# 20 Blinds
+# 24 Blinds
 Fracture - All played cards are destroyed
 
 Zero Build - Wood, Brick and Metal are debuffed
@@ -765,6 +807,14 @@ Impostors - Add 10 impostor cards to your deck hands containing impostor cards d
 
 Deliver The Bomb - Connect the armory to the launcher
 
+Unstable - Receive constant random ads
+
+Tetris Rift - Win without losing in Tetris
+
+Streamed Assets - Shuffle and corrupt all card graphics
+
+Lightners Live - Play Lightners Live and score a C or better to live
+
 # 1 Stake
 Sweaty Stake - Finish the run at Ante 16 Finisher blinds appear every attention 8 antes
 
@@ -773,3 +823,4 @@ additional content with:
 [ortalab](https://github.com/EremelMods/Ortalab/tree/498cbebaa0226853b76a8d2475717ad393fa5682)
 [cryptid](https://github.com/MathIsFun0/Cryptid)
 [multiplayer](https://github.com/Balatro-Multiplayer/BalatroMultiplayer)
+[deltalatro](https://github.com/IrisCantArt/Deltalatro)
