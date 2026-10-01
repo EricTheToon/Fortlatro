@@ -3,6 +3,7 @@
 	"name": "Fortlatro",
 	"author": [
 		"EricTheToon",
+		"IrisCantArt,"
 
 	],
 	"description": " A terribly coded mod to add Fortnite themed stuff + stuff for my friends to Balatro.",
@@ -11,7 +12,7 @@
 	"priority": -10,
 	"badge_colour": "672A62",
 	"badge_text_colour": "",
-	"version": "1.2.6",
+	"version": "1.2.7",
 	"dependencies": [
 		"Steamodded (>=1.0.0~BETA-1503a)",
 		"Talisman (>=2.7)",
