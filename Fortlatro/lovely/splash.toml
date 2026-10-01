@@ -25,7 +25,12 @@ if G.STAGE == G.STAGES.MAIN_MENU and not G.fort_splash then
 	G.DODGE_GAME.shake_timer = 0
 	G.DEFENSE_GAME.active = false
 	G.PIPE_GAME.active = false
+	G.KOVAAK_GAME.active = false
 	G.GAME.Practice = true
+	Fortlatro.clear_ads()
+	if G.LIGHTNERS_LIVE_GAME and G.LIGHTNERS_LIVE_GAME.active then
+		G.LIGHTNERS_LIVE_GAME.active = false
+	end
     if Fortlatro and Fortlatro.initialize_splashtext then
         Fortlatro.initialize_splashtext()
     end

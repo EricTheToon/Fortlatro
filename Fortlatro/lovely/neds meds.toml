@@ -1,0 +1,26 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -1
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''
+                    func = function()
+                        G.FUNCS.evaluate_play()
+                        return true
+                    end'''
+position = "at"
+payload = '''
+func = function()
+    if G.FUNCS.find_game_gate() then
+        return false
+    end
+    G.FIND_GAME.active = false
+    G.FIND_GAME.answered = false
+    G.FUNCS.evaluate_play()
+    return true
+end
+'''
+match_indent = true

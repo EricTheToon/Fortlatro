@@ -47,7 +47,7 @@ end
 '''
 
 ########################################
-# Empty Pool Fallback – Random Fortlatro Joker (No Repeats)
+# Empty Pool Fallback – Weighted Fortlatro Joker (No Repeats, Respects in_pool)
 ########################################
 
 [[patches]]
@@ -67,39 +67,69 @@ and G.GAME.selected_back.effect.center.key == "b_fn_FortniteDeck" then
 
     local Fortlatro_joker_pool = {}
     local all_possible = {}
+    local total_weight = 0
 
-    -- Collect all valid Fortlatro jokers
+    -- Collect all valid Fortlatro jokers (excluding Legendaries) that pass their in_pool check
     for k, v in pairs(G.P_CENTERS) do
         if v.set == "Joker"
         and v.rarity
-        and v.rarity ~= 4
-        and v.rarity ~= 3
+        and v.rarity ~= 4  -- Exclude Legendaries
         and v.mod
         and v.mod.id == "Fortlatro" then
-            all_possible[#all_possible + 1] = k
+            
+            -- Check if custom in_pool allows it to spawn right now
+            local can_spawn = true
+            if v.in_pool and type(v.in_pool) == "function" then
+                can_spawn = v.in_pool(v)
+            end
 
-            -- Only include unused jokers
-            if not G.GAME.used_defaults[k] then
-                Fortlatro_joker_pool[#Fortlatro_joker_pool + 1] = k
+            if can_spawn then
+                -- Assign weight based on rarity (Common=8, Uncommon=4, Rare=2)
+                local rarity = v.rarity or 1
+                local weight = 8
+                if rarity == 2 then weight = 4
+                elseif rarity == 3 then weight = 2 end
+
+                all_possible[#all_possible + 1] = { key = k, weight = weight }
+
+                -- Only include unused jokers for the primary roll pool
+                if not G.GAME.used_defaults[k] then
+                    Fortlatro_joker_pool[#Fortlatro_joker_pool + 1] = { key = k, weight = weight }
+                    total_weight = total_weight + weight
+                end
             end
         end
     end
 
-    -- If all possible defaults have been used, reset tracking
+    -- If all possible defaults have been used, reset tracking and rebuild pool weights
     if #Fortlatro_joker_pool == 0 and #all_possible > 0 then
         G.GAME.used_defaults = {}
-        Fortlatro_joker_pool = all_possible
+        for _, item in ipairs(all_possible) do
+            Fortlatro_joker_pool[#Fortlatro_joker_pool + 1] = item
+            total_weight = total_weight + item.weight
+        end
     end
 
-    -- Pick a random unused (or reset) joker
-    if #Fortlatro_joker_pool > 0 then
-        local choice = Fortlatro_joker_pool[math.random(#Fortlatro_joker_pool)]
+    -- Pick a random unused (or reset) joker using weighted distribution
+    if #Fortlatro_joker_pool > 0 and total_weight > 0 then
+        local roll = pseudorandom('fortlatro_fallback') * total_weight
+        local chosen_sprite = nil
 
-        -- Mark as used
-        G.GAME.used_defaults[choice] = true
+        for _, item in ipairs(Fortlatro_joker_pool) do
+            roll = roll - item.weight
+            if roll <= 0 then
+                chosen_sprite = item.key
+                break
+            end
+        end
 
-        _pool = { choice }
-        _pool_size = 1
+        if chosen_sprite then
+            -- Mark as used
+            G.GAME.used_defaults[chosen_sprite] = true
+
+            _pool = { chosen_sprite }
+            _pool_size = 1
+        end
     end
 end
 '''

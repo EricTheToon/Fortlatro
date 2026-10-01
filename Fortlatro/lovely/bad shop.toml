@@ -4,24 +4,29 @@ dump_lua = true
 priority = -11
 
 # =========================
-# After cash-out go to BLIND_SELECT
+# Intercept cash-out to trigger Mysterious Rift
 # =========================
 
 [[patches]]
 [patches.pattern]
 target = 'functions/button_callbacks.lua'
-pattern = '''G.STATE = G.STATES.SHOP'''
+pattern = 'G.STATE = G.STATES.SHOP'
 position = 'at'
 match_indent = true
 payload = '''
--- Force BLIND_SELECT after cash-out
 if G.GAME.Burger and G.GAME.Burger > 0 then
-    --print("[Fortlatro] Redirecting to BLIND_SELECT after cash-out")
-	G.GAME.Burger = G.GAME.Burger - 1
+    G.GAME.Burger = G.GAME.Burger - 1
     G.STATE = G.STATES.BLIND_SELECT
 else
-	G.GAME.ForcedFail = false
-	G.GAME.ForcedFailTriggered = false
-    G.STATE = G.STATES.SHOP
+    G.GAME.ForcedFail = false
+    G.GAME.ForcedFailTriggered = false
+    
+    -- 1 in 10 chance (10%) to trigger the Mysterious Rift
+    if math.random(1, 10) == 6 then
+        G.STATE = 6942067
+        G.FUNCS.overlay_mysterious_rift()
+    else
+        G.STATE = G.STATES.SHOP
+    end
 end
 '''
